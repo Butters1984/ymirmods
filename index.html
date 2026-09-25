@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>YMIR Mods</title>
 
@@ -18,10 +12,10 @@
   />
 
   <style>
-
     :root {
       --bg: #07090d;
       --bg2: #0b1117;
+
       --panel: rgba(18, 21, 27, 0.94);
 
       --text: #f4e5b5;
@@ -36,11 +30,10 @@
       --line: rgba(255, 192, 76, 0.15);
 
       --shadow:
-        0 20px 60px rgba(0,0,0,0.45);
+        0 20px 60px rgba(0, 0, 0, 0.45);
 
       --max: 1220px;
     }
-
 
     * {
       box-sizing: border-box;
@@ -48,11 +41,9 @@
       padding: 0;
     }
 
-
     html {
       scroll-behavior: smooth;
     }
-
 
     body {
       min-height: 100vh;
@@ -68,25 +59,21 @@
       color: var(--text);
 
       background:
-
         radial-gradient(
           circle at 15% 20%,
           rgba(255,180,60,0.10),
           transparent 23%
         ),
-
         radial-gradient(
           circle at 82% 18%,
           rgba(255,120,0,0.09),
           transparent 20%
         ),
-
         radial-gradient(
           circle at 78% 72%,
           rgba(255,196,80,0.07),
           transparent 19%
         ),
-
         linear-gradient(
           180deg,
           #05070a,
@@ -96,24 +83,19 @@
         );
     }
 
-
     body::before {
       content: "";
-
       position: fixed;
       inset: 0;
-
       pointer-events: none;
       z-index: 0;
 
       background:
-
         radial-gradient(
           circle at 50% 0%,
           rgba(255,189,74,0.08),
           transparent 45%
         ),
-
         radial-gradient(
           circle at 10% 60%,
           rgba(255,110,0,0.05),
@@ -121,17 +103,14 @@
         );
     }
 
-
     a {
       color: inherit;
       text-decoration: none;
     }
 
-
     button {
       font-family: inherit;
     }
-
 
     .container {
       width:
@@ -146,7 +125,6 @@
       z-index: 2;
     }
 
-
     /* =====================================================
        GALAXY
        ===================================================== */
@@ -156,15 +134,14 @@
       inset: 0;
 
       overflow: hidden;
+
       pointer-events: none;
 
       z-index: 0;
     }
 
-
     .galaxy-star {
       position: absolute;
-
       display: block;
 
       width: var(--star-size);
@@ -197,14 +174,12 @@
         var(--delay);
     }
 
-
     .galaxy-star.aesir-star {
       box-shadow:
         0 0 6px currentColor,
         0 0 14px currentColor,
         0 0 30px rgba(255,166,40,0.35);
     }
-
 
     @keyframes starTwinkle {
       from {
@@ -215,7 +190,6 @@
         opacity: var(--max-opacity);
       }
     }
-
 
     @keyframes starDrift {
       from {
@@ -232,7 +206,6 @@
           );
       }
     }
-
 
     /* =====================================================
        HEADER
@@ -259,26 +232,25 @@
         rgba(0,0,0,0.28);
     }
 
-
     .nav {
       min-height: 88px;
 
       display: flex;
+
       align-items: center;
 
       gap: 24px;
     }
 
-
     .header-brand {
       display: flex;
+
       align-items: center;
 
       gap: 13px;
 
       flex-shrink: 0;
     }
-
 
     .header-logo {
       width: 58px;
@@ -293,13 +265,11 @@
           0 0 8px
           rgba(255,174,35,0.45)
         )
-
         drop-shadow(
           0 0 18px
           rgba(255,110,0,0.18)
         );
     }
-
 
     .brand h1 {
       color: var(--gold2);
@@ -311,7 +281,6 @@
       letter-spacing: 1px;
     }
 
-
     .brand p {
       color: var(--muted);
 
@@ -320,18 +289,19 @@
       white-space: nowrap;
     }
 
-
     .header-actions {
       display: flex;
+
       align-items: center;
 
       gap: 9px;
     }
 
-
     .header-right {
       display: flex;
+
       align-items: center;
+
       justify-content: flex-end;
 
       gap: 22px;
@@ -339,14 +309,13 @@
       margin-left: auto;
     }
 
-
     .nav-links {
       display: flex;
+
       align-items: center;
 
       gap: 19px;
     }
-
 
     .nav-links a {
       color: #e9d6a3;
@@ -355,14 +324,18 @@
 
       font-size: 0.92rem;
 
-      transition: 0.2s ease;
+      transition:
+        color 0.2s ease,
+        text-shadow 0.2s ease;
     }
-
 
     .nav-links a:hover {
-      color: var(--gold2);
-    }
+      color: #ffe09a;
 
+      text-shadow:
+        0 0 10px
+        rgba(255,175,45,0.35);
+    }
 
     /* =====================================================
        BUTTONS
@@ -372,6 +345,7 @@
       display: inline-flex;
 
       align-items: center;
+
       justify-content: center;
 
       gap: 8px;
@@ -388,15 +362,16 @@
 
       cursor: pointer;
 
-      transition: 0.22s ease;
+      transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease;
     }
-
 
     .btn:hover {
       transform:
         translateY(-2px);
     }
-
 
     .btn.primary {
       color: #111;
@@ -409,6 +384,11 @@
         );
     }
 
+    .btn.primary:hover {
+      box-shadow:
+        0 0 18px rgba(255,190,60,0.28),
+        0 0 34px rgba(255,110,0,0.14);
+    }
 
     .btn.secondary {
       color: var(--gold2);
@@ -417,6 +397,14 @@
         rgba(255,183,77,0.06);
     }
 
+    .btn.secondary:hover {
+      border-color:
+        rgba(255,190,65,0.42);
+
+      box-shadow:
+        0 0 16px
+        rgba(255,145,20,0.14);
+    }
 
     /* =====================================================
        ACCOUNT
@@ -426,7 +414,9 @@
       min-width: 82px;
 
       display: flex;
+
       align-items: center;
+
       justify-content: flex-end;
 
       gap: 8px;
@@ -438,18 +428,15 @@
         rgba(255,194,82,0.12);
     }
 
-
     .account-loading {
       color: var(--muted);
 
       font-size: 0.78rem;
     }
 
-
     .account-login {
       display: none;
     }
-
 
     .account-user {
       display: none;
@@ -458,7 +445,6 @@
 
       gap: 8px;
     }
-
 
     .account-name {
       color: var(--gold2);
@@ -476,11 +462,11 @@
       white-space: nowrap;
     }
 
-
     .account-button {
       display: inline-flex;
 
       align-items: center;
+
       justify-content: center;
 
       min-height: 35px;
@@ -503,7 +489,6 @@
       cursor: pointer;
     }
 
-
     .account-button.login {
       background:
         linear-gradient(
@@ -517,7 +502,6 @@
       border: none;
     }
 
-
     .account-button.logout {
       color: #ffc5b6;
 
@@ -527,7 +511,6 @@
       background:
         rgba(170,50,35,0.08);
     }
-
 
     /* =====================================================
        HERO
@@ -542,7 +525,6 @@
       z-index: 2;
     }
 
-
     .hero-grid {
       display: grid;
 
@@ -554,11 +536,9 @@
       align-items: start;
     }
 
-
     .hero-copy {
       padding-top: 25px;
     }
-
 
     .eyebrow {
       display: inline-block;
@@ -579,8 +559,11 @@
       color: var(--gold2);
 
       font-weight: 700;
-    }
 
+      box-shadow:
+        0 0 18px
+        rgba(255,145,20,0.08);
+    }
 
     .hero h2 {
       font-size:
@@ -597,10 +580,12 @@
       color: #f3db9d;
 
       text-shadow:
-        0 0 28px
-        rgba(255,183,77,0.16);
-    }
+        0 0 18px
+        rgba(255,205,110,0.18),
 
+        0 0 38px
+        rgba(255,125,10,0.10);
+    }
 
     .hero-copy > p {
       color: #d6c08d;
@@ -610,7 +595,6 @@
       max-width: 760px;
     }
 
-
     /* =====================================================
        LAST UPDATED MODS
        ===================================================== */
@@ -619,15 +603,17 @@
       width: 100%;
     }
 
-
     .last-updated-title {
       color: var(--gold2);
 
       font-size: 1.85rem;
 
       margin-bottom: 16px;
-    }
 
+      text-shadow:
+        0 0 12px
+        rgba(255,190,70,0.12);
+    }
 
     .last-updated-grid {
       display: grid;
@@ -637,7 +623,6 @@
 
       gap: 14px;
     }
-
 
     .last-mod-card {
       position: relative;
@@ -653,6 +638,7 @@
       isolation: isolate;
 
       display: flex;
+
       flex-direction: column;
 
       background:
@@ -673,39 +659,39 @@
       transition:
         transform 0.28s ease,
         border-color 0.28s ease,
+        background 0.28s ease,
         box-shadow 0.28s ease;
     }
-
 
     .last-mod-card::before {
       content: "";
 
       position: absolute;
 
-      top: -55px;
-      right: -55px;
+      top: -65px;
+      right: -45px;
 
-      width: 140px;
-      height: 140px;
+      width: 180px;
+      height: 180px;
 
       border-radius: 50%;
-
-      background:
-        radial-gradient(
-          circle,
-          rgba(255,170,50,0.12),
-          transparent 65%
-        );
 
       pointer-events: none;
 
       z-index: -1;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,180,50,0.16),
+          rgba(255,120,0,0.05) 45%,
+          transparent 70%
+        );
+
+      transition:
+        opacity 0.28s ease,
+        transform 0.28s ease;
     }
-
-
-    /* =====================================================
-       GLOW OVERLAY
-       ===================================================== */
 
     .last-mod-card::after {
       content: "";
@@ -718,60 +704,86 @@
 
       pointer-events: none;
 
-      opacity: 0;
-
       z-index: -1;
 
+      opacity: 0;
+
       background:
-
         radial-gradient(
-          circle at 50% 0%,
-          rgba(255,215,120,0.10),
-          transparent 52%
+          circle at 17% 18%,
+          rgba(255,220,130,0.22),
+          rgba(255,165,45,0.12) 24%,
+          rgba(255,115,0,0.06) 44%,
+          transparent 64%
         ),
-
         radial-gradient(
-          circle at 90% 15%,
-          rgba(255,140,20,0.08),
-          transparent 40%
+          circle at 95% 5%,
+          rgba(255,125,0,0.16),
+          transparent 48%
+        ),
+        linear-gradient(
+          135deg,
+          rgba(255,150,25,0.065),
+          transparent 60%
         );
 
       transition:
         opacity 0.28s ease;
     }
 
-
     .last-mod-card:hover {
       transform:
-        translateY(-6px)
-        scale(1.015);
+        translateY(-7px)
+        scale(1.018);
 
       border-color:
-        rgba(255,205,100,0.48);
+        rgba(255,192,60,0.72);
+
+      background:
+        radial-gradient(
+          circle at 15% 15%,
+          rgba(255,160,25,0.14),
+          transparent 46%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(37,28,20,0.98),
+          rgba(16,18,20,0.98)
+        );
 
       box-shadow:
+        0 30px 72px
+        rgba(0,0,0,0.56),
 
-        0 28px 64px
-        rgba(0,0,0,0.50),
+        0 0 8px
+        rgba(255,232,150,0.25),
 
-        0 0 16px
-        rgba(255,190,70,0.20),
+        0 0 18px
+        rgba(255,198,75,0.30),
 
-        0 0 32px
-        rgba(255,145,20,0.16),
+        0 0 36px
+        rgba(255,145,25,0.24),
 
-        0 0 52px
-        rgba(255,100,0,0.08),
+        0 0 58px
+        rgba(255,95,0,0.14),
 
-        inset 0 0 24px
-        rgba(255,195,75,0.045);
+        inset 0 0 22px
+        rgba(255,210,110,0.08),
+
+        inset 0 0 44px
+        rgba(255,135,15,0.055);
     }
 
+    .last-mod-card:hover::before {
+      transform:
+        scale(1.15);
+
+      opacity: 1;
+    }
 
     .last-mod-card:hover::after {
       opacity: 1;
     }
-
 
     .last-mod-card .type {
       display: inline-block;
@@ -798,24 +810,33 @@
       font-weight: 700;
 
       transition:
+        color 0.25s ease,
         border-color 0.25s ease,
         background 0.25s ease,
-        box-shadow 0.25s ease;
+        box-shadow 0.25s ease,
+        text-shadow 0.25s ease;
     }
-
 
     .last-mod-card:hover .type {
+      color: #ffe7a5;
+
       border-color:
-        rgba(255,194,81,0.32);
+        rgba(255,196,75,0.58);
 
       background:
-        rgba(255,156,25,0.12);
+        rgba(255,145,20,0.15);
 
       box-shadow:
-        0 0 14px
-        rgba(255,149,25,0.13);
-    }
+        0 0 10px
+        rgba(255,205,100,0.20),
 
+        0 0 22px
+        rgba(255,120,0,0.12);
+
+      text-shadow:
+        0 0 8px
+        rgba(255,205,105,0.25);
+    }
 
     .last-mod-heading {
       display: flex;
@@ -831,13 +852,10 @@
       margin-bottom: 8px;
     }
 
-
     .last-mod-name-area {
       flex: 1;
-
       min-width: 0;
     }
-
 
     .last-mod-card h4 {
       color: #f2d797;
@@ -853,19 +871,22 @@
         text-shadow 0.25s ease;
     }
 
-
     .last-mod-card:hover h4 {
-      color: #ffe0a0;
+      color: #ffe4a1;
 
       text-shadow:
+        0 0 6px
+        rgba(255,235,175,0.75),
 
-        0 0 10px
-        rgba(255,191,70,0.35),
+        0 0 14px
+        rgba(255,195,75,0.55),
 
-        0 0 22px
-        rgba(255,118,0,0.12);
+        0 0 28px
+        rgba(255,135,15,0.30),
+
+        0 0 42px
+        rgba(255,90,0,0.15);
     }
-
 
     .last-mod-icon-area {
       flex-shrink: 0;
@@ -879,7 +900,6 @@
       gap: 8px;
     }
 
-
     .last-mod-icon {
       width: 108px;
       height: 108px;
@@ -890,8 +910,7 @@
 
       border-radius: 10px;
 
-      background:
-        #080b0f;
+      background: #080b0f;
 
       border:
         1px solid
@@ -904,27 +923,31 @@
       transition:
         transform 0.28s ease,
         border-color 0.28s ease,
-        box-shadow 0.28s ease;
+        box-shadow 0.28s ease,
+        filter 0.28s ease;
     }
 
-
-    .last-mod-card:hover
-    .last-mod-icon {
+    .last-mod-card:hover .last-mod-icon {
       transform:
-        scale(1.035);
+        scale(1.045);
 
       border-color:
-        rgba(255,202,95,0.42);
+        rgba(255,210,100,0.66);
 
       box-shadow:
+        0 0 8px
+        rgba(255,225,145,0.30),
 
-        0 0 12px
-        rgba(255,195,75,0.22),
+        0 0 20px
+        rgba(255,180,55,0.30),
 
-        0 0 24px
-        rgba(255,135,20,0.14);
+        0 0 38px
+        rgba(255,110,0,0.18);
+
+      filter:
+        brightness(1.08)
+        saturate(1.08);
     }
-
 
     .mod-version {
       color: #b9a472;
@@ -934,8 +957,19 @@
       line-height: 1;
 
       white-space: nowrap;
+
+      transition:
+        color 0.25s ease,
+        text-shadow 0.25s ease;
     }
 
+    .last-mod-card:hover .mod-version {
+      color: #f4c86e;
+
+      text-shadow:
+        0 0 8px
+        rgba(255,160,30,0.22);
+    }
 
     .mod-author {
       color: #9f906c;
@@ -945,11 +979,22 @@
       margin-top: 5px;
     }
 
-
     .mod-author strong {
       color: var(--orange2);
+
+      transition:
+        color 0.25s ease,
+        text-shadow 0.25s ease;
     }
 
+    .last-mod-card:hover
+    .mod-author strong {
+      color: #ffc04e;
+
+      text-shadow:
+        0 0 8px
+        rgba(255,140,15,0.25);
+    }
 
     .last-mod-description {
       color: #cdb786;
@@ -967,8 +1012,15 @@
       -webkit-box-orient: vertical;
 
       overflow: hidden;
+
+      transition:
+        color 0.25s ease;
     }
 
+    .last-mod-card:hover
+    .last-mod-description {
+      color: #dbc38c;
+    }
 
     .last-mod-links {
       margin-top: auto;
@@ -979,7 +1031,6 @@
 
       gap: 14px;
     }
-
 
     .last-mod-links a {
       color: var(--orange2);
@@ -993,15 +1044,16 @@
         text-shadow 0.2s ease;
     }
 
-
     .last-mod-links a:hover {
-      color: var(--gold2);
+      color: #ffd57b;
 
       text-shadow:
-        0 0 8px
-        rgba(255,175,50,0.32);
-    }
+        0 0 7px
+        rgba(255,220,120,0.45),
 
+        0 0 16px
+        rgba(255,125,10,0.28);
+    }
 
     .mods-loading,
     .mods-empty {
@@ -1023,7 +1075,6 @@
         var(--line);
     }
 
-
     /* =====================================================
        SECTIONS
        ===================================================== */
@@ -1037,11 +1088,9 @@
         28px 0 70px;
     }
 
-
     .section-heading {
       margin-bottom: 26px;
     }
-
 
     .section-heading h3 {
       color: var(--gold2);
@@ -1051,13 +1100,11 @@
       margin-bottom: 8px;
     }
 
-
     .section-heading p {
       color: var(--muted);
 
       max-width: 820px;
     }
-
 
     /* =====================================================
        RUNES
@@ -1076,6 +1123,7 @@
       display: flex;
 
       align-items: center;
+
       justify-content: center;
 
       gap: 22px;
@@ -1086,7 +1134,6 @@
 
       z-index: 2;
     }
-
 
     .runic-divider::before,
     .runic-divider::after {
@@ -1105,15 +1152,17 @@
         );
 
       box-shadow:
-        0 0 9px
-        rgba(255,157,30,0.40);
-    }
+        0 0 7px
+        rgba(255,157,30,0.45),
 
+        0 0 18px
+        rgba(255,105,0,0.18);
+    }
 
     .runic-divider::after {
-      transform: scaleX(-1);
+      transform:
+        scaleX(-1);
     }
-
 
     .runic-divider span {
       color: #f8cf73;
@@ -1125,12 +1174,14 @@
       white-space: nowrap;
 
       text-shadow:
-
         0 0 6px
         rgba(255,220,135,0.80),
 
         0 0 14px
-        rgba(255,164,35,0.55);
+        rgba(255,164,35,0.55),
+
+        0 0 28px
+        rgba(255,105,0,0.22);
 
       animation:
         runePulse
@@ -1138,7 +1189,6 @@
         ease-in-out
         infinite;
     }
-
 
     @keyframes runePulse {
       0%,
@@ -1151,9 +1201,8 @@
       }
     }
 
-
     /* =====================================================
-       FEATURED CARDS
+       FEATURED MOD CARDS
        ===================================================== */
 
     .cards {
@@ -1164,7 +1213,6 @@
 
       gap: 22px;
     }
-
 
     .card {
       padding: 24px;
@@ -1194,9 +1242,41 @@
       transition:
         transform 0.28s ease,
         border-color 0.28s ease,
+        background 0.28s ease,
         box-shadow 0.28s ease;
     }
 
+    .card::before {
+      content: "";
+
+      position: absolute;
+
+      top: -70px;
+      left: -50px;
+
+      width: 230px;
+      height: 230px;
+
+      border-radius: 50%;
+
+      pointer-events: none;
+
+      z-index: -1;
+
+      opacity: 0;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,205,105,0.18),
+          rgba(255,145,25,0.10) 35%,
+          transparent 70%
+        );
+
+      transition:
+        opacity 0.28s ease,
+        transform 0.28s ease;
+    }
 
     .card::after {
       content: "";
@@ -1207,50 +1287,80 @@
 
       pointer-events: none;
 
-      opacity: 0;
-
       z-index: -1;
+
+      opacity: 0;
 
       background:
         radial-gradient(
-          circle at 50% 0%,
-          rgba(255,205,100,0.08),
-          transparent 55%
+          circle at 15% 18%,
+          rgba(255,215,120,0.18),
+          rgba(255,145,25,0.08) 33%,
+          transparent 58%
+        ),
+        linear-gradient(
+          135deg,
+          rgba(255,145,20,0.05),
+          transparent 65%
         );
 
       transition:
         opacity 0.28s ease;
     }
 
-
     .card:hover {
       transform:
         translateY(-8px)
-        scale(1.015);
+        scale(1.018);
 
       border-color:
-        rgba(255,197,87,0.42);
+        rgba(255,190,55,0.70);
+
+      background:
+        radial-gradient(
+          circle at 15% 15%,
+          rgba(255,160,25,0.14),
+          transparent 47%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(38,29,20,0.98),
+          rgba(16,18,20,0.98)
+        );
 
       box-shadow:
+        0 30px 72px
+        rgba(0,0,0,0.55),
 
-        0 28px 70px
-        rgba(0,0,0,0.50),
+        0 0 9px
+        rgba(255,226,140,0.24),
 
-        0 0 22px
-        rgba(255,160,28,0.13),
+        0 0 20px
+        rgba(255,192,65,0.28),
 
         0 0 38px
-        rgba(255,110,0,0.07),
+        rgba(255,140,20,0.22),
 
-        inset 0 0 26px
-        rgba(255,188,70,0.025);
+        0 0 60px
+        rgba(255,90,0,0.12),
+
+        inset 0 0 25px
+        rgba(255,205,105,0.07),
+
+        inset 0 0 46px
+        rgba(255,130,10,0.05);
     }
 
+    .card:hover::before {
+      opacity: 1;
+
+      transform:
+        scale(1.08);
+    }
 
     .card:hover::after {
       opacity: 1;
     }
-
 
     .card .type {
       display: inline-block;
@@ -1275,24 +1385,33 @@
       font-weight: bold;
 
       transition:
+        color 0.25s ease,
         border-color 0.25s ease,
         background 0.25s ease,
-        box-shadow 0.25s ease;
+        box-shadow 0.25s ease,
+        text-shadow 0.25s ease;
     }
-
 
     .card:hover .type {
+      color: #ffe8a6;
+
       border-color:
-        rgba(255,194,81,0.30);
+        rgba(255,195,70,0.56);
 
       background:
-        rgba(255,156,25,0.12);
+        rgba(255,155,25,0.15);
 
       box-shadow:
-        0 0 14px
-        rgba(255,149,25,0.12);
-    }
+        0 0 11px
+        rgba(255,205,100,0.18),
 
+        0 0 22px
+        rgba(255,115,0,0.12);
+
+      text-shadow:
+        0 0 8px
+        rgba(255,220,145,0.26);
+    }
 
     .card h4 {
       color: #f2d797;
@@ -1306,33 +1425,53 @@
         text-shadow 0.25s ease;
     }
 
-
     .card:hover h4 {
-      color: #ffe0a0;
+      color: #ffe3a0;
 
       text-shadow:
+        0 0 6px
+        rgba(255,235,175,0.72),
 
-        0 0 10px
-        rgba(255,191,70,0.35),
+        0 0 14px
+        rgba(255,195,70,0.52),
 
-        0 0 22px
-        rgba(255,118,0,0.12);
+        0 0 28px
+        rgba(255,130,10,0.28);
     }
-
 
     .card p {
       color: #cdb786;
 
       margin-bottom: 20px;
+
+      transition:
+        color 0.25s ease;
     }
 
+    .card:hover p {
+      color: #dec790;
+    }
 
     .card a {
       color: var(--orange2);
 
       font-weight: bold;
+
+      transition:
+        color 0.2s ease,
+        text-shadow 0.2s ease;
     }
 
+    .card a:hover {
+      color: #ffd578;
+
+      text-shadow:
+        0 0 8px
+        rgba(255,190,65,0.40),
+
+        0 0 18px
+        rgba(255,110,0,0.22);
+    }
 
     /* =====================================================
        PANELS
@@ -1356,7 +1495,6 @@
         var(--shadow);
     }
 
-
     .split {
       display: grid;
 
@@ -1366,11 +1504,9 @@
       gap: 22px;
     }
 
-
     .info-box {
       padding: 28px;
     }
-
 
     .info-box h4 {
       color: var(--gold2);
@@ -1380,13 +1516,11 @@
       margin-bottom: 10px;
     }
 
-
     .info-box p {
       color: #cdb786;
 
       margin-bottom: 15px;
     }
-
 
     .info-box ul {
       color: var(--muted);
@@ -1394,13 +1528,11 @@
       padding-left: 20px;
     }
 
-
     .cta {
       padding: 42px;
 
       text-align: center;
     }
-
 
     .cta h3 {
       color: var(--gold2);
@@ -1409,7 +1541,6 @@
 
       margin-bottom: 10px;
     }
-
 
     .cta p {
       color: var(--muted);
@@ -1420,7 +1551,6 @@
         0 auto 22px;
     }
 
-
     .hero-actions {
       display: flex;
 
@@ -1430,7 +1560,6 @@
 
       flex-wrap: wrap;
     }
-
 
     /* =====================================================
        FOOTER
@@ -1449,7 +1578,6 @@
         rgba(255,194,82,0.10);
     }
 
-
     .footer-grid {
       display: flex;
 
@@ -1460,11 +1588,9 @@
       align-items: center;
     }
 
-
     footer p {
       color: var(--muted);
     }
-
 
     .footer-links {
       display: flex;
@@ -1473,7 +1599,6 @@
 
       color: #cfbb88;
     }
-
 
     /* =====================================================
        RESPONSIVE
@@ -1485,11 +1610,9 @@
         grid-template-columns: 1fr;
       }
 
-
       .nav {
         flex-wrap: wrap;
       }
-
 
       .header-right {
         width: 100%;
@@ -1501,39 +1624,32 @@
       }
     }
 
-
     @media (max-width: 800px) {
 
       .cards {
         grid-template-columns: 1fr;
       }
 
-
       .split {
         grid-template-columns: 1fr;
       }
-
 
       .last-updated-grid {
         grid-template-columns: 1fr;
       }
 
-
       .nav-links {
         display: none;
       }
-
 
       .header-actions {
         order: 3;
       }
 
-
       .footer-grid {
         flex-direction: column;
       }
     }
-
 
     @media (max-width: 580px) {
 
@@ -1545,31 +1661,25 @@
           );
       }
 
-
       .hero {
         padding-top: 50px;
       }
-
 
       .hero h2 {
         font-size: 3rem;
       }
 
-
       .header-brand {
         width: 100%;
       }
-
 
       .header-actions {
         width: 100%;
       }
 
-
       .header-actions .btn {
         flex: 1;
       }
-
 
       .account-area {
         border-left: 0;
@@ -1577,18 +1687,16 @@
         padding-left: 0;
       }
 
-
       .last-mod-icon {
         width: 92px;
         height: 92px;
       }
 
-
       .cta {
-        padding: 28px 20px;
+        padding:
+          28px 20px;
       }
     }
-
 
     @media (prefers-reduced-motion: reduce) {
 
@@ -1597,13 +1705,14 @@
         animation: none;
       }
 
-
       .last-mod-card,
+      .last-mod-card::before,
       .last-mod-card::after,
       .last-mod-card h4,
       .last-mod-card .type,
       .last-mod-icon,
       .card,
+      .card::before,
       .card::after,
       .card h4,
       .card .type {
@@ -1612,12 +1721,9 @@
     }
 
   </style>
-
 </head>
 
-
 <body>
-
 
   <div
     id="galaxy-stars"
@@ -1633,7 +1739,6 @@
 
     <div class="container nav">
 
-
       <a
         href="/"
         class="header-brand"
@@ -1644,7 +1749,6 @@
           src="ymirmodwebsiteicon.png"
           alt="YMIR Mods"
         />
-
 
         <div class="brand">
 
@@ -1682,7 +1786,6 @@
 
       <div class="header-right">
 
-
         <nav class="nav-links">
 
           <a href="#mods">
@@ -1705,7 +1808,6 @@
 
 
         <div class="account-area">
-
 
           <span
             id="accountLoading"
@@ -1761,12 +1863,9 @@
 
           </div>
 
-
         </div>
 
-
       </div>
-
 
     </div>
 
@@ -1775,7 +1874,6 @@
 
   <main>
 
-
     <!-- ===================================================
          HERO
          =================================================== -->
@@ -1783,7 +1881,6 @@
     <section class="hero">
 
       <div class="container hero-grid">
-
 
         <div class="hero-copy">
 
@@ -1810,8 +1907,9 @@
         </div>
 
 
-        <div class="last-updated-area">
+        <!-- LAST UPDATED MODS -->
 
+        <div class="last-updated-area">
 
           <h3 class="last-updated-title">
             Last Updated Mods
@@ -1829,9 +1927,7 @@
 
           </div>
 
-
         </div>
-
 
       </div>
 
@@ -1856,7 +1952,6 @@
 
       <div class="container">
 
-
         <div class="section-heading">
 
           <h3>
@@ -1865,15 +1960,15 @@
 
           <p>
             A few of the core YMIR projects.
-            As YMIR grows these will link to complete
-            mod pages, downloads, changelogs and releases.
+            These will eventually link to full mod pages,
+            downloads, screenshots, changelogs,
+            and additional information.
           </p>
 
         </div>
 
 
         <div class="cards">
-
 
           <article class="card">
 
@@ -1887,8 +1982,9 @@
 
             <p>
               A living outpost with Toski,
-              Squee, quests, companions
-              and community systems.
+              Squee, a quest board,
+              companion systems, and a growing
+              community-driven world.
             </p>
 
             <a href="#">
@@ -1910,8 +2006,9 @@
 
             <p>
               Refined riding controls,
-              better mount handling
-              and smoother travel throughout Valheim.
+              better mount handling,
+              quality-of-life behavior,
+              and smoother adventure across Valheim.
             </p>
 
             <a href="#">
@@ -1932,9 +2029,9 @@
             </h4>
 
             <p>
-              Take to the skies with dragons,
-              abilities, flight mechanics
-              and cinematic Norse combat.
+              Take to the skies with powerful dragons,
+              abilities, flight mechanics,
+              and cinematic Norse combat energy.
             </p>
 
             <a href="#">
@@ -1956,7 +2053,8 @@
 
             <p>
               A player-driven economy with listings,
-              NPC interaction and multiplayer trading.
+              NPC interaction, and a marketplace
+              built for server communities.
             </p>
 
             <a href="#">
@@ -1977,9 +2075,10 @@
             </h4>
 
             <p>
-              Glide across the world using
-              progression-based equipment built
-              for freedom and exploration.
+              Glide across the world with
+              progression-based wings and equipment
+              designed for freedom,
+              danger, and style.
             </p>
 
             <a href="#">
@@ -2000,9 +2099,10 @@
             </h4>
 
             <p>
-              Fog, Night Feeders,
-              mystical progression
-              and a darker survival atmosphere.
+              Bring a haunting edge to Valheim
+              with fog, nightfeeders,
+              mystical oak progression,
+              and survival tension.
             </p>
 
             <a href="#">
@@ -2010,7 +2110,6 @@
             </a>
 
           </article>
-
 
         </div>
 
@@ -2037,7 +2136,6 @@
 
       <div class="container">
 
-
         <div class="section-heading">
 
           <h3>
@@ -2045,15 +2143,15 @@
           </h3>
 
           <p>
-            Built with a darker Valheim identity in mind —
-            part mythic forge, part cosmic hall of the gods.
+            Built with a darker Valheim identity
+            in mind — part mythic forge,
+            part cosmic hall of the gods.
           </p>
 
         </div>
 
 
         <div class="split">
-
 
           <div class="panel info-box">
 
@@ -2064,7 +2162,8 @@
             <p>
               Dark backgrounds,
               orange-gold highlights,
-              mythic atmosphere and subtle cosmic energy.
+              mythic atmosphere,
+              and subtle cosmic energy.
             </p>
 
             <ul>
@@ -2094,7 +2193,7 @@
 
             <p>
               YMIR Mods is becoming a central home
-              for creators, downloads, updates
+              for creators, downloads, updates,
               and community content.
             </p>
 
@@ -2116,7 +2215,6 @@
 
           </div>
 
-
         </div>
 
       </div>
@@ -2132,7 +2230,6 @@
 
       <div class="container">
 
-
         <div class="section-heading">
 
           <h3>
@@ -2141,14 +2238,13 @@
 
           <p>
             YMIR development news,
-            patch notes and announcements.
+            patch notes, and announcements.
           </p>
 
         </div>
 
 
         <div class="cards">
-
 
           <article class="card">
 
@@ -2162,7 +2258,7 @@
 
             <p>
               New combat tuning,
-              improved dragon handling
+              improved dragon handling,
               and better flight behaviour.
             </p>
 
@@ -2185,7 +2281,7 @@
 
             <p>
               Event schedules,
-              server happenings
+              server happenings,
               and community announcements.
             </p>
 
@@ -2208,7 +2304,7 @@
 
             <p>
               New features,
-              fixes, roadmap ideas
+              fixes, roadmap ideas,
               and upcoming releases.
             </p>
 
@@ -2217,7 +2313,6 @@
             </a>
 
           </article>
-
 
         </div>
 
@@ -2244,7 +2339,6 @@
 
       <div class="container">
 
-
         <div class="panel cta">
 
           <h3>
@@ -2254,8 +2348,9 @@
           <p>
             Follow development,
             check server updates,
-            discover new mods
-            and become part of the growing YMIR world.
+            discover new mods,
+            and become part of
+            the growing YMIR Valheim world.
           </p>
 
 
@@ -2279,11 +2374,9 @@
 
         </div>
 
-
       </div>
 
     </section>
-
 
   </main>
 
@@ -2299,7 +2392,8 @@
       <p>
         &copy;
         <span id="year"></span>
-        YMIR Mods. All rights reserved.
+        YMIR Mods.
+        All rights reserved.
       </p>
 
 
@@ -2334,9 +2428,9 @@
        YEAR
        ===================================================== */
 
-    document.getElementById(
-      "year"
-    ).textContent =
+    document
+      .getElementById("year")
+      .textContent =
       new Date().getFullYear();
 
 
@@ -2349,24 +2443,20 @@
         "accountLoading"
       );
 
-
     const accountLoggedOut =
       document.getElementById(
         "accountLoggedOut"
       );
-
 
     const accountLoggedIn =
       document.getElementById(
         "accountLoggedIn"
       );
 
-
     const headerUsername =
       document.getElementById(
         "headerUsername"
       );
-
 
     const headerLogout =
       document.getElementById(
@@ -3142,7 +3232,5 @@
 
   </script>
 
-
 </body>
-
 </html>
