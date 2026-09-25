@@ -3,6 +3,9 @@ const PBKDF2_ITERATIONS = 100000;
 const SESSION_COOKIE_NAME = "ymir_session";
 const SESSION_LENGTH_SECONDS = 60 * 60 * 24 * 7;
 
+const MAX_MOD_FILE_SIZE = 100 * 1024 * 1024;
+const MAX_ICON_FILE_SIZE = 5 * 1024 * 1024;
+
 
 /* =========================================================
    YMIR MODS WORKER
@@ -13,115 +16,103 @@ export default {
     const url = new URL(request.url);
 
 
-    /* =======================================================
-       TEST BACKEND + DATABASE
-       ======================================================= */
+    /* =====================================================
+       BACKEND TEST
+       ===================================================== */
 
     if (
       url.pathname === "/api/test" &&
       request.method === "GET"
     ) {
-      try {
-        const result = await env.DB
-          .prepare(
-            "SELECT COUNT(*) AS count FROM users"
-          )
-          .first();
-
-        return jsonResponse({
-          success: true,
-          message: "YMIR Mods backend is running",
-          database: "connected",
-          users: result?.count ?? 0
-        });
-
-      } catch (error) {
-
-        console.error(
-          "Database test error:",
-          error
-        );
-
-        return jsonResponse(
-          {
-            success: false,
-            message:
-              "Backend is running, but database connection failed"
-          },
-          500
-        );
-      }
+      return handleTest(env);
     }
 
 
-    /* =======================================================
+    /* =====================================================
        REGISTER
-       ======================================================= */
+       ===================================================== */
 
     if (
       url.pathname === "/api/register" &&
       request.method === "POST"
     ) {
-      return handleRegister(
-        request,
-        env
-      );
+      return handleRegister(request, env);
     }
 
 
-    /* =======================================================
+    /* =====================================================
        LOGIN
-       ======================================================= */
+       ===================================================== */
 
     if (
       url.pathname === "/api/login" &&
       request.method === "POST"
     ) {
-      return handleLogin(
-        request,
-        env
-      );
+      return handleLogin(request, env);
     }
 
 
-    /* =======================================================
+    /* =====================================================
        LOGOUT
-       ======================================================= */
+       ===================================================== */
 
     if (
       url.pathname === "/api/logout" &&
       request.method === "POST"
     ) {
-      return handleLogout(
-        request,
-        env
-      );
+      return handleLogout(request, env);
     }
 
 
-    /* =======================================================
+    /* =====================================================
        CURRENT USER
-       ======================================================= */
+       ===================================================== */
 
     if (
       url.pathname === "/api/me" &&
       request.method === "GET"
     ) {
-      return handleCurrentUser(
+      return handleCurrentUser(request, env);
+    }
+
+
+    /* =====================================================
+       UPLOAD MOD
+       ===================================================== */
+
+    if (
+      url.pathname === "/api/mods/upload" &&
+      request.method === "POST"
+    ) {
+      return handleModUpload(request, env);
+    }
+
+
+    /* =====================================================
+       SERVE R2 FILES
+       ===================================================== */
+
+    if (
+      url.pathname.startsWith("/files/") &&
+      request.method === "GET"
+    ) {
+      return handleStoredFile(
         request,
-        env
+        env,
+        url
       );
     }
 
 
-    /* =======================================================
+    /* =====================================================
        API METHOD ERRORS
-       ======================================================= */
+       ===================================================== */
 
     if (
       url.pathname === "/api/register" ||
       url.pathname === "/api/login" ||
-      url.pathname === "/api/logout"
+      url.pathname === "/api/logout" ||
+      url.pathname === "/api/mods/upload"
     ) {
       return jsonResponse(
         {
@@ -133,15 +124,57 @@ export default {
     }
 
 
-    /* =======================================================
+    /* =====================================================
        NORMAL WEBSITE FILES
-       ======================================================= */
+       ===================================================== */
 
-    return env.ASSETS.fetch(
-      request
-    );
+    return env.ASSETS.fetch(request);
   }
 };
+
+
+/* =========================================================
+   TEST BACKEND
+   ========================================================= */
+
+async function handleTest(env) {
+  try {
+    const userResult =
+      await env.DB
+        .prepare(
+          "SELECT COUNT(*) AS count FROM users"
+        )
+        .first();
+
+
+    return jsonResponse({
+      success: true,
+      message: "YMIR Mods backend is running",
+      database: "connected",
+      r2: env.MOD_FILES
+        ? "connected"
+        : "missing",
+      users: userResult?.count ?? 0
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Backend test error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success: false,
+        message:
+          "Backend or database connection failed."
+      },
+      500
+    );
+  }
+}
 
 
 /* =========================================================
@@ -190,10 +223,6 @@ async function handleRegister(
       );
 
 
-    /* =======================================================
-       VALIDATION
-       ======================================================= */
-
     if (
       username.length < 3 ||
       username.length > 24
@@ -226,9 +255,7 @@ async function handleRegister(
 
 
     if (
-      !isValidEmail(
-        email
-      )
+      !isValidEmail(email)
     ) {
       return jsonResponse(
         {
@@ -256,10 +283,6 @@ async function handleRegister(
     }
 
 
-    /* =======================================================
-       EXISTING ACCOUNT CHECK
-       ======================================================= */
-
     const existingUser =
       await env.DB
         .prepare(`
@@ -276,9 +299,7 @@ async function handleRegister(
         .first();
 
 
-    if (
-      existingUser
-    ) {
+    if (existingUser) {
       return jsonResponse(
         {
           success: false,
@@ -290,19 +311,9 @@ async function handleRegister(
     }
 
 
-    /* =======================================================
-       HASH PASSWORD
-       ======================================================= */
-
     const passwordHash =
-      await hashPassword(
-        password
-      );
+      await hashPassword(password);
 
-
-    /* =======================================================
-       CREATE ACCOUNT
-       ======================================================= */
 
     const result =
       await env.DB
@@ -333,7 +344,6 @@ async function handleRegister(
     return jsonResponse(
       {
         success: true,
-
         message:
           "YMIR Mods account created successfully.",
 
@@ -429,10 +439,6 @@ async function handleLogin(
     }
 
 
-    /* =======================================================
-       FIND USER
-       ======================================================= */
-
     const user =
       await env.DB
         .prepare(`
@@ -467,10 +473,6 @@ async function handleLogin(
     }
 
 
-    /* =======================================================
-       VERIFY PASSWORD
-       ======================================================= */
-
     const validPassword =
       await verifyPassword(
         password,
@@ -490,10 +492,6 @@ async function handleLogin(
     }
 
 
-    /* =======================================================
-       CLEAN EXPIRED SESSIONS
-       ======================================================= */
-
     const now =
       Math.floor(
         Date.now() / 1000
@@ -505,15 +503,9 @@ async function handleLogin(
         DELETE FROM sessions
         WHERE expires_at <= ?
       `)
-      .bind(
-        now
-      )
+      .bind(now)
       .run();
 
-
-    /* =======================================================
-       CREATE SESSION TOKEN
-       ======================================================= */
 
     const sessionToken =
       generateSessionToken();
@@ -547,10 +539,6 @@ async function handleLogin(
       .run();
 
 
-    /* =======================================================
-       LOGIN SUCCESS
-       ======================================================= */
-
     return jsonResponse(
       {
         success: true,
@@ -559,17 +547,10 @@ async function handleLogin(
           "Login successful.",
 
         user: {
-          id:
-            user.id,
-
-          username:
-            user.username,
-
-          email:
-            user.email,
-
-          role:
-            user.role,
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
 
           can_upload:
             Boolean(
@@ -615,76 +596,19 @@ async function handleCurrentUser(
   env
 ) {
   try {
-    const sessionToken =
-      getCookie(
-        request,
-        SESSION_COOKIE_NAME
-      );
-
-
-    if (!sessionToken) {
-      return jsonResponse(
-        {
-          success: true,
-          authenticated: false,
-          user: null
-        }
-      );
-    }
-
-
-    const tokenHash =
-      await hashSessionToken(
-        sessionToken
-      );
-
-
-    const now =
-      Math.floor(
-        Date.now() / 1000
-      );
-
-
     const user =
-      await env.DB
-        .prepare(`
-          SELECT
-            users.id,
-            users.username,
-            users.email,
-            users.role,
-            users.can_upload
-          FROM sessions
-
-          INNER JOIN users
-            ON users.id =
-               sessions.user_id
-
-          WHERE sessions.token_hash = ?
-            AND sessions.expires_at > ?
-
-          LIMIT 1
-        `)
-        .bind(
-          tokenHash,
-          now
-        )
-        .first();
+      await getAuthenticatedUser(
+        request,
+        env
+      );
 
 
     if (!user) {
-      return jsonResponse(
-        {
-          success: true,
-          authenticated: false,
-          user: null
-        },
-        200,
-        {
-          "Set-Cookie":
-            clearSessionCookie()
-        }
-      );
+      return jsonResponse({
+        success: true,
+        authenticated: false,
+        user: null
+      });
     }
 
 
@@ -717,7 +641,7 @@ async function handleCurrentUser(
   } catch (error) {
 
     console.error(
-      "Current-user error:",
+      "Current user error:",
       error
     );
 
@@ -750,9 +674,7 @@ async function handleLogout(
       );
 
 
-    if (
-      sessionToken
-    ) {
+    if (sessionToken) {
       const tokenHash =
         await hashSessionToken(
           sessionToken
@@ -805,6 +727,830 @@ async function handleLogout(
 
 
 /* =========================================================
+   UPLOAD MOD
+   ========================================================= */
+
+async function handleModUpload(
+  request,
+  env
+) {
+  let packageKey = null;
+  let iconKey = null;
+  let modId = null;
+
+  try {
+
+    /* -----------------------------------------------------
+       VERIFY USER
+       ----------------------------------------------------- */
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (!user) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    if (
+      !Boolean(
+        user.can_upload
+      )
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Your account does not have upload permission."
+        },
+        403
+      );
+    }
+
+
+    if (!env.MOD_FILES) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "YMIR file storage is not connected."
+        },
+        500
+      );
+    }
+
+
+    /* -----------------------------------------------------
+       READ FORM
+       ----------------------------------------------------- */
+
+    const form =
+      await request.formData();
+
+
+    const name =
+      String(
+        form.get("name") ?? ""
+      ).trim();
+
+
+    const version =
+      String(
+        form.get("version") ?? ""
+      ).trim();
+
+
+    const category =
+      String(
+        form.get("category") ?? ""
+      ).trim();
+
+
+    const shortDescription =
+      String(
+        form.get("short_description") ?? ""
+      ).trim();
+
+
+    const fullDescription =
+      String(
+        form.get("full_description") ?? ""
+      ).trim();
+
+
+    const changelog =
+      String(
+        form.get("changelog") ?? ""
+      ).trim();
+
+
+    const modFile =
+      form.get("mod_file");
+
+
+    const iconFile =
+      form.get("icon_file");
+
+
+    /* -----------------------------------------------------
+       VALIDATE TEXT
+       ----------------------------------------------------- */
+
+    if (
+      name.length < 2 ||
+      name.length > 80
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Mod name must be between 2 and 80 characters."
+        },
+        400
+      );
+    }
+
+
+    if (
+      version.length < 1 ||
+      version.length > 32
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Please enter a valid mod version."
+        },
+        400
+      );
+    }
+
+
+    if (
+      category.length < 2 ||
+      category.length > 60
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Please select a mod category."
+        },
+        400
+      );
+    }
+
+
+    if (
+      shortDescription.length < 10 ||
+      shortDescription.length > 250
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Short description must be between 10 and 250 characters."
+        },
+        400
+      );
+    }
+
+
+    if (
+      fullDescription.length > 10000
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Full description is too long."
+        },
+        400
+      );
+    }
+
+
+    if (
+      changelog.length > 10000
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Changelog is too long."
+        },
+        400
+      );
+    }
+
+
+    /* -----------------------------------------------------
+       VALIDATE MOD FILE
+       ----------------------------------------------------- */
+
+    if (
+      !(modFile instanceof File) ||
+      modFile.size === 0
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Please choose a mod ZIP file."
+        },
+        400
+      );
+    }
+
+
+    if (
+      modFile.size >
+      MAX_MOD_FILE_SIZE
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Mod package is too large."
+        },
+        413
+      );
+    }
+
+
+    if (
+      !modFile.name
+        .toLowerCase()
+        .endsWith(".zip")
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Mod package must be a ZIP file."
+        },
+        400
+      );
+    }
+
+
+    /* -----------------------------------------------------
+       VALIDATE ICON
+       ----------------------------------------------------- */
+
+    if (
+      iconFile instanceof File &&
+      iconFile.size > 0
+    ) {
+
+      if (
+        iconFile.size >
+        MAX_ICON_FILE_SIZE
+      ) {
+        return jsonResponse(
+          {
+            success: false,
+            message:
+              "Mod icon is too large."
+          },
+          413
+        );
+      }
+
+
+      const allowedIconTypes = [
+        "image/png",
+        "image/jpeg",
+        "image/webp"
+      ];
+
+
+      if (
+        !allowedIconTypes.includes(
+          iconFile.type
+        )
+      ) {
+        return jsonResponse(
+          {
+            success: false,
+            message:
+              "Mod icon must be PNG, JPG or WebP."
+          },
+          400
+        );
+      }
+
+    }
+
+
+    /* -----------------------------------------------------
+       CREATE SLUG
+       ----------------------------------------------------- */
+
+    let slug =
+      createSlug(name);
+
+
+    if (!slug) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "Unable to create a valid mod URL."
+        },
+        400
+      );
+    }
+
+
+    const existingSlug =
+      await env.DB
+        .prepare(`
+          SELECT id
+          FROM mods
+          WHERE slug = ?
+          LIMIT 1
+        `)
+        .bind(slug)
+        .first();
+
+
+    if (existingSlug) {
+      slug =
+        slug +
+        "-" +
+        Date.now()
+          .toString()
+          .slice(-6);
+    }
+
+
+    /* -----------------------------------------------------
+       R2 KEYS
+       ----------------------------------------------------- */
+
+    const timestamp =
+      Date.now();
+
+
+    const cleanPackageName =
+      sanitizeFilename(
+        modFile.name
+      );
+
+
+    packageKey =
+      `mods/${user.id}/${slug}/${version}/${timestamp}-${cleanPackageName}`;
+
+
+    /* -----------------------------------------------------
+       UPLOAD MOD ZIP
+       ----------------------------------------------------- */
+
+    await env.MOD_FILES.put(
+      packageKey,
+      modFile.stream(),
+      {
+        httpMetadata: {
+          contentType:
+            modFile.type ||
+            "application/zip",
+
+          contentDisposition:
+            `attachment; filename="${cleanPackageName}"`
+        },
+
+        customMetadata: {
+          uploader:
+            user.username,
+
+          mod:
+            name,
+
+          version:
+            version
+        }
+      }
+    );
+
+
+    /* -----------------------------------------------------
+       UPLOAD ICON
+       ----------------------------------------------------- */
+
+    if (
+      iconFile instanceof File &&
+      iconFile.size > 0
+    ) {
+
+      const iconExtension =
+        getImageExtension(
+          iconFile.type
+        );
+
+
+      iconKey =
+        `mods/${user.id}/${slug}/icon-${timestamp}.${iconExtension}`;
+
+
+      await env.MOD_FILES.put(
+        iconKey,
+        iconFile.stream(),
+        {
+          httpMetadata: {
+            contentType:
+              iconFile.type,
+
+            contentDisposition:
+              "inline"
+          }
+        }
+      );
+
+    }
+
+
+    /* -----------------------------------------------------
+       FILE URLS
+       ----------------------------------------------------- */
+
+    const packageUrl =
+      "/files/" +
+      encodeURI(packageKey);
+
+
+    const iconUrl =
+      iconKey
+        ? "/files/" +
+          encodeURI(iconKey)
+        : null;
+
+
+    /* -----------------------------------------------------
+       INSERT MOD
+       ----------------------------------------------------- */
+
+    const modInsert =
+      await env.DB
+        .prepare(`
+          INSERT INTO mods (
+            owner_user_id,
+            name,
+            slug,
+            version,
+            category,
+            short_description,
+            full_description,
+            icon_url,
+            download_url,
+            changelog,
+            is_published,
+            created_at,
+            updated_at
+          )
+          VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            1,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
+          )
+        `)
+        .bind(
+          user.id,
+          name,
+          slug,
+          version,
+          category,
+          shortDescription,
+          fullDescription,
+          iconUrl,
+          packageUrl,
+          changelog
+        )
+        .run();
+
+
+    modId =
+      modInsert?.meta
+        ?.last_row_id;
+
+
+    if (!modId) {
+      throw new Error(
+        "Unable to determine new mod ID."
+      );
+    }
+
+
+    /* -----------------------------------------------------
+       INSERT VERSION
+       ----------------------------------------------------- */
+
+    await env.DB
+      .prepare(`
+        INSERT INTO mod_versions (
+          mod_id,
+          version,
+          file_url,
+          changelog,
+          file_size,
+          downloads,
+          created_at
+        )
+        VALUES (
+          ?,
+          ?,
+          ?,
+          ?,
+          ?,
+          0,
+          CURRENT_TIMESTAMP
+        )
+      `)
+      .bind(
+        modId,
+        version,
+        packageUrl,
+        changelog,
+        modFile.size
+      )
+      .run();
+
+
+    /* -----------------------------------------------------
+       SUCCESS
+       ----------------------------------------------------- */
+
+    return jsonResponse(
+      {
+        success: true,
+
+        message:
+          "Mod uploaded successfully.",
+
+        mod: {
+          id:
+            modId,
+
+          name:
+            name,
+
+          slug:
+            slug,
+
+          version:
+            version,
+
+          category:
+            category,
+
+          icon_url:
+            iconUrl,
+
+          download_url:
+            packageUrl
+        }
+      },
+      201
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Mod upload error:",
+      error
+    );
+
+
+    /* -----------------------------------------------------
+       BEST-EFFORT CLEANUP
+       ----------------------------------------------------- */
+
+    try {
+
+      if (
+        modId
+      ) {
+        await env.DB
+          .prepare(`
+            DELETE FROM mods
+            WHERE id = ?
+          `)
+          .bind(modId)
+          .run();
+      }
+
+
+      if (
+        packageKey
+      ) {
+        await env.MOD_FILES
+          .delete(packageKey);
+      }
+
+
+      if (
+        iconKey
+      ) {
+        await env.MOD_FILES
+          .delete(iconKey);
+      }
+
+    } catch (cleanupError) {
+
+      console.error(
+        "Upload cleanup error:",
+        cleanupError
+      );
+
+    }
+
+
+    return jsonResponse(
+      {
+        success: false,
+        message:
+          "Unable to upload mod."
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   SERVE FILE FROM R2
+   ========================================================= */
+
+async function handleStoredFile(
+  request,
+  env,
+  url
+) {
+  try {
+
+    if (!env.MOD_FILES) {
+      return new Response(
+        "Storage unavailable.",
+        {
+          status: 500
+        }
+      );
+    }
+
+
+    const encodedKey =
+      url.pathname.slice(
+        "/files/".length
+      );
+
+
+    const key =
+      decodeURIComponent(
+        encodedKey
+      );
+
+
+    if (
+      !key ||
+      key.includes("..")
+    ) {
+      return new Response(
+        "Invalid file.",
+        {
+          status: 400
+        }
+      );
+    }
+
+
+    const object =
+      await env.MOD_FILES.get(
+        key
+      );
+
+
+    if (!object) {
+      return new Response(
+        "File not found.",
+        {
+          status: 404
+        }
+      );
+    }
+
+
+    const headers =
+      new Headers();
+
+
+    object.writeHttpMetadata(
+      headers
+    );
+
+
+    headers.set(
+      "etag",
+      object.httpEtag
+    );
+
+
+    headers.set(
+      "Cache-Control",
+      "public, max-age=3600"
+    );
+
+
+    return new Response(
+      object.body,
+      {
+        headers
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "R2 file error:",
+      error
+    );
+
+
+    return new Response(
+      "Unable to load file.",
+      {
+        status: 500
+      }
+    );
+  }
+}
+
+
+/* =========================================================
+   AUTHENTICATED USER
+   ========================================================= */
+
+async function getAuthenticatedUser(
+  request,
+  env
+) {
+  const sessionToken =
+    getCookie(
+      request,
+      SESSION_COOKIE_NAME
+    );
+
+
+  if (!sessionToken) {
+    return null;
+  }
+
+
+  const tokenHash =
+    await hashSessionToken(
+      sessionToken
+    );
+
+
+  const now =
+    Math.floor(
+      Date.now() / 1000
+    );
+
+
+  const user =
+    await env.DB
+      .prepare(`
+        SELECT
+          users.id,
+          users.username,
+          users.email,
+          users.role,
+          users.can_upload
+        FROM sessions
+
+        INNER JOIN users
+          ON users.id =
+             sessions.user_id
+
+        WHERE sessions.token_hash = ?
+          AND sessions.expires_at > ?
+
+        LIMIT 1
+      `)
+      .bind(
+        tokenHash,
+        now
+      )
+      .first();
+
+
+  return user || null;
+}
+
+
+/* =========================================================
    PASSWORD HASHING
    ========================================================= */
 
@@ -824,18 +1570,11 @@ async function hashPassword(
   const keyMaterial =
     await crypto.subtle.importKey(
       "raw",
-
-      encoder.encode(
-        password
-      ),
-
+      encoder.encode(password),
       {
-        name:
-          "PBKDF2"
+        name: "PBKDF2"
       },
-
       false,
-
       [
         "deriveBits"
       ]
@@ -864,12 +1603,6 @@ async function hashPassword(
     );
 
 
-  const hashBytes =
-    new Uint8Array(
-      derivedBits
-    );
-
-
   return [
     "pbkdf2_sha256",
 
@@ -880,7 +1613,9 @@ async function hashPassword(
     ),
 
     bytesToBase64(
-      hashBytes
+      new Uint8Array(
+        derivedBits
+      )
     )
   ].join("$");
 }
@@ -990,14 +1725,11 @@ async function verifyPassword(
       );
 
 
-    const actualHash =
+    return constantTimeEqual(
       new Uint8Array(
         derivedBits
-      );
+      ),
 
-
-    return constantTimeEqual(
-      actualHash,
       expectedHash
     );
 
@@ -1007,6 +1739,7 @@ async function verifyPassword(
       "Password verification error:",
       error
     );
+
 
     return false;
   }
@@ -1018,14 +1751,10 @@ async function verifyPassword(
    ========================================================= */
 
 function generateSessionToken() {
-  const bytes =
+  return bytesToBase64Url(
     crypto.getRandomValues(
       new Uint8Array(32)
-    );
-
-
-  return bytesToBase64Url(
-    bytes
+    )
   );
 }
 
@@ -1040,6 +1769,7 @@ async function hashSessionToken(
   const digest =
     await crypto.subtle.digest(
       "SHA-256",
+
       encoder.encode(
         token
       )
@@ -1063,15 +1793,10 @@ function createSessionCookie(
 ) {
   return [
     `${SESSION_COOKIE_NAME}=${token}`,
-
     "Path=/",
-
     "HttpOnly",
-
     "Secure",
-
     "SameSite=Lax",
-
     `Max-Age=${SESSION_LENGTH_SECONDS}`
   ].join("; ");
 }
@@ -1080,15 +1805,10 @@ function createSessionCookie(
 function clearSessionCookie() {
   return [
     `${SESSION_COOKIE_NAME}=`,
-
     "Path=/",
-
     "HttpOnly",
-
     "Secure",
-
     "SameSite=Lax",
-
     "Max-Age=0"
   ].join("; ");
 }
@@ -1158,6 +1878,72 @@ function getCookie(
 
 
 /* =========================================================
+   MOD HELPERS
+   ========================================================= */
+
+function createSlug(
+  value
+) {
+  return String(value)
+    .toLowerCase()
+    .trim()
+    .replace(
+      /[^a-z0-9]+/g,
+      "-"
+    )
+    .replace(
+      /^-+|-+$/g,
+      ""
+    )
+    .slice(
+      0,
+      80
+    );
+}
+
+
+function sanitizeFilename(
+  filename
+) {
+  return String(filename)
+    .replace(
+      /[^A-Za-z0-9._-]/g,
+      "_"
+    )
+    .replace(
+      /_+/g,
+      "_"
+    )
+    .slice(
+      -120
+    );
+}
+
+
+function getImageExtension(
+  mime
+) {
+  if (
+    mime ===
+    "image/jpeg"
+  ) {
+    return "jpg";
+  }
+
+
+  if (
+    mime ===
+    "image/webp"
+  ) {
+    return "webp";
+  }
+
+
+  return "png";
+}
+
+
+/* =========================================================
    ENCODING HELPERS
    ========================================================= */
 
@@ -1179,9 +1965,7 @@ function bytesToBase64(
   }
 
 
-  return btoa(
-    binary
-  );
+  return btoa(binary);
 }
 
 
@@ -1189,9 +1973,7 @@ function base64ToBytes(
   value
 ) {
   const binary =
-    atob(
-      value
-    );
+    atob(value);
 
 
   const bytes =
@@ -1206,9 +1988,7 @@ function base64ToBytes(
     i++
   ) {
     bytes[i] =
-      binary.charCodeAt(
-        i
-      );
+      binary.charCodeAt(i);
   }
 
 
@@ -1241,9 +2021,7 @@ function bytesToHex(
   bytes
 ) {
   return Array
-    .from(
-      bytes
-    )
+    .from(bytes)
     .map(
       byte =>
         byte
@@ -1273,7 +2051,8 @@ function constantTimeEqual(
   }
 
 
-  let difference = 0;
+  let difference =
+    0;
 
 
   for (
@@ -1287,21 +2066,20 @@ function constantTimeEqual(
   }
 
 
-  return difference === 0;
+  return difference ===
+    0;
 }
 
 
 /* =========================================================
-   EMAIL VALIDATION
+   EMAIL
    ========================================================= */
 
 function isValidEmail(
   email
 ) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    .test(
-      email
-    );
+    .test(email);
 }
 
 
