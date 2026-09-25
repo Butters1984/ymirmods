@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Upload Mod - YMIR Mods</title>
+
+  <style>
+
+    :root {
+
+      --bg: #07090d;
+      --bg-2: #0b1117;
+
+      --panel: rgba(18, 21, 27, 0.96);
+      --panel-2: rgba(24, 28, 35, 0.94);
+
+      --gold: #ffdc8c;
+      --gold-2: #f2c15b;
+
+      --orange: #ff9f1c;
+      --orange-dark: #d97706;
+
+      --text: #f4e5b5;
+      --muted: #bca97a;
+
+      --green: #9be57d;
+      --red: #ff9b86;
+
+      --line:
+        rgba(255, 194, 82, 0.14);
+
+    }
+
+
+    * {
+
+      box-sizing:
+        border-box;
+
+      margin:
+        0;
+
+      padding:
+        0;
+
+    }
+
+
+    body {
+
+      min-height:
+        100vh;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      color:
+        var(--text);
+
+      background:
+
+        radial-gradient(
+          circle at 18% 16%,
+          rgba(255, 155, 30, 0.10),
+          transparent 24%
+        ),
+
+        radial-gradient(
+          circle at 84% 76%,
+          rgba(255, 190, 70, 0.06),
+          transparent 24%
+        ),
+
+        linear-gradient(
+          180deg,
+          #05070a,
+          #0b1117
+        );
+
+    }
+
+
+    a {
+
+      color:
+        inherit;
+
+      text-decoration:
+        none;
+
+    }
+
+
+    button,
+    input,
+    textarea,
+    select {
+
+      font:
+        inherit;
+
+    }
+
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
+    .topbar {
+
+      position:
+        sticky;
+
+      top:
+        0;
+
+      z-index:
+        30;
+
+      background:
+        rgba(5, 7, 10, 0.90);
+
+      backdrop-filter:
+        blur(12px);
+
+      border-bottom:
+        1px solid
+        var(--line);
+
+      box-shadow:
+        0 8px 30px
+        rgba(0, 0, 0, 0.30);
+
+    }
+
+
+    .nav {
+
+      width:
+        min(
+          1180px,
+          calc(100% - 40px)
+        );
+
+      margin:
+        0 auto;
+
+      min-height:
+        84px;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        20px;
+
+    }
+
+
+    .brand {
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      gap:
+        12px;
+
+    }
+
+
+    .brand img {
+
+      width:
+        54px;
+
+      height:
+        54px;
+
+      object-fit:
+        cover;
+
+      border-radius:
+        10px;
+
+      filter:
+        drop-shadow(
+          0 0 10px
+          rgba(255, 170, 35, 0.45)
+        );
+
+    }
+
+
+    .brand-text h1 {
+
+      color:
+        var(--gold);
+
+      font-size:
+        1.5rem;
+
+      line-height:
+        1.1;
+
+    }
+
+
+    .brand-text p {
+
+      color:
+        var(--muted);
+
+      font-size:
+        0.82rem;
+
+      margin-top:
+        3px;
+
+    }
+
+
+    .nav-actions {
+
+      display:
+        flex;
+
+      gap:
+        10px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    /* =====================================================
+       BUTTONS
+       ===================================================== */
+
+    .button {
+
+      display:
+        inline-flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      min-height:
+        42px;
+
+      padding:
+        10px 16px;
+
+      border-radius:
+        11px;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.16);
+
+      cursor:
+        pointer;
+
+      font-weight:
+        bold;
+
+      transition:
+        0.2s ease;
+
+    }
+
+
+    .button:hover {
+
+      transform:
+        translateY(-2px);
+
+    }
+
+
+    .button.primary {
+
+      color:
+        #15100a;
+
+      background:
+
+        linear-gradient(
+          135deg,
+          var(--orange-dark),
+          var(--gold-2)
+        );
+
+      border:
+        none;
+
+      box-shadow:
+        0 12px 30px
+        rgba(217, 119, 6, 0.18);
+
+    }
+
+
+    .button.secondary {
+
+      color:
+        var(--gold);
+
+      background:
+        rgba(255, 183, 77, 0.06);
+
+    }
+
+
+    .button.danger {
+
+      color:
+        #ffc8bb;
+
+      background:
+        rgba(170, 50, 35, 0.10);
+
+      border-color:
+        rgba(255, 100, 75, 0.18);
+
+    }
+
+
+    .button:disabled {
+
+      opacity:
+        0.55;
+
+      cursor:
+        default;
+
+      transform:
+        none;
+
+    }
+
+
+    /* =====================================================
+       PAGE
+       ===================================================== */
+
+    .page {
+
+      width:
+        min(
+          1180px,
+          calc(100% - 40px)
+        );
+
+      margin:
+        0 auto;
+
+      padding:
+        50px 0 80px;
+
+    }
+
+
+    .page-heading {
+
+      display:
+        flex;
+
+      align-items:
+        flex-end;
+
+      justify-content:
+        space-between;
+
+      gap:
+        24px;
+
+      margin-bottom:
+        28px;
+
+    }
+
+
+    .eyebrow {
+
+      display:
+        inline-block;
+
+      padding:
+        6px 11px;
+
+      border-radius:
+        999px;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.15);
+
+      background:
+        rgba(255, 183, 77, 0.06);
+
+      color:
+        var(--gold);
+
+      font-size:
+        0.74rem;
+
+      font-weight:
+        bold;
+
+      margin-bottom:
+        10px;
+
+    }
+
+
+    .page-heading h2 {
+
+      color:
+        var(--gold);
+
+      font-size:
+        clamp(
+          2.4rem,
+          5vw,
+          4rem
+        );
+
+      line-height:
+        1;
+
+      margin-bottom:
+        10px;
+
+    }
+
+
+    .page-heading p {
+
+      color:
+        var(--muted);
+
+      max-width:
+        720px;
+
+    }
+
+
+    .account-card {
+
+      min-width:
+        250px;
+
+      padding:
+        16px;
+
+      border-radius:
+        14px;
+
+      background:
+        var(--panel);
+
+      border:
+        1px solid
+        var(--line);
+
+      box-shadow:
+        0 16px 38px
+        rgba(0, 0, 0, 0.34);
+
+    }
+
+
+    .account-card strong {
+
+      color:
+        var(--gold);
+
+    }
+
+
+    .account-card p {
+
+      color:
+        var(--muted);
+
+      font-size:
+        0.82rem;
+
+      margin-top:
+        3px;
+
+    }
+
+
+    /* =====================================================
+       ACCESS STATES
+       ===================================================== */
+
+    .loading,
+    .access-denied {
+
+      max-width:
+        650px;
+
+      margin:
+        80px auto;
+
+      padding:
+        30px;
+
+      text-align:
+        center;
+
+      border-radius:
+        18px;
+
+      background:
+        var(--panel);
+
+      border:
+        1px solid
+        var(--line);
+
+    }
+
+
+    .loading {
+
+      color:
+        var(--muted);
+
+    }
+
+
+    .access-denied {
+
+      display:
+        none;
+
+    }
+
+
+    .access-denied h3 {
+
+      color:
+        var(--red);
+
+      margin-bottom:
+        10px;
+
+      font-size:
+        1.6rem;
+
+    }
+
+
+    .access-denied p {
+
+      color:
+        #c9a79f;
+
+      margin-bottom:
+        18px;
+
+    }
+
+
+    /* =====================================================
+       FORM PANEL
+       ===================================================== */
+
+    .upload-wrap {
+
+      display:
+        none;
+
+    }
+
+
+    .upload-panel {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        1.35fr 0.65fr;
+
+      gap:
+        22px;
+
+      align-items:
+        start;
+
+    }
+
+
+    .form-card,
+    .side-card {
+
+      border-radius:
+        18px;
+
+      background:
+
+        linear-gradient(
+          180deg,
+          rgba(23, 27, 34, 0.97),
+          rgba(11, 14, 19, 0.97)
+        );
+
+      border:
+        1px solid
+        var(--line);
+
+      box-shadow:
+        0 20px 50px
+        rgba(0, 0, 0, 0.38);
+
+    }
+
+
+    .form-card {
+
+      padding:
+        28px;
+
+    }
+
+
+    .side-card {
+
+      padding:
+        22px;
+
+    }
+
+
+    .side-card + .side-card {
+
+      margin-top:
+        18px;
+
+    }
+
+
+    .side-card h3 {
+
+      color:
+        var(--gold);
+
+      margin-bottom:
+        10px;
+
+      font-size:
+        1.25rem;
+
+    }
+
+
+    .side-card p,
+    .side-card li {
+
+      color:
+        var(--muted);
+
+      font-size:
+        0.9rem;
+
+      line-height:
+        1.55;
+
+    }
+
+
+    .side-card ul {
+
+      padding-left:
+        18px;
+
+      margin-top:
+        10px;
+
+      display:
+        grid;
+
+      gap:
+        7px;
+
+    }
+
+
+    /* =====================================================
+       FORM
+       ===================================================== */
+
+    .form-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap:
+        18px;
+
+    }
+
+
+    .field {
+
+      margin-bottom:
+        18px;
+
+    }
+
+
+    .field.full {
+
+      grid-column:
+        1 / -1;
+
+    }
+
+
+    label {
+
+      display:
+        block;
+
+      margin-bottom:
+        7px;
+
+      color:
+        #edd49c;
+
+      font-weight:
+        bold;
+
+    }
+
+
+    .hint {
+
+      display:
+        block;
+
+      margin-top:
+        6px;
+
+      color:
+        #8e8065;
+
+      font-size:
+        0.77rem;
+
+    }
+
+
+    input,
+    textarea,
+    select {
+
+      width:
+        100%;
+
+      color:
+        #fff1cf;
+
+      background:
+        rgba(5, 8, 12, 0.86);
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.14);
+
+      border-radius:
+        11px;
+
+      outline:
+        none;
+
+      padding:
+        12px 13px;
+
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+
+    }
+
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+
+      border-color:
+        rgba(255, 184, 65, 0.48);
+
+      box-shadow:
+        0 0 16px
+        rgba(255, 145, 20, 0.10);
+
+    }
+
+
+    textarea {
+
+      resize:
+        vertical;
+
+      min-height:
+        130px;
+
+    }
+
+
+    textarea.large {
+
+      min-height:
+        210px;
+
+    }
+
+
+    select option {
+
+      background:
+        #11151b;
+
+      color:
+        #f4e5b5;
+
+    }
+
+
+    input[type="file"] {
+
+      cursor:
+        pointer;
+
+      padding:
+        10px;
+
+    }
+
+
+    /* =====================================================
+       FILE BOX
+       ===================================================== */
+
+    .file-box {
+
+      border:
+        1px dashed
+        rgba(255, 194, 82, 0.22);
+
+      background:
+        rgba(255, 183, 77, 0.025);
+
+      border-radius:
+        13px;
+
+      padding:
+        16px;
+
+    }
+
+
+    .file-name {
+
+      margin-top:
+        8px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        0.82rem;
+
+      word-break:
+        break-all;
+
+    }
+
+
+    /* =====================================================
+       ICON PREVIEW
+       ===================================================== */
+
+    .preview-box {
+
+      display:
+        none;
+
+      margin-top:
+        12px;
+
+      width:
+        110px;
+
+      height:
+        110px;
+
+      overflow:
+        hidden;
+
+      border-radius:
+        13px;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.14);
+
+      background:
+        #07090d;
+
+    }
+
+
+    .preview-box img {
+
+      width:
+        100%;
+
+      height:
+        100%;
+
+      object-fit:
+        cover;
+
+    }
+
+
+    /* =====================================================
+       SUBMIT AREA
+       ===================================================== */
+
+    .submit-area {
+
+      margin-top:
+        12px;
+
+      padding-top:
+        22px;
+
+      border-top:
+        1px solid
+        var(--line);
+
+    }
+
+
+    .submit-area .button {
+
+      width:
+        100%;
+
+      min-height:
+        50px;
+
+      font-size:
+        1rem;
+
+    }
+
+
+    .message {
+
+      display:
+        none;
+
+      margin-top:
+        16px;
+
+      padding:
+        13px 14px;
+
+      border-radius:
+        11px;
+
+      text-align:
+        center;
+
+      line-height:
+        1.45;
+
+    }
+
+
+    .message.success {
+
+      display:
+        block;
+
+      color:
+        #dfffd2;
+
+      background:
+        rgba(87, 155, 65, 0.13);
+
+      border:
+        1px solid
+        rgba(130, 210, 105, 0.20);
+
+    }
+
+
+    .message.error {
+
+      display:
+        block;
+
+      color:
+        #ffd1c6;
+
+      background:
+        rgba(180, 50, 35, 0.13);
+
+      border:
+        1px solid
+        rgba(230, 90, 60, 0.20);
+
+    }
+
+
+    /* =====================================================
+       PROGRESS
+       ===================================================== */
+
+    .progress-wrap {
+
+      display:
+        none;
+
+      margin-top:
+        16px;
+
+    }
+
+
+    .progress-label {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      gap:
+        12px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        0.82rem;
+
+      margin-bottom:
+        7px;
+
+    }
+
+
+    .progress-track {
+
+      width:
+        100%;
+
+      height:
+        10px;
+
+      border-radius:
+        999px;
+
+      background:
+        rgba(255, 255, 255, 0.05);
+
+      overflow:
+        hidden;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.08);
+
+    }
+
+
+    .progress-bar {
+
+      width:
+        0%;
+
+      height:
+        100%;
+
+      background:
+
+        linear-gradient(
+          90deg,
+          #d97706,
+          #f2c15b
+        );
+
+      transition:
+        width 0.2s ease;
+
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (
+      max-width: 900px
+    ) {
+
+      .upload-panel {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+
+      .page-heading {
+
+        flex-direction:
+          column;
+
+        align-items:
+          flex-start;
+
+      }
+
+
+      .account-card {
+
+        width:
+          100%;
+
+      }
+
+    }
+
+
+    @media (
+      max-width: 680px
+    ) {
+
+      .nav {
+
+        align-items:
+          flex-start;
+
+        flex-direction:
+          column;
+
+        padding:
+          13px 0;
+
+      }
+
+
+      .nav-actions {
+
+        width:
+          100%;
+
+      }
+
+
+      .nav-actions .button {
+
+        flex:
+          1;
+
+      }
+
+
+      .form-grid {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+
+      .field.full {
+
+        grid-column:
+          auto;
+
+      }
+
+
+      .page {
+
+        padding-top:
+          36px;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header class="topbar">
+
+
+    <div class="nav">
+
+
+      <a
+        href="/"
+        class="brand"
+      >
+
+        <img
+          src="ymirmodwebsiteicon.png"
+          alt="YMIR Mods"
+        />
+
+
+        <div class="brand-text">
+
+          <h1>
+            YMIR MODS
+          </h1>
+
+          <p>
+            Mod Publisher
+          </p>
+
+        </div>
+
+      </a>
+
+
+      <div class="nav-actions">
+
+        <a
+          href="/dashboard"
+          class="button secondary"
+        >
+          Dashboard
+        </a>
+
+
+        <a
+          href="/"
+          class="button secondary"
+        >
+          View Website
+        </a>
+
+      </div>
+
+
+    </div>
+
+
+  </header>
+
+
+  <main class="page">
+
+
+    <!-- LOADING -->
+
+    <div
+      id="loading"
+      class="loading"
+    >
+      Checking your YMIR uploader permissions...
+    </div>
+
+
+    <!-- ACCESS DENIED -->
+
+    <div
+      id="accessDenied"
+      class="access-denied"
+    >
+
+      <h3>
+        Upload Access Required
+      </h3>
+
+      <p id="accessDeniedMessage">
+        Your account is not permitted to upload mods.
+      </p>
+
+      <a
+        href="/dashboard"
+        class="button primary"
+      >
+        Return to Dashboard
+      </a>
+
+    </div>
+
+
+    <!-- UPLOAD PAGE -->
+
+    <div
+      id="uploadWrap"
+      class="upload-wrap"
+    >
+
+
+      <section class="page-heading">
+
+
+        <div>
+
+          <span class="eyebrow">
+            YMIR CREATOR TOOLS
+          </span>
+
+          <h2>
+            Upload New Mod
+          </h2>
+
+          <p>
+            Publish a mod directly to YMIR Mods.
+            Your package will be stored in Cloudflare R2
+            and the mod information will be saved in
+            the YMIR database.
+          </p>
+
+        </div>
+
+
+        <div class="account-card">
+
+          <strong id="accountName">
+            Creator
+          </strong>
+
+          <p id="accountEmail">
+            Loading...
+          </p>
+
+          <p id="accountRole">
+            Checking permissions...
+          </p>
+
+        </div>
+
+
+      </section>
+
+
+      <div class="upload-panel">
+
+
+        <!-- =================================================
+             FORM
+             ================================================= -->
+
+        <section class="form-card">
+
+
+          <form id="uploadForm">
+
+
+            <div class="form-grid">
+
+
+              <!-- MOD NAME -->
+
+              <div class="field">
+
+                <label for="name">
+                  Mod Name
+                </label>
+
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  maxlength="80"
+                  placeholder="Example: BeastMarketOutpost"
+                  required
+                />
+
+              </div>
+
+
+              <!-- VERSION -->
+
+              <div class="field">
+
+                <label for="version">
+                  Version
+                </label>
+
+                <input
+                  id="version"
+                  name="version"
+                  type="text"
+                  maxlength="32"
+                  placeholder="Example: 1.0.0"
+                  required
+                />
+
+              </div>
+
+
+              <!-- CATEGORY -->
+
+              <div class="field full">
+
+                <label for="category">
+                  Category
+                </label>
+
+                <select
+                  id="category"
+                  name="category"
+                  required
+                >
+
+                  <option value="">
+                    Select category
+                  </option>
+
+                  <option value="Adventure">
+                    Adventure
+                  </option>
+
+                  <option value="Building">
+                    Building
+                  </option>
+
+                  <option value="Combat">
+                    Combat
+                  </option>
+
+                  <option value="Companions">
+                    Companions
+                  </option>
+
+                  <option value="Creatures">
+                    Creatures
+                  </option>
+
+                  <option value="Gameplay">
+                    Gameplay
+                  </option>
+
+                  <option value="Magic">
+                    Magic
+                  </option>
+
+                  <option value="Mounts">
+                    Mounts
+                  </option>
+
+                  <option value="Quests">
+                    Quests
+                  </option>
+
+                  <option value="Server">
+                    Server
+                  </option>
+
+                  <option value="Trading">
+                    Trading
+                  </option>
+
+                  <option value="Utility">
+                    Utility
+                  </option>
+
+                  <option value="World">
+                    World
+                  </option>
+
+                  <option value="Other">
+                    Other
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <!-- SHORT DESCRIPTION -->
+
+              <div class="field full">
+
+                <label for="shortDescription">
+                  Short Description
+                </label>
+
+                <textarea
+                  id="shortDescription"
+                  name="short_description"
+                  maxlength="250"
+                  placeholder="A short summary that will appear on mod cards."
+                  required
+                ></textarea>
+
+                <span
+                  id="shortCounter"
+                  class="hint"
+                >
+                  0 / 250 characters
+                </span>
+
+              </div>
+
+
+              <!-- FULL DESCRIPTION -->
+
+              <div class="field full">
+
+                <label for="fullDescription">
+                  Full Description
+                </label>
+
+                <textarea
+                  id="fullDescription"
+                  class="large"
+                  name="full_description"
+                  maxlength="10000"
+                  placeholder="Describe the mod, its features, requirements, controls, progression, compatibility, and anything players should know."
+                ></textarea>
+
+              </div>
+
+
+              <!-- CHANGELOG -->
+
+              <div class="field full">
+
+                <label for="changelog">
+                  Changelog
+                </label>
+
+                <textarea
+                  id="changelog"
+                  name="changelog"
+                  maxlength="10000"
+                  placeholder="Example:
+- Added companion commands
+- Fixed mount animation
+- Improved server sync"
+                ></textarea>
+
+              </div>
+
+
+              <!-- MOD ZIP -->
+
+              <div class="field full">
+
+                <label for="modFile">
+                  Mod ZIP
+                </label>
+
+                <div class="file-box">
+
+                  <input
+                    id="modFile"
+                    name="mod_file"
+                    type="file"
+                    accept=".zip,application/zip"
+                    required
+                  />
+
+                  <div
+                    id="modFileName"
+                    class="file-name"
+                  >
+                    No ZIP selected.
+                  </div>
+
+                </div>
+
+                <span class="hint">
+                  Required. Maximum size currently set to 100 MB.
+                </span>
+
+              </div>
+
+
+              <!-- ICON -->
+
+              <div class="field full">
+
+                <label for="iconFile">
+                  Mod Icon
+                </label>
+
+                <div class="file-box">
+
+                  <input
+                    id="iconFile"
+                    name="icon_file"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                  />
+
+                  <div
+                    id="iconFileName"
+                    class="file-name"
+                  >
+                    No icon selected.
+                  </div>
+
+
+                  <div
+                    id="iconPreview"
+                    class="preview-box"
+                  >
+
+                    <img
+                      id="iconPreviewImage"
+                      alt="Icon preview"
+                    />
+
+                  </div>
+
+                </div>
+
+                <span class="hint">
+                  Optional. PNG, JPG or WebP. Maximum 5 MB.
+                </span>
+
+              </div>
+
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <div class="submit-area">
+
+
+              <button
+                id="submitButton"
+                class="button primary"
+                type="submit"
+              >
+                Upload Mod
+              </button>
+
+
+              <div
+                id="progressWrap"
+                class="progress-wrap"
+              >
+
+                <div class="progress-label">
+
+                  <span id="progressText">
+                    Uploading...
+                  </span>
+
+                  <span id="progressPercent">
+                    0%
+                  </span>
+
+                </div>
+
+
+                <div class="progress-track">
+
+                  <div
+                    id="progressBar"
+                    class="progress-bar"
+                  ></div>
+
+                </div>
+
+              </div>
+
+
+              <div
+                id="message"
+                class="message"
+              ></div>
+
+
+            </div>
+
+
+          </form>
+
+
+        </section>
+
+
+        <!-- =================================================
+             SIDE INFO
+             ================================================= -->
+
+        <aside>
+
+
+          <div class="side-card">
+
+            <h3>
+              Upload Requirements
+            </h3>
+
+            <ul>
+
+              <li>
+                You must be logged into a YMIR account.
+              </li>
+
+              <li>
+                Your account must have uploader permission.
+              </li>
+
+              <li>
+                Mod package must be a ZIP file.
+              </li>
+
+              <li>
+                Use a clear version number such as 1.0.0.
+              </li>
+
+              <li>
+                Icons should ideally be square.
+              </li>
+
+            </ul>
+
+          </div>
+
+
+          <div class="side-card">
+
+            <h3>
+              What Happens Next?
+            </h3>
+
+            <p>
+              The ZIP and icon are stored in
+              YMIR's R2 storage.
+            </p>
+
+            <p style="margin-top:10px;">
+              The mod's name, version, description,
+              category, file location and changelog
+              are saved into D1.
+            </p>
+
+            <p style="margin-top:10px;">
+              Next we'll create proper public mod pages
+              so uploaded mods automatically appear
+              on the main website.
+            </p>
+
+          </div>
+
+
+        </aside>
+
+
+      </div>
+
+
+    </div>
+
+
+  </main>
+
+
+  <script>
+
+    /* =====================================================
+       ELEMENTS
+       ===================================================== */
+
+    const loading =
+      document.getElementById(
+        "loading"
+      );
+
+
+    const accessDenied =
+      document.getElementById(
+        "accessDenied"
+      );
+
+
+    const accessDeniedMessage =
+      document.getElementById(
+        "accessDeniedMessage"
+      );
+
+
+    const uploadWrap =
+      document.getElementById(
+        "uploadWrap"
+      );
+
+
+    const accountName =
+      document.getElementById(
+        "accountName"
+      );
+
+
+    const accountEmail =
+      document.getElementById(
+        "accountEmail"
+      );
+
+
+    const accountRole =
+      document.getElementById(
+        "accountRole"
+      );
+
+
+    const form =
+      document.getElementById(
+        "uploadForm"
+      );
+
+
+    const submitButton =
+      document.getElementById(
+        "submitButton"
+      );
+
+
+    const message =
+      document.getElementById(
+        "message"
+      );
+
+
+    const modFile =
+      document.getElementById(
+        "modFile"
+      );
+
+
+    const modFileName =
+      document.getElementById(
+        "modFileName"
+      );
+
+
+    const iconFile =
+      document.getElementById(
+        "iconFile"
+      );
+
+
+    const iconFileName =
+      document.getElementById(
+        "iconFileName"
+      );
+
+
+    const iconPreview =
+      document.getElementById(
+        "iconPreview"
+      );
+
+
+    const iconPreviewImage =
+      document.getElementById(
+        "iconPreviewImage"
+      );
+
+
+    const shortDescription =
+      document.getElementById(
+        "shortDescription"
+      );
+
+
+    const shortCounter =
+      document.getElementById(
+        "shortCounter"
+      );
+
+
+    const progressWrap =
+      document.getElementById(
+        "progressWrap"
+      );
+
+
+    const progressBar =
+      document.getElementById(
+        "progressBar"
+      );
+
+
+    const progressText =
+      document.getElementById(
+        "progressText"
+      );
+
+
+    const progressPercent =
+      document.getElementById(
+        "progressPercent"
+      );
+
+
+    /* =====================================================
+       CHECK LOGIN + UPLOAD PERMISSION
+       ===================================================== */
+
+    async function checkUploaderAccess() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/me",
+            {
+              method:
+                "GET",
+
+              credentials:
+                "same-origin",
+
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          denyAccess(
+            "Unable to verify your YMIR account."
+          );
+
+          return;
+        }
+
+
+        if (
+          !result.authenticated ||
+          !result.user
+        ) {
+
+          denyAccess(
+            "You must be logged in before uploading mods."
+          );
+
+          return;
+        }
+
+
+        if (
+          !result.user.can_upload
+        ) {
+
+          denyAccess(
+            "Your YMIR account does not currently have uploader permission."
+          );
+
+          return;
+        }
+
+
+        accountName.textContent =
+          result.user.username;
+
+
+        accountEmail.textContent =
+          result.user.email;
+
+
+        accountRole.textContent =
+          String(
+            result.user.role
+          ).toUpperCase()
+          +
+          " • UPLOADER";
+
+
+        loading.style.display =
+          "none";
+
+
+        accessDenied.style.display =
+          "none";
+
+
+        uploadWrap.style.display =
+          "block";
+
+
+      } catch (error) {
+
+        denyAccess(
+          "Unable to contact the YMIR server."
+        );
+
+      }
+
+    }
+
+
+    function denyAccess(
+      text
+    ) {
+
+      loading.style.display =
+        "none";
+
+
+      uploadWrap.style.display =
+        "none";
+
+
+      accessDenied.style.display =
+        "block";
+
+
+      accessDeniedMessage.textContent =
+        text;
+
+    }
+
+
+    /* =====================================================
+       DESCRIPTION COUNTER
+       ===================================================== */
+
+    shortDescription.addEventListener(
+      "input",
+      () => {
+
+        shortCounter.textContent =
+          shortDescription
+            .value
+            .length
+          +
+          " / 250 characters";
+
+      }
+    );
+
+
+    /* =====================================================
+       MOD FILE NAME
+       ===================================================== */
+
+    modFile.addEventListener(
+      "change",
+      () => {
+
+        const file =
+          modFile.files[0];
+
+
+        if (!file) {
+
+          modFileName.textContent =
+            "No ZIP selected.";
+
+          return;
+
+        }
+
+
+        modFileName.textContent =
+          file.name
+          +
+          " • "
+          +
+          formatBytes(
+            file.size
+          );
+
+      }
+    );
+
+
+    /* =====================================================
+       ICON PREVIEW
+       ===================================================== */
+
+    iconFile.addEventListener(
+      "change",
+      () => {
+
+        const file =
+          iconFile.files[0];
+
+
+        if (!file) {
+
+          iconFileName.textContent =
+            "No icon selected.";
+
+
+          iconPreview.style.display =
+            "none";
+
+
+          iconPreviewImage.removeAttribute(
+            "src"
+          );
+
+
+          return;
+
+        }
+
+
+        iconFileName.textContent =
+          file.name
+          +
+          " • "
+          +
+          formatBytes(
+            file.size
+          );
+
+
+        const reader =
+          new FileReader();
+
+
+        reader.onload =
+          (event) => {
+
+            iconPreviewImage.src =
+              event.target.result;
+
+
+            iconPreview.style.display =
+              "block";
+
+          };
+
+
+        reader.readAsDataURL(
+          file
+        );
+
+      }
+    );
+
+
+    /* =====================================================
+       UPLOAD FORM
+       ===================================================== */
+
+    form.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+
+        message.className =
+          "message";
+
+
+        message.textContent =
+          "";
+
+
+        const selectedModFile =
+          modFile.files[0];
+
+
+        if (!selectedModFile) {
+
+          showMessage(
+            "Please choose a mod ZIP file.",
+            false
+          );
+
+          return;
+
+        }
+
+
+        if (
+          !selectedModFile.name
+            .toLowerCase()
+            .endsWith(".zip")
+        ) {
+
+          showMessage(
+            "The mod package must be a ZIP file.",
+            false
+          );
+
+          return;
+
+        }
+
+
+        if (
+          selectedModFile.size >
+          100 * 1024 * 1024
+        ) {
+
+          showMessage(
+            "The mod ZIP is larger than 100 MB.",
+            false
+          );
+
+          return;
+
+        }
+
+
+        const selectedIconFile =
+          iconFile.files[0];
+
+
+        if (
+          selectedIconFile &&
+          selectedIconFile.size >
+          5 * 1024 * 1024
+        ) {
+
+          showMessage(
+            "The icon is larger than 5 MB.",
+            false
+          );
+
+          return;
+
+        }
+
+
+        const formData =
+          new FormData(
+            form
+          );
+
+
+        submitButton.disabled =
+          true;
+
+
+        submitButton.textContent =
+          "Uploading...";
+
+
+        progressWrap.style.display =
+          "block";
+
+
+        setProgress(
+          15,
+          "Preparing upload..."
+        );
+
+
+        try {
+
+          setProgress(
+            35,
+            "Sending files to YMIR..."
+          );
+
+
+          const response =
+            await fetch(
+              "/api/mods/upload",
+              {
+                method:
+                  "POST",
+
+                credentials:
+                  "same-origin",
+
+                body:
+                  formData
+              }
+            );
+
+
+          setProgress(
+            80,
+            "Saving mod information..."
+          );
+
+
+          let result;
+
+
+          try {
+
+            result =
+              await response.json();
+
+          } catch {
+
+            result = {
+              success:
+                false,
+
+              message:
+                "The YMIR server returned an invalid response."
+            };
+
+          }
+
+
+          if (
+            !response.ok ||
+            !result.success
+          ) {
+
+            showMessage(
+              result.message ||
+              "Unable to upload mod.",
+              false
+            );
+
+
+            setProgress(
+              0,
+              "Upload failed."
+            );
+
+
+            return;
+
+          }
+
+
+          setProgress(
+            100,
+            "Upload complete."
+          );
+
+
+          showMessage(
+            result.mod.name
+            +
+            " "
+            +
+            result.mod.version
+            +
+            " uploaded successfully!",
+            true
+          );
+
+
+          form.reset();
+
+
+          modFileName.textContent =
+            "No ZIP selected.";
+
+
+          iconFileName.textContent =
+            "No icon selected.";
+
+
+          iconPreview.style.display =
+            "none";
+
+
+          iconPreviewImage.removeAttribute(
+            "src"
+          );
+
+
+          shortCounter.textContent =
+            "0 / 250 characters";
+
+
+        } catch (error) {
+
+          console.error(
+            error
+          );
+
+
+          showMessage(
+            "Unable to contact the YMIR upload server.",
+            false
+          );
+
+
+          setProgress(
+            0,
+            "Upload failed."
+          );
+
+
+        } finally {
+
+          submitButton.disabled =
+            false;
+
+
+          submitButton.textContent =
+            "Upload Mod";
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       STATUS MESSAGE
+       ===================================================== */
+
+    function showMessage(
+      text,
+      success
+    ) {
+
+      message.textContent =
+        text;
+
+
+      message.className =
+        success
+          ? "message success"
+          : "message error";
+
+    }
+
+
+    /* =====================================================
+       PROGRESS
+       ===================================================== */
+
+    function setProgress(
+      percent,
+      text
+    ) {
+
+      progressBar.style.width =
+        percent + "%";
+
+
+      progressPercent.textContent =
+        percent + "%";
+
+
+      progressText.textContent =
+        text;
+
+    }
+
+
+    /* =====================================================
+       FILE SIZE
+       ===================================================== */
+
+    function formatBytes(
+      bytes
+    ) {
+
+      if (
+        bytes === 0
+      ) {
+        return "0 B";
+      }
+
+
+      const units = [
+        "B",
+        "KB",
+        "MB",
+        "GB"
+      ];
+
+
+      const index =
+        Math.floor(
+          Math.log(bytes) /
+          Math.log(1024)
+        );
+
+
+      const value =
+        bytes /
+        Math.pow(
+          1024,
+          index
+        );
+
+
+      return (
+        Math.round(
+          value * 10
+        ) / 10
+      )
+      +
+      " "
+      +
+      units[index];
+
+    }
+
+
+    /* =====================================================
+       START
+       ===================================================== */
+
+    checkUploaderAccess();
+
+  </script>
+
+
+</body>
+
+</html>
