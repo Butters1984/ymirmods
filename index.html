@@ -1,13 +1,663 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>YMIR Mods</title>
-</head>
+  <meta name="description" content="YMIR Mods - Valheim mods, downloads, updates and community content." />
+  <style>
+    :root {
+      --bg: #0b0f0d;
+      --bg2: #121915;
+      --panel: rgba(19, 27, 23, 0.92);
+      --panel-2: rgba(28, 39, 33, 0.88);
+      --text: #e7e2d3;
+      --muted: #a7aa9d;
+      --gold: #c6a96b;
+      --gold-2: #e1c68f;
+      --green: #6c8b5f;
+      --green-2: #88a978;
+      --line: rgba(198, 169, 107, 0.2);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      --max: 1200px;
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top, rgba(79, 104, 74, 0.18), transparent 30%),
+        linear-gradient(180deg, #0b0f0d 0%, #0e1310 35%, #121915 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .container {
+      width: min(92%, var(--max));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(8, 11, 9, 0.85);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 76px;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand h1 {
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      color: var(--gold-2);
+      text-transform: uppercase;
+    }
+
+    .brand span {
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      font-size: 0.95rem;
+      opacity: 0.9;
+      transition: 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--gold-2);
+      opacity: 1;
+    }
+
+    .hero {
+      padding: 90px 0 70px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      z-index: 0;
+    }
+
+    .hero::before {
+      width: 240px;
+      height: 240px;
+      top: 20px;
+      left: -60px;
+      background: rgba(198, 169, 107, 0.08);
+    }
+
+    .hero::after {
+      width: 300px;
+      height: 300px;
+      right: -100px;
+      bottom: -20px;
+      background: rgba(108, 139, 95, 0.10);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 30px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-copy h2 {
+      font-size: clamp(2.4rem, 6vw, 4.6rem);
+      line-height: 1.05;
+      color: var(--gold-2);
+      margin-bottom: 18px;
+      text-shadow: 0 2px 18px rgba(0,0,0,0.35);
+    }
+
+    .hero-copy p {
+      font-size: 1.08rem;
+      color: var(--text);
+      max-width: 720px;
+      margin-bottom: 28px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 13px 22px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(198,169,107,0.18), rgba(198,169,107,0.08));
+      color: var(--gold-2);
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      box-shadow: var(--shadow);
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(198,169,107,0.5);
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,0.02);
+      color: var(--text);
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(20,28,24,0.95), rgba(13,18,15,0.95));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card h3 {
+      color: var(--gold-2);
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .hero-card p {
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .runes {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .rune {
+      border: 1px solid rgba(198,169,107,0.25);
+      background: rgba(198,169,107,0.07);
+      color: var(--gold-2);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+    }
+
+    section {
+      padding: 28px 0 70px;
+    }
+
+    .section-title {
+      margin-bottom: 28px;
+    }
+
+    .section-title h3 {
+      font-size: 2rem;
+      color: var(--gold-2);
+      margin-bottom: 8px;
+    }
+
+    .section-title p {
+      color: var(--muted);
+      max-width: 700px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      transition: 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(198,169,107,0.35);
+    }
+
+    .card h4 {
+      color: var(--gold-2);
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--muted);
+      margin-bottom: 16px;
+      min-height: 72px;
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 0.8rem;
+      color: var(--green-2);
+      border: 1px solid rgba(136,169,120,0.25);
+      background: rgba(136,169,120,0.07);
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin-bottom: 12px;
+    }
+
+    .card .link {
+      color: var(--gold-2);
+      font-weight: bold;
+    }
+
+    .feature-band {
+      background: linear-gradient(180deg, rgba(20,28,24,0.7), rgba(11,15,13,0.6));
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .feature {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .feature h4 {
+      color: var(--gold-2);
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .updates {
+      display: grid;
+      gap: 16px;
+    }
+
+    .update {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--gold);
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .update h4 {
+      color: var(--gold-2);
+      margin-bottom: 6px;
+    }
+
+    .update p {
+      color: var(--muted);
+    }
+
+    .cta {
+      background: linear-gradient(180deg, rgba(28,39,33,0.96), rgba(18,25,21,0.96));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .cta h3 {
+      color: var(--gold-2);
+      font-size: 1.9rem;
+      margin-bottom: 8px;
+    }
+
+    .cta p {
+      color: var(--muted);
+      max-width: 720px;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 28px 0 40px;
+      color: var(--muted);
+      background: rgba(8, 11, 9, 0.6);
+    }
+
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a:hover {
+      color: var(--gold-2);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .cards,
+      .feature-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .nav {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 0;
+      }
+
+      .hero {
+        padding-top: 70px;
+      }
+
+      .hero-grid,
+      .cards,
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy h2 {
+        font-size: 2.4rem;
+      }
+
+      .cta {
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
 <body>
-  <h1>YMIR Mods</h1>
-  <p>Valheim mods, updates, downloads and community content.</p>
+
+  <header class="topbar">
+    <div class="container nav">
+      <div class="brand">
+        <h1>YMIR Mods</h1>
+        <span>Valheim mods, downloads, updates & community</span>
+      </div>
+
+      <nav class="nav-links">
+        <a href="#mods">Mods</a>
+        <a href="#features">Features</a>
+        <a href="#updates">Updates</a>
+        <a href="#community">Community</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <h2>Forge Your Valheim World With YMIR Mods</h2>
+          <p>
+            Discover custom Valheim content built for adventure, immersion, mounts,
+            markets, gliders, companions, horror systems, and more. Welcome to the
+            home of YMIR Mods.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn" href="#mods">Explore Mods</a>
+            <a class="btn secondary" href="#community">Join Community</a>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <h3>Featured Realms</h3>
+          <p>
+            A Valheim-inspired hub for downloads, updates, mod showcases, server news,
+            and community creations.
+          </p>
+          <div class="runes">
+            <span class="rune">Mounts</span>
+            <span class="rune">Magic</span>
+            <span class="rune">Markets</span>
+            <span class="rune">Gliders</span>
+            <span class="rune">Companions</span>
+            <span class="rune">Server Events</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="mods">
+      <div class="container">
+        <div class="section-title">
+          <h3>Featured Mods</h3>
+          <p>
+            A few of the core YMIR projects. You can replace these links later with
+            real download pages, GitHub links, Thunderstore links, or your own mod pages.
+          </p>
+        </div>
+
+        <div class="cards">
+          <article class="card">
+            <span class="pill">Hub / Quests</span>
+            <h4>BeastMarketOutpost</h4>
+            <p>
+              A living NPC outpost with quest boards, progression, companions,
+              and a handcrafted world-building experience.
+            </p>
+            <a class="link" href="#">View mod →</a>
+          </article>
+
+          <article class="card">
+            <span class="pill">Mount System</span>
+            <h4>MountRidingSystem</h4>
+            <p>
+              Refined riding controls, mount behavior systems, restrictions,
+              and smoother creature handling for Valheim adventures.
+            </p>
+            <a class="link" href="#">View mod →</a>
+          </article>
+
+          <article class="card">
+            <span class="pill">Dragons / Combat</span>
+            <h4>DragonWars</h4>
+            <p>
+              Expanded dragon riding, aerial combat abilities, HUD elements,
+              and powerful movement options in the skies of Valheim.
+            </p>
+            <a class="link" href="#">View mod →</a>
+          </article>
+
+          <article class="card">
+            <span class="pill">Travel / Utility</span>
+            <h4>Valheim Gliders</h4>
+            <p>
+              Add glider progression and controlled aerial travel with themed
+              equipment, movement balance, and new ways to explore.
+            </p>
+            <a class="link" href="#">View mod →</a>
+          </article>
+
+          <article class="card">
+            <span class="pill">Trade / Economy</span>
+            <h4>World Market</h4>
+            <p>
+              A player-driven trading system with NPC mode, listings, and
+              immersive economy features for multiplayer servers.
+            </p>
+            <a class="link" href="#">View mod →</a>
+          </article>
+
+          <article class="card">
+            <span class="pill">Horror / Survival</span>
+            <h4>The Mist</h4>
+            <p>
+              Night horror systems, day-night danger, mystical rewards,
+              and atmospheric fear-driven survival gameplay.
+            </p>
+            <a class="link" href="#">View mod →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="feature-band">
+      <div class="container">
+        <div class="section-title">
+          <h3>What Makes YMIR Different</h3>
+          <p>
+            Built for memorable gameplay, themed servers, and Valheim experiences that feel bigger,
+            richer, and more alive.
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <div class="feature">
+            <h4>Immersive Design</h4>
+            <p>Mods built with atmosphere, progression, and in-world identity in mind.</p>
+          </div>
+          <div class="feature">
+            <h4>Server Ready</h4>
+            <p>Many systems are made with multiplayer communities and themed servers in mind.</p>
+          </div>
+          <div class="feature">
+            <h4>Fantasy Theme</h4>
+            <p>Norse-inspired visual identity and mechanics that suit Valheim’s style.</p>
+          </div>
+          <div class="feature">
+            <h4>Ongoing Updates</h4>
+            <p>Active tweaking, balancing, improvements, and fresh features over time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="updates">
+      <div class="container">
+        <div class="section-title">
+          <h3>Latest Updates</h3>
+          <p>
+            For now these are sample update blocks. Later we can turn this into a proper
+            changelog or news area.
+          </p>
+        </div>
+
+        <div class="updates">
+          <div class="update">
+            <h4>Website Launched</h4>
+            <p>
+              The first version of YMIR Mods is now live with Cloudflare Pages and GitHub deployment.
+            </p>
+          </div>
+
+          <div class="update">
+            <h4>Valheim Theme Added</h4>
+            <p>
+              The homepage now carries a darker Norse-fantasy style fitting the YMIR brand.
+            </p>
+          </div>
+
+          <div class="update">
+            <h4>More Mod Pages Coming Soon</h4>
+            <p>
+              Individual pages for each mod, download buttons, screenshots, and server/community links
+              can be added next.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="community">
+      <div class="container">
+        <div class="cta">
+          <div>
+            <h3>Join the YMIR Community</h3>
+            <p>
+              Follow development, check server updates, discover new mods, and become part of the
+              growing YMIR Valheim world.
+            </p>
+          </div>
+          <div class="hero-actions">
+            <a class="btn" href="#">Discord</a>
+            <a class="btn secondary" href="#">Server Info</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <p>© <span id="year"></span> YMIR Mods. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#mods">Mods</a>
+        <a href="#updates">Updates</a>
+        <a href="#community">Community</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
