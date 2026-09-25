@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Dashboard - YMIR Mods</title>
+
+  <style>
+    :root {
+      --bg: #07090d;
+      --bg-2: #0b1117;
+
+      --panel: rgba(18, 21, 27, 0.94);
+      --panel-2: rgba(24, 28, 35, 0.92);
+
+      --gold: #ffdc8c;
+      --gold-2: #f2c15b;
+
+      --orange: #ff9f1c;
+      --orange-dark: #d97706;
+
+      --text: #f4e5b5;
+      --muted: #bca97a;
+
+      --green: #91d878;
+      --red: #ff8b75;
+
+      --line: rgba(255, 194, 82, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      color: var(--text);
+
+      background:
+        radial-gradient(
+          circle at 18% 18%,
+          rgba(255, 155, 30, 0.09),
+          transparent 26%
+        ),
+        radial-gradient(
+          circle at 82% 70%,
+          rgba(255, 190, 70, 0.06),
+          transparent 25%
+        ),
+        linear-gradient(
+          180deg,
+          #05070a,
+          #0b1117
+        );
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+
+      background:
+        rgba(5, 7, 10, 0.88);
+
+      backdrop-filter:
+        blur(12px);
+
+      border-bottom:
+        1px solid
+        var(--line);
+
+      box-shadow:
+        0 8px 30px
+        rgba(0, 0, 0, 0.28);
+    }
+
+    .nav {
+      width:
+        min(
+          1180px,
+          calc(100% - 40px)
+        );
+
+      min-height: 86px;
+
+      margin: 0 auto;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content:
+        space-between;
+
+      gap: 22px;
+    }
+
+    .brand {
+      display: flex;
+
+      align-items: center;
+
+      gap: 13px;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+
+      object-fit: cover;
+
+      border-radius: 11px;
+
+      filter:
+        drop-shadow(
+          0 0 10px
+          rgba(255, 170, 35, 0.45)
+        );
+    }
+
+    .brand-text h1 {
+      color: var(--gold);
+
+      font-size: 1.55rem;
+
+      line-height: 1.1;
+    }
+
+    .brand-text p {
+      color: var(--muted);
+
+      font-size: 0.82rem;
+
+      margin-top: 3px;
+    }
+
+    .nav-actions {
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+    }
+
+    /* =====================================================
+       BUTTONS
+       ===================================================== */
+
+    .button {
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      min-height: 42px;
+
+      padding: 10px 16px;
+
+      border-radius: 11px;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.15);
+
+      cursor: pointer;
+
+      font-family: inherit;
+
+      font-weight: bold;
+
+      font-size: 0.9rem;
+
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .button:hover {
+      transform:
+        translateY(-2px);
+    }
+
+    .button.primary {
+      color: #15100a;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--orange-dark),
+          var(--gold-2)
+        );
+
+      box-shadow:
+        0 10px 28px
+        rgba(217, 119, 6, 0.18);
+    }
+
+    .button.primary:hover {
+      box-shadow:
+        0 14px 34px
+        rgba(217, 119, 6, 0.28);
+    }
+
+    .button.secondary {
+      color: var(--gold);
+
+      background:
+        rgba(255, 183, 77, 0.06);
+    }
+
+    .button.secondary:hover {
+      border-color:
+        rgba(255, 194, 82, 0.35);
+    }
+
+    .button.danger {
+      color: #ffc7bb;
+
+      background:
+        rgba(180, 50, 35, 0.10);
+
+      border-color:
+        rgba(255, 110, 85, 0.18);
+    }
+
+    /* =====================================================
+       PAGE
+       ===================================================== */
+
+    .page {
+      width:
+        min(
+          1180px,
+          calc(100% - 40px)
+        );
+
+      margin: 0 auto;
+
+      padding:
+        60px 0 80px;
+    }
+
+    .loading-screen {
+      min-height: 420px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 1.05rem;
+    }
+
+    .dashboard {
+      display: none;
+    }
+
+    /* =====================================================
+       WELCOME
+       ===================================================== */
+
+    .welcome {
+      display: flex;
+
+      align-items: flex-end;
+
+      justify-content:
+        space-between;
+
+      gap: 24px;
+
+      margin-bottom: 28px;
+    }
+
+    .welcome-tag {
+      display: inline-block;
+
+      padding: 7px 12px;
+
+      margin-bottom: 12px;
+
+      border-radius: 999px;
+
+      color: var(--gold);
+
+      font-size: 0.78rem;
+
+      font-weight: bold;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.15);
+
+      background:
+        rgba(255, 176, 45, 0.06);
+    }
+
+    .welcome h2 {
+      color: var(--gold);
+
+      font-size:
+        clamp(
+          2.2rem,
+          5vw,
+          4rem
+        );
+
+      line-height: 1;
+
+      margin-bottom: 10px;
+
+      text-shadow:
+        0 0 22px
+        rgba(255, 170, 35, 0.10);
+    }
+
+    .welcome p {
+      color: var(--muted);
+
+      font-size: 1.02rem;
+    }
+
+    /* =====================================================
+       USER CARD
+       ===================================================== */
+
+    .user-card {
+      min-width: 270px;
+
+      padding: 18px;
+
+      border-radius: 16px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(24, 28, 35, 0.95),
+          rgba(12, 15, 20, 0.95)
+        );
+
+      border:
+        1px solid
+        var(--line);
+
+      box-shadow:
+        0 18px 45px
+        rgba(0, 0, 0, 0.35);
+    }
+
+    .user-name {
+      color: var(--gold);
+
+      font-size: 1.25rem;
+
+      font-weight: bold;
+    }
+
+    .user-email {
+      color: var(--muted);
+
+      font-size: 0.82rem;
+
+      margin-top: 3px;
+
+      word-break: break-word;
+    }
+
+    .badges {
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 7px;
+
+      margin-top: 13px;
+    }
+
+    .badge {
+      display: inline-flex;
+
+      align-items: center;
+
+      padding: 5px 9px;
+
+      border-radius: 999px;
+
+      font-size: 0.72rem;
+
+      font-weight: bold;
+    }
+
+    .badge.admin {
+      color: #15100a;
+
+      background:
+        linear-gradient(
+          135deg,
+          #e58d0d,
+          #f4cf73
+        );
+    }
+
+    .badge.uploader {
+      color: #dfffd2;
+
+      background:
+        rgba(86, 160, 65, 0.15);
+
+      border:
+        1px solid
+        rgba(130, 210, 105, 0.20);
+    }
+
+    /* =====================================================
+       DASHBOARD GRID
+       ===================================================== */
+
+    .dashboard-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 18px;
+
+      margin-top: 34px;
+    }
+
+    .dashboard-card {
+      position: relative;
+
+      min-height: 220px;
+
+      padding: 24px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      border-radius: 18px;
+
+      overflow: hidden;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(23, 27, 34, 0.96),
+          rgba(11, 14, 19, 0.96)
+        );
+
+      border:
+        1px solid
+        var(--line);
+
+      box-shadow:
+        0 20px 50px
+        rgba(0, 0, 0, 0.38);
+
+      transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .dashboard-card::before {
+      content: "";
+
+      position: absolute;
+
+      top: -75px;
+      right: -75px;
+
+      width: 180px;
+      height: 180px;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255, 160, 30, 0.10),
+          transparent 65%
+        );
+
+      pointer-events: none;
+    }
+
+    .dashboard-card:hover {
+      transform:
+        translateY(-5px);
+
+      border-color:
+        rgba(255, 194, 82, 0.32);
+
+      box-shadow:
+        0 26px 60px
+        rgba(0, 0, 0, 0.45),
+
+        0 0 20px
+        rgba(255, 150, 25, 0.07);
+    }
+
+    .card-icon {
+      color: var(--orange);
+
+      font-size: 1.8rem;
+
+      margin-bottom: 12px;
+    }
+
+    .dashboard-card h3 {
+      color: var(--gold);
+
+      font-size: 1.45rem;
+
+      margin-bottom: 8px;
+    }
+
+    .dashboard-card p {
+      color: var(--muted);
+
+      font-size: 0.91rem;
+
+      line-height: 1.55;
+
+      margin-bottom: 20px;
+    }
+
+    .dashboard-card .button {
+      margin-top: auto;
+
+      align-self: flex-start;
+    }
+
+    .dashboard-card.disabled {
+      opacity: 0.58;
+    }
+
+    .dashboard-card.disabled:hover {
+      transform: none;
+    }
+
+    /* =====================================================
+       STATUS
+       ===================================================== */
+
+    .status-panel {
+      margin-top: 22px;
+
+      padding: 20px 22px;
+
+      border-radius: 16px;
+
+      background:
+        rgba(18, 21, 27, 0.72);
+
+      border:
+        1px solid
+        var(--line);
+    }
+
+    .status-panel h3 {
+      color: var(--gold);
+
+      margin-bottom: 9px;
+    }
+
+    .status-panel p {
+      color: var(--muted);
+
+      line-height: 1.55;
+    }
+
+    /* =====================================================
+       ERROR
+       ===================================================== */
+
+    .error-screen {
+      display: none;
+
+      max-width: 620px;
+
+      margin:
+        80px auto;
+
+      padding: 32px;
+
+      text-align: center;
+
+      border-radius: 18px;
+
+      background:
+        rgba(22, 18, 19, 0.94);
+
+      border:
+        1px solid
+        rgba(255, 110, 85, 0.18);
+    }
+
+    .error-screen h2 {
+      color: var(--red);
+
+      margin-bottom: 10px;
+    }
+
+    .error-screen p {
+      color: #cfaaa0;
+
+      margin-bottom: 20px;
+    }
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+      .welcome {
+        align-items:
+          flex-start;
+
+        flex-direction:
+          column;
+      }
+
+      .user-card {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .nav {
+        padding:
+          12px 0;
+
+        align-items:
+          flex-start;
+
+        flex-direction:
+          column;
+      }
+
+      .nav-actions {
+        width: 100%;
+
+        flex-wrap: wrap;
+      }
+
+      .dashboard-grid {
+        grid-template-columns:
+          1fr;
+      }
+
+      .page {
+        padding-top:
+          38px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="topbar">
+
+    <div class="nav">
+
+      <a
+        href="/"
+        class="brand"
+      >
+
+        <img
+          src="ymirmodwebsiteicon.png"
+          alt="YMIR Mods"
+          class="logo"
+        />
+
+        <div class="brand-text">
+
+          <h1>
+            YMIR MODS
+          </h1>
+
+          <p>
+            Creator Dashboard
+          </p>
+
+        </div>
+
+      </a>
+
+
+      <div class="nav-actions">
+
+        <a
+          class="button secondary"
+          href="/"
+        >
+          View Website
+        </a>
+
+        <button
+          class="button danger"
+          id="logoutButton"
+          type="button"
+        >
+          Logout
+        </button>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <main class="page">
+
+    <!-- LOADING -->
+    <div
+      id="loadingScreen"
+      class="loading-screen"
+    >
+      Checking your YMIR account...
+    </div>
+
+
+    <!-- ERROR -->
+    <div
+      id="errorScreen"
+      class="error-screen"
+    >
+
+      <h2>
+        Access Denied
+      </h2>
+
+      <p id="errorMessage">
+        You must be logged in to access the dashboard.
+      </p>
+
+      <a
+        class="button primary"
+        href="/login"
+      >
+        Go to Login
+      </a>
+
+    </div>
+
+
+    <!-- DASHBOARD -->
+    <div
+      id="dashboard"
+      class="dashboard"
+    >
+
+      <section class="welcome">
+
+        <div>
+
+          <span class="welcome-tag">
+            YMIR CREATOR CONTROL
+          </span>
+
+          <h2>
+            Welcome,
+            <span id="welcomeUsername">
+              Creator
+            </span>
+          </h2>
+
+          <p>
+            Manage your YMIR Mods content,
+            releases, and uploads from here.
+          </p>
+
+        </div>
+
+
+        <div class="user-card">
+
+          <div
+            id="userName"
+            class="user-name"
+          >
+            Loading...
+          </div>
+
+          <div
+            id="userEmail"
+            class="user-email"
+          ></div>
+
+          <div class="badges">
+
+            <span
+              id="roleBadge"
+              class="badge admin"
+            >
+              MEMBER
+            </span>
+
+            <span
+              id="uploadBadge"
+              class="badge uploader"
+              style="display:none;"
+            >
+              UPLOADER
+            </span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- DASHBOARD CARDS -->
+      <section class="dashboard-grid">
+
+        <article
+          id="uploadCard"
+          class="dashboard-card"
+        >
+
+          <div class="card-icon">
+            ↑
+          </div>
+
+          <h3>
+            Upload Mod
+          </h3>
+
+          <p>
+            Publish a new YMIR mod,
+            add its information,
+            icon, version,
+            and downloadable package.
+          </p>
+
+          <a
+            id="uploadButton"
+            class="button primary"
+            href="/upload"
+          >
+            Upload New Mod
+          </a>
+
+        </article>
+
+
+        <article class="dashboard-card">
+
+          <div class="card-icon">
+            ◈
+          </div>
+
+          <h3>
+            My Mods
+          </h3>
+
+          <p>
+            View the mods attached
+            to your YMIR account
+            and manage their future releases.
+          </p>
+
+          <button
+            class="button secondary"
+            type="button"
+            disabled
+          >
+            Coming Soon
+          </button>
+
+        </article>
+
+
+        <article class="dashboard-card">
+
+          <div class="card-icon">
+            ⚒
+          </div>
+
+          <h3>
+            Mod Updates
+          </h3>
+
+          <p>
+            Upload new versions,
+            maintain changelogs,
+            and manage existing releases.
+          </p>
+
+          <button
+            class="button secondary"
+            type="button"
+            disabled
+          >
+            Coming Soon
+          </button>
+
+        </article>
+
+
+        <article class="dashboard-card">
+
+          <div class="card-icon">
+            ◉
+          </div>
+
+          <h3>
+            Downloads
+          </h3>
+
+          <p>
+            Track how often your mods
+            are downloaded from YMIR Mods.
+          </p>
+
+          <button
+            class="button secondary"
+            type="button"
+            disabled
+          >
+            Coming Soon
+          </button>
+
+        </article>
+
+
+        <article
+          id="adminCard"
+          class="dashboard-card"
+          style="display:none;"
+        >
+
+          <div class="card-icon">
+            ♛
+          </div>
+
+          <h3>
+            Admin Controls
+          </h3>
+
+          <p>
+            Manage YMIR members,
+            uploader permissions,
+            moderation,
+            and site administration.
+          </p>
+
+          <button
+            class="button secondary"
+            type="button"
+            disabled
+          >
+            Coming Soon
+          </button>
+
+        </article>
+
+
+        <article class="dashboard-card">
+
+          <div class="card-icon">
+            ⚙
+          </div>
+
+          <h3>
+            Account
+          </h3>
+
+          <p>
+            Account settings
+            and profile management
+            will live here later.
+          </p>
+
+          <button
+            class="button secondary"
+            type="button"
+            disabled
+          >
+            Coming Soon
+          </button>
+
+        </article>
+
+      </section>
+
+
+      <section class="status-panel">
+
+        <h3>
+          YMIR Creator Access
+        </h3>
+
+        <p id="accessStatus">
+          Checking upload permissions...
+        </p>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+  <script>
+    const loadingScreen =
+      document.getElementById(
+        "loadingScreen"
+      );
+
+    const errorScreen =
+      document.getElementById(
+        "errorScreen"
+      );
+
+    const errorMessage =
+      document.getElementById(
+        "errorMessage"
+      );
+
+    const dashboard =
+      document.getElementById(
+        "dashboard"
+      );
+
+    const welcomeUsername =
+      document.getElementById(
+        "welcomeUsername"
+      );
+
+    const userName =
+      document.getElementById(
+        "userName"
+      );
+
+    const userEmail =
+      document.getElementById(
+        "userEmail"
+      );
+
+    const roleBadge =
+      document.getElementById(
+        "roleBadge"
+      );
+
+    const uploadBadge =
+      document.getElementById(
+        "uploadBadge"
+      );
+
+    const uploadCard =
+      document.getElementById(
+        "uploadCard"
+      );
+
+    const uploadButton =
+      document.getElementById(
+        "uploadButton"
+      );
+
+    const adminCard =
+      document.getElementById(
+        "adminCard"
+      );
+
+    const accessStatus =
+      document.getElementById(
+        "accessStatus"
+      );
+
+    const logoutButton =
+      document.getElementById(
+        "logoutButton"
+      );
+
+
+    /* =====================================================
+       LOAD CURRENT USER
+       ===================================================== */
+
+    async function loadUser() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/me",
+            {
+              method: "GET",
+
+              credentials:
+                "same-origin",
+
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          showError(
+            "Unable to verify your YMIR account."
+          );
+
+          return;
+        }
+
+
+        if (
+          !result.authenticated ||
+          !result.user
+        ) {
+
+          showError(
+            "You must be logged in to access the YMIR creator dashboard."
+          );
+
+          return;
+        }
+
+
+        showDashboard(
+          result.user
+        );
+
+
+      } catch (error) {
+
+        showError(
+          "Unable to contact the YMIR server."
+        );
+
+      }
+    }
+
+
+    /* =====================================================
+       SHOW DASHBOARD
+       ===================================================== */
+
+    function showDashboard(
+      user
+    ) {
+
+      loadingScreen.style.display =
+        "none";
+
+      errorScreen.style.display =
+        "none";
+
+      dashboard.style.display =
+        "block";
+
+
+      welcomeUsername.textContent =
+        user.username;
+
+
+      userName.textContent =
+        user.username;
+
+
+      userEmail.textContent =
+        user.email;
+
+
+      roleBadge.textContent =
+        String(
+          user.role
+        ).toUpperCase();
+
+
+      /* ADMIN CARD */
+
+      if (
+        user.role ===
+        "admin"
+      ) {
+
+        adminCard.style.display =
+          "flex";
+
+      }
+
+
+      /* UPLOADER ACCESS */
+
+      if (
+        user.can_upload
+      ) {
+
+        uploadBadge.style.display =
+          "inline-flex";
+
+
+        accessStatus.textContent =
+          "Upload access granted. You are authorized to publish mods on YMIR Mods.";
+
+      } else {
+
+        uploadBadge.style.display =
+          "none";
+
+
+        uploadCard.classList.add(
+          "disabled"
+        );
+
+
+        uploadButton.removeAttribute(
+          "href"
+        );
+
+
+        uploadButton.textContent =
+          "Upload Access Required";
+
+
+        uploadButton.classList.remove(
+          "primary"
+        );
+
+
+        uploadButton.classList.add(
+          "secondary"
+        );
+
+
+        accessStatus.textContent =
+          "Your account does not currently have mod upload permission.";
+
+      }
+    }
+
+
+    /* =====================================================
+       ERROR
+       ===================================================== */
+
+    function showError(
+      text
+    ) {
+
+      loadingScreen.style.display =
+        "none";
+
+
+      dashboard.style.display =
+        "none";
+
+
+      errorScreen.style.display =
+        "block";
+
+
+      errorMessage.textContent =
+        text;
+    }
+
+
+    /* =====================================================
+       LOGOUT
+       ===================================================== */
+
+    logoutButton.addEventListener(
+      "click",
+      async () => {
+
+        logoutButton.disabled =
+          true;
+
+
+        logoutButton.textContent =
+          "Logging Out...";
+
+
+        try {
+
+          await fetch(
+            "/api/logout",
+            {
+              method:
+                "POST",
+
+              credentials:
+                "same-origin"
+            }
+          );
+
+        } catch (error) {
+
+          console.error(
+            error
+          );
+
+        }
+
+
+        window.location.href =
+          "/login";
+
+      }
+    );
+
+
+    loadUser();
+  </script>
+
+</body>
+</html>
