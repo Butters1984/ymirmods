@@ -259,7 +259,6 @@
       height: 58px;
 
       object-fit: cover;
-
       border-radius: 10px;
       flex-shrink: 0;
 
@@ -321,10 +320,8 @@
     .header-actions {
       display: flex;
       align-items: center;
-
       gap: 9px;
       margin-left: 6px;
-
       flex-wrap: nowrap;
     }
 
@@ -379,10 +376,10 @@
       display: grid;
 
       grid-template-columns:
-        1.25fr 0.75fr;
+        1.15fr 0.85fr;
 
-      gap: 42px;
-      align-items: center;
+      gap: 44px;
+      align-items: start;
     }
 
     .eyebrow {
@@ -511,191 +508,197 @@
     }
 
     /* =========================================================
-       PANELS
+       LAST UPDATED MODS
        ========================================================= */
 
-    .panel {
+    .last-updated-area {
+      width: 100%;
+    }
+
+    .last-updated-title {
+      color: var(--gold-2);
+
+      font-size: 1.85rem;
+
+      margin-bottom: 16px;
+
+      text-shadow:
+        0 0 18px
+        rgba(255, 174, 35, 0.12);
+    }
+
+    .last-updated-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .last-mod-card {
+      position: relative;
+      padding: 18px;
+
+      border-radius: 17px;
+      overflow: hidden;
+      isolation: isolate;
+
       background:
         linear-gradient(
           180deg,
-          rgba(22,26,32,0.92),
-          rgba(12,15,20,0.92)
+          rgba(22,27,34,0.96),
+          rgba(12,16,21,0.96)
         );
 
       border:
         1px solid
-        rgba(255,192,80,0.12);
-
-      border-radius: var(--radius);
+        rgba(255,194,82,0.10);
 
       box-shadow:
-        var(--shadow),
+        0 15px 38px
+        rgba(0,0,0,0.34);
 
-        inset 0 0 0 1px
-        rgba(255,255,255,0.02);
+      transition:
+        transform 0.28s ease,
+        border-color 0.28s ease,
+        box-shadow 0.28s ease;
     }
 
-    /* =========================================================
-       LAST UPDATED MODS
-       ========================================================= */
-
-    .last-updated-panel {
-      padding: 22px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .last-updated-panel::before {
+    .last-mod-card::before {
       content: "";
 
       position: absolute;
 
-      width: 220px;
-      height: 220px;
+      top: -55px;
+      right: -55px;
 
-      top: -100px;
-      right: -80px;
+      width: 140px;
+      height: 140px;
 
       border-radius: 50%;
 
       background:
         radial-gradient(
           circle,
-          rgba(255, 162, 30, 0.13),
+          rgba(255,170,50,0.12),
           transparent 65%
         );
 
       pointer-events: none;
     }
 
-    .last-updated-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .last-mod-card::after {
+      content: "";
 
-      gap: 16px;
+      position: absolute;
+      inset: -70%;
 
-      margin-bottom: 16px;
+      z-index: -1;
 
-      position: relative;
-      z-index: 1;
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,185,70,0.14),
+          rgba(255,115,0,0.06) 30%,
+          transparent 64%
+        );
+
+      opacity: 0;
+      transform: scale(0.70);
+
+      transition:
+        opacity 0.35s ease,
+        transform 0.45s ease;
     }
 
-    .last-updated-header h3 {
+    .last-mod-card:hover {
+      transform:
+        translateY(-5px)
+        scale(1.012);
+
+      border-color:
+        rgba(255,197,87,0.38);
+
+      box-shadow:
+        0 22px 50px
+        rgba(0,0,0,0.42),
+
+        0 0 20px
+        rgba(255,150,25,0.10);
+    }
+
+    .last-mod-card:hover::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .last-mod-card .type {
+      display: inline-block;
+
+      margin-bottom: 8px;
+
+      padding: 5px 10px;
+
+      border-radius: 999px;
+
       color: var(--gold-2);
 
-      font-size: 1.55rem;
-
-      margin: 0;
-
-      text-shadow:
-        0 0 16px
-        rgba(255, 174, 35, 0.12);
-    }
-
-    .last-updated-header span {
-      color: var(--muted);
-
-      font-size: 0.78rem;
-
-      white-space: nowrap;
-    }
-
-    .last-updated-list {
-      display: grid;
-
-      gap: 10px;
-
-      position: relative;
-      z-index: 1;
-    }
-
-    .mini-mod-card {
-      display: flex;
-
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 14px;
-
-      padding: 13px 14px;
-
-      border-radius: 13px;
+      background:
+        rgba(255,193,74,0.07);
 
       border:
         1px solid
-        rgba(255, 190, 80, 0.10);
+        rgba(255,196,86,0.14);
 
-      background:
-        linear-gradient(
-          180deg,
-          rgba(25, 29, 36, 0.80),
-          rgba(14, 17, 22, 0.88)
-        );
-
-      transition:
-        transform 0.22s ease,
-        border-color 0.22s ease,
-        box-shadow 0.22s ease,
-        background 0.22s ease;
-    }
-
-    .mini-mod-card:hover {
-      transform: translateX(5px);
-
-      border-color:
-        rgba(255, 193, 75, 0.28);
-
-      background:
-        linear-gradient(
-          180deg,
-          rgba(32, 35, 41, 0.92),
-          rgba(17, 20, 25, 0.95)
-        );
-
-      box-shadow:
-        0 0 18px
-        rgba(255, 150, 20, 0.08);
-    }
-
-    .mini-type {
-      display: inline-block;
-
-      margin-bottom: 2px;
-
-      color: var(--orange-2);
-
-      font-size: 0.69rem;
-
+      font-size: 0.72rem;
       font-weight: 700;
     }
 
-    .mini-mod-card h4 {
+    .last-mod-card h4 {
       color: #f2d797;
 
-      font-size: 0.98rem;
+      font-size: 1.28rem;
 
-      margin: 0;
+      margin-bottom: 7px;
 
       transition:
-        color 0.2s ease,
-        text-shadow 0.2s ease;
+        color 0.25s ease,
+        text-shadow 0.25s ease;
     }
 
-    .mini-mod-card:hover h4 {
+    .last-mod-card:hover h4 {
       color: #ffe0a0;
 
       text-shadow:
         0 0 10px
-        rgba(255, 180, 55, 0.18);
+        rgba(255,191,70,0.28);
     }
 
-    .updated-text {
-      color: var(--muted);
+    .last-mod-card p {
+      color: #cdb786;
 
-      font-size: 0.72rem;
+      font-size: 0.88rem;
 
-      white-space: nowrap;
+      line-height: 1.5;
+
+      margin-bottom: 11px;
+    }
+
+    .last-mod-card a {
+      display: inline-block;
+
+      color: var(--orange-2);
+
+      font-size: 0.86rem;
+
+      font-weight: 700;
+
+      transition: 0.2s ease;
+    }
+
+    .last-mod-card a:hover {
+      color: var(--gold-2);
+
+      text-shadow:
+        0 0 10px
+        rgba(255,160,20,0.18);
     }
 
     /* =========================================================
@@ -819,7 +822,7 @@
     }
 
     /* =========================================================
-       CARDS
+       FEATURED MOD CARDS
        ========================================================= */
 
     .cards {
@@ -878,7 +881,6 @@
         );
 
       border-radius: 50%;
-
       pointer-events: none;
     }
 
@@ -899,7 +901,6 @@
         );
 
       opacity: 0;
-
       transform: scale(0.70);
 
       transition:
@@ -969,7 +970,6 @@
 
     .card h4 {
       font-size: 1.8rem;
-
       margin-bottom: 10px;
 
       color: #f2d797;
@@ -990,7 +990,6 @@
 
     .card p {
       color: #cdb786;
-
       margin-bottom: 20px;
     }
 
@@ -1015,6 +1014,27 @@
     /* =========================================================
        WHY YMIR
        ========================================================= */
+
+    .panel {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(22,26,32,0.92),
+          rgba(12,15,20,0.92)
+        );
+
+      border:
+        1px solid
+        rgba(255,192,80,0.12);
+
+      border-radius: var(--radius);
+
+      box-shadow:
+        var(--shadow),
+
+        inset 0 0 0 1px
+        rgba(255,255,255,0.02);
+    }
 
     .split {
       display: grid;
@@ -1060,11 +1080,9 @@
 
     .info-box ul {
       padding-left: 18px;
-
       margin-top: 12px;
 
       display: grid;
-
       gap: 8px;
     }
 
@@ -1074,13 +1092,11 @@
 
     .cta {
       margin-top: 10px;
-
       padding: 36px;
 
       text-align: center;
 
       position: relative;
-
       overflow: hidden;
     }
 
@@ -1110,7 +1126,6 @@
 
     .cta h3 {
       position: relative;
-
       z-index: 1;
 
       font-size: 2.2rem;
@@ -1122,7 +1137,6 @@
 
     .cta p {
       position: relative;
-
       z-index: 1;
 
       color: #d4c08f;
@@ -1135,7 +1149,6 @@
 
     .cta .hero-actions {
       position: relative;
-
       z-index: 1;
 
       justify-content: center;
@@ -1147,7 +1160,6 @@
 
     footer {
       position: relative;
-
       z-index: 2;
 
       border-top:
@@ -1160,20 +1172,16 @@
       backdrop-filter: blur(8px);
 
       padding: 26px 0;
-
       margin-top: 30px;
     }
 
     .footer-grid {
       display: flex;
-
-      justify-content:
-        space-between;
+      justify-content: space-between;
 
       gap: 18px;
 
       align-items: center;
-
       flex-wrap: wrap;
     }
 
@@ -1183,15 +1191,12 @@
 
     .footer-links {
       display: flex;
-
       gap: 18px;
-
       flex-wrap: wrap;
     }
 
     .footer-links a {
       color: #e8cf97;
-
       font-weight: 700;
     }
 
@@ -1206,9 +1211,7 @@
     @media (max-width: 1120px) {
       .nav {
         align-items: flex-start;
-
         flex-direction: column;
-
         padding: 14px 0;
       }
 
@@ -1218,9 +1221,7 @@
 
       .nav-links {
         width: 100%;
-
         justify-content: flex-start;
-
         padding-left: 72px;
       }
     }
@@ -1236,8 +1237,17 @@
           repeat(2, 1fr);
       }
 
-      .last-updated-panel {
-        max-width: 650px;
+      .last-updated-area {
+        max-width: 720px;
+      }
+
+      .last-updated-grid {
+        grid-template-columns:
+          repeat(3, 1fr);
+      }
+
+      .last-mod-card {
+        min-height: 220px;
       }
     }
 
@@ -1248,13 +1258,11 @@
     @media (max-width: 760px) {
       .nav {
         align-items: center;
-
         text-align: center;
       }
 
       .header-left {
         justify-content: center;
-
         flex-wrap: wrap;
       }
 
@@ -1273,13 +1281,11 @@
 
       .brand p {
         white-space: normal;
-
         max-width: 210px;
       }
 
       .header-actions {
         width: 100%;
-
         justify-content: center;
 
         margin-left: 0;
@@ -1288,7 +1294,6 @@
 
       .header-actions .btn {
         padding: 9px 12px;
-
         font-size: 0.82rem;
       }
 
@@ -1316,26 +1321,21 @@
         grid-template-columns: 1fr;
       }
 
+      .last-updated-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .last-mod-card {
+        min-height: auto;
+      }
+
       .runic-divider {
         gap: 12px;
       }
 
       .runic-divider span {
         font-size: 1rem;
-
         letter-spacing: 5px;
-      }
-
-      .last-updated-panel {
-        width: 100%;
-      }
-
-      .last-updated-header {
-        align-items: flex-start;
-
-        flex-direction: column;
-
-        gap: 2px;
       }
     }
 
@@ -1356,8 +1356,9 @@
       .btn,
       .info-box,
       .header-logo,
-      .mini-mod-card,
-      .mini-mod-card h4 {
+      .last-mod-card,
+      .last-mod-card::after,
+      .last-mod-card h4 {
         transition: none;
       }
     }
@@ -1366,7 +1367,6 @@
 
 <body>
 
-  <!-- RANDOM GALAXY -->
   <div id="galaxy-stars" aria-hidden="true"></div>
 
   <!-- HEADER -->
@@ -1458,104 +1458,89 @@
           </h2>
 
           <p>
-
             Discover a darker, richer Valheim experience
             shaped by Norse myth, cosmic atmosphere,
             and handcrafted systems for mounts,
             quests, markets, dragons, gliders,
             companions, and more.
-
           </p>
 
         </div>
 
         <!-- LAST UPDATED MODS -->
-        <div class="panel last-updated-panel">
+        <div class="last-updated-area">
 
-          <div class="last-updated-header">
+          <h3 class="last-updated-title">
+            Last Updated Mods
+          </h3>
 
-            <h3>
-              Last Updated Mods
-            </h3>
+          <div class="last-updated-grid">
 
-            <span>
-              Recent changes
-            </span>
+            <article class="last-mod-card">
 
-          </div>
-
-          <div class="last-updated-list">
-
-            <a
-              class="mini-mod-card"
-              href="#"
-            >
-
-              <div>
-
-                <span class="mini-type">
-                  Dragons / Combat
-                </span>
-
-                <h4>
-                  DragonWars
-                </h4>
-
-              </div>
-
-              <span class="updated-text">
-                Updated
+              <span class="type">
+                Dragons / Combat
               </span>
 
-            </a>
+              <h4>
+                DragonWars
+              </h4>
 
+              <p>
+                Take to the skies with powerful dragons,
+                abilities, flight mechanics, and cinematic
+                Norse combat energy.
+              </p>
 
-            <a
-              class="mini-mod-card"
-              href="#"
-            >
+              <a href="#">
+                View Mod →
+              </a>
 
-              <div>
+            </article>
 
-                <span class="mini-type">
-                  Travel / Utility
-                </span>
+            <article class="last-mod-card">
 
-                <h4>
-                  Valheim Gliders
-                </h4>
-
-              </div>
-
-              <span class="updated-text">
-                Updated
+              <span class="type">
+                Travel / Utility
               </span>
 
-            </a>
+              <h4>
+                Valheim Gliders
+              </h4>
 
+              <p>
+                Glide across the world with progression-based
+                wings and equipment built for freedom,
+                exploration, and adventure.
+              </p>
 
-            <a
-              class="mini-mod-card"
-              href="#"
-            >
+              <a href="#">
+                View Mod →
+              </a>
 
-              <div>
+            </article>
 
-                <span class="mini-type">
-                  Trading
-                </span>
+            <article class="last-mod-card">
 
-                <h4>
-                  World Market
-                </h4>
-
-              </div>
-
-              <span class="updated-text">
-                Updated
+              <span class="type">
+                Trading
               </span>
 
-            </a>
+              <h4>
+                World Market
+              </h4>
+
+              <p>
+                A player-driven economy with listings,
+                NPC interaction, and an immersive marketplace
+                built for multiplayer communities.
+              </p>
+
+              <a href="#">
+                View Mod →
+              </a>
+
+            </article>
 
           </div>
 
@@ -1587,12 +1572,10 @@
           </h3>
 
           <p>
-
             A few of the core YMIR projects.
             These will eventually link to full
             mod pages, downloads, screenshots,
             changelogs, and additional information.
-
           </p>
 
         </div>
@@ -1610,12 +1593,10 @@
             </h4>
 
             <p>
-
               A living outpost with Toski,
               Squee, a quest board,
               companion systems, and a growing
               community-driven world.
-
             </p>
 
             <a href="#">
@@ -1635,12 +1616,10 @@
             </h4>
 
             <p>
-
               Refined riding controls,
               better mount handling,
               quality-of-life behavior,
               and smoother adventure across Valheim.
-
             </p>
 
             <a href="#">
@@ -1660,11 +1639,9 @@
             </h4>
 
             <p>
-
               Take to the skies with powerful dragons,
               abilities, flight mechanics,
               and cinematic Norse combat energy.
-
             </p>
 
             <a href="#">
@@ -1684,11 +1661,9 @@
             </h4>
 
             <p>
-
               A player-driven economy with listings,
               NPC interaction, and a marketplace
               built for server communities.
-
             </p>
 
             <a href="#">
@@ -1708,11 +1683,9 @@
             </h4>
 
             <p>
-
               Glide across the world with
               progression-based wings and equipment
               designed for freedom, danger, and style.
-
             </p>
 
             <a href="#">
@@ -1732,12 +1705,10 @@
             </h4>
 
             <p>
-
               Bring a haunting edge to Valheim
               with fog, nightfeeders,
               mystical oak progression,
               and survival tension.
-
             </p>
 
             <a href="#">
@@ -1774,11 +1745,9 @@
           </h3>
 
           <p>
-
             Built with a darker Valheim identity
             in mind — part mythic forge,
             part cosmic hall of the gods.
-
           </p>
 
         </div>
@@ -1792,14 +1761,12 @@
             </h4>
 
             <p>
-
               Dark backgrounds,
               orange-gold highlights,
               mythic atmosphere,
               and a subtle cosmic tone inspired
               by Norse gods and the forge
               of the heavens.
-
             </p>
 
             <ul>
@@ -1827,12 +1794,10 @@
             </h4>
 
             <p>
-
               This site can grow into your central
               home for mod pages, patch notes,
               community links, server information,
               and download hubs.
-
             </p>
 
             <ul>
@@ -1871,11 +1836,9 @@
           </h3>
 
           <p>
-
             This area can later become your proper
             YMIR development news, patch notes,
             and announcement hub.
-
           </p>
 
         </div>
@@ -1893,12 +1856,10 @@
             </h4>
 
             <p>
-
               New combat tuning,
               improved dragon handling,
               and better flight behavior
               for sky-bound adventures.
-
             </p>
 
             <a href="#">
@@ -1918,12 +1879,10 @@
             </h4>
 
             <p>
-
               Post event schedules,
               special server happenings,
               and the latest community calls
               from the YMIR world.
-
             </p>
 
             <a href="#">
@@ -1943,12 +1902,10 @@
             </h4>
 
             <p>
-
               Share what you're building next —
               new features, bug fixes,
               roadmap ideas,
               and upcoming releases.
-
             </p>
 
             <a href="#">
@@ -1985,13 +1942,11 @@
           </h3>
 
           <p>
-
             Follow development,
             check server updates,
             discover new mods,
             and become part of the growing
             YMIR Valheim world.
-
           </p>
 
           <div class="hero-actions">
@@ -2063,12 +2018,10 @@
       .textContent =
       new Date().getFullYear();
 
-
     const galaxy =
       document.getElementById(
         "galaxy-stars"
       );
-
 
     const starColours = [
       "#ffffff",
@@ -2079,24 +2032,20 @@
       "#ff9825"
     ];
 
-
     const isMobile =
       window.matchMedia(
         "(max-width: 760px)"
       ).matches;
-
 
     const STAR_COUNT =
       isMobile
         ? 85
         : 155;
 
-
     const AESIR_STAR_COUNT =
       isMobile
         ? 4
         : 8;
-
 
     for (
       let i = 0;
@@ -2109,40 +2058,31 @@
           "span"
         );
 
-
       star.className =
         "galaxy-star";
-
 
       star.style.left =
         Math.random() * 100 + "%";
 
-
       star.style.top =
         Math.random() * 100 + "%";
-
 
       let size =
         Math.random() * 1.5 +
         0.45;
 
-
       if (
         Math.random() > 0.94
       ) {
-
         size =
           Math.random() * 1.8 +
           1.8;
-
       }
-
 
       star.style.setProperty(
         "--star-size",
         size + "px"
       );
-
 
       const colour =
         starColours[
@@ -2152,10 +2092,8 @@
           )
         ];
 
-
       star.style.color =
         colour;
-
 
       const minOpacity =
         (
@@ -2164,7 +2102,6 @@
           0.08
         ).toFixed(2);
 
-
       const maxOpacity =
         (
           Math.random() *
@@ -2172,96 +2109,78 @@
           0.40
         ).toFixed(2);
 
-
       star.style.setProperty(
         "--min-opacity",
         minOpacity
       );
-
 
       star.style.setProperty(
         "--max-opacity",
         maxOpacity
       );
 
-
       const glow =
         Math.random() * 5 +
         2;
-
 
       star.style.setProperty(
         "--star-glow",
         glow + "px"
       );
 
-
       const twinkleSpeed =
         Math.random() * 6 +
         3;
-
 
       star.style.setProperty(
         "--twinkle-speed",
         twinkleSpeed + "s"
       );
 
-
       const floatSpeed =
         Math.random() * 100 +
         80;
-
 
       star.style.setProperty(
         "--float-speed",
         floatSpeed + "s"
       );
 
-
       const driftX =
         Math.random() * 90 -
         45;
 
-
       const driftY =
         Math.random() * 90 -
         45;
-
 
       star.style.setProperty(
         "--drift-x",
         driftX + "px"
       );
 
-
       star.style.setProperty(
         "--drift-y",
         driftY + "px"
       );
 
-
       const delay =
         -(Math.random() * 15);
-
 
       star.style.setProperty(
         "--delay",
         delay + "s"
       );
 
-
       galaxy.appendChild(
         star
       );
-
     }
-
 
     const generatedStars =
       galaxy.querySelectorAll(
         ".galaxy-star"
       );
-
 
     const availableIndexes =
       Array.from(
@@ -2269,11 +2188,9 @@
           length:
             generatedStars.length
         },
-
         (_, index) =>
           index
       );
-
 
     for (
       let i = 0;
@@ -2287,47 +2204,39 @@
           availableIndexes.length
         );
 
-
       const starIndex =
         availableIndexes.splice(
           randomPosition,
           1
         )[0];
 
-
       const star =
         generatedStars[
           starIndex
         ];
 
-
       star.classList.add(
         "aesir-star"
       );
 
-
       const largerSize =
         Math.random() * 1.8 +
         2.2;
-
 
       star.style.setProperty(
         "--star-size",
         largerSize + "px"
       );
 
-
       star.style.setProperty(
         "--max-opacity",
         "0.95"
       );
 
-
       star.style.setProperty(
         "--star-glow",
         "8px"
       );
-
     }
   </script>
 
