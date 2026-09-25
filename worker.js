@@ -1,4 +1,4 @@
-const PBKDF2_ITERATIONS = 210000;
+const PBKDF2_ITERATIONS = 100000;
 
 /* =========================================================
    YMIR MODS WORKER
@@ -29,8 +29,7 @@ export default {
         return jsonResponse(
           {
             success: false,
-            message: "Backend is running, but database connection failed",
-            error: error?.message || String(error)
+            message: "Backend is running, but database connection failed"
           },
           500
         );
@@ -262,18 +261,10 @@ async function handleRegister(request, env) {
       error
     );
 
-
-    /* TEMPORARY DEBUG MESSAGE */
     return jsonResponse(
       {
         success: false,
-
-        message:
-          "Unable to create account: " +
-          (
-            error?.message ||
-            String(error)
-          )
+        message: "Unable to create account."
       },
       500
     );
