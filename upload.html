@@ -2,133 +2,96 @@
 <html lang="en">
 
 <head>
-
   <meta charset="UTF-8" />
-
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   />
 
-  <title>Upload Mod - YMIR Mods</title>
+  <title>Submit a Mod - YMIR Mods</title>
+
+  <!-- ZIP reader -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
   <style>
-
     :root {
-
       --bg: #07090d;
-      --bg-2: #0b1117;
-
-      --panel: rgba(18, 21, 27, 0.96);
-      --panel-2: rgba(24, 28, 35, 0.94);
+      --bg2: #0b1118;
+      --panel: #11161f;
+      --panel2: #161c27;
 
       --gold: #ffdc8c;
-      --gold-2: #f2c15b;
-
+      --gold2: #f2c15b;
       --orange: #ff9f1c;
-      --orange-dark: #d97706;
+      --orange2: #d97706;
 
-      --text: #f4e5b5;
-      --muted: #bca97a;
+      --text: #f5e8bd;
+      --muted: #a99670;
 
       --green: #9be57d;
-      --red: #ff9b86;
+      --red: #ff9c89;
 
-      --line:
-        rgba(255, 194, 82, 0.14);
-
+      --line: rgba(255, 194, 82, 0.15);
+      --purple-line: rgba(255, 180, 55, 0.34);
     }
-
 
     * {
-
-      box-sizing:
-        border-box;
-
-      margin:
-        0;
-
-      padding:
-        0;
-
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-
     body {
-
-      min-height:
-        100vh;
+      min-height: 100vh;
 
       font-family:
         Georgia,
         "Times New Roman",
         serif;
 
-      color:
-        var(--text);
+      color: var(--text);
 
       background:
-
         radial-gradient(
-          circle at 18% 16%,
-          rgba(255, 155, 30, 0.10),
+          circle at 10% 15%,
+          rgba(255, 140, 10, 0.08),
           transparent 24%
         ),
-
         radial-gradient(
-          circle at 84% 76%,
-          rgba(255, 190, 70, 0.06),
-          transparent 24%
+          circle at 90% 75%,
+          rgba(255, 190, 70, 0.05),
+          transparent 26%
         ),
-
         linear-gradient(
           180deg,
-          #05070a,
-          #0b1117
+          #06080c,
+          #0b1118
         );
-
     }
-
 
     a {
-
-      color:
-        inherit;
-
-      text-decoration:
-        none;
-
+      color: inherit;
+      text-decoration: none;
     }
-
 
     button,
     input,
-    textarea,
-    select {
-
-      font:
-        inherit;
-
+    select,
+    textarea {
+      font: inherit;
     }
-
 
     /* =====================================================
        HEADER
        ===================================================== */
 
     .topbar {
-
-      position:
-        sticky;
-
-      top:
-        0;
-
-      z-index:
-        30;
+      position: sticky;
+      top: 0;
+      z-index: 100;
 
       background:
-        rgba(5, 7, 10, 0.90);
+        rgba(5, 7, 10, 0.92);
 
       backdrop-filter:
         blur(12px);
@@ -136,499 +99,239 @@
       border-bottom:
         1px solid
         var(--line);
-
-      box-shadow:
-        0 8px 30px
-        rgba(0, 0, 0, 0.30);
-
     }
 
-
     .nav {
-
       width:
         min(
           1180px,
           calc(100% - 40px)
         );
 
+      min-height: 82px;
+
       margin:
         0 auto;
 
-      min-height:
-        84px;
+      display: flex;
 
-      display:
-        flex;
+      align-items: center;
+      justify-content: space-between;
 
-      align-items:
-        center;
-
-      justify-content:
-        space-between;
-
-      gap:
-        20px;
-
+      gap: 20px;
     }
-
 
     .brand {
+      display: flex;
+      align-items: center;
 
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      gap:
-        12px;
-
+      gap: 12px;
     }
 
-
     .brand img {
+      width: 54px;
+      height: 54px;
 
-      width:
-        54px;
+      object-fit: cover;
 
-      height:
-        54px;
-
-      object-fit:
-        cover;
-
-      border-radius:
-        10px;
+      border-radius: 10px;
 
       filter:
         drop-shadow(
-          0 0 10px
-          rgba(255, 170, 35, 0.45)
+          0 0 11px
+          rgba(255, 160, 25, 0.50)
         );
-
     }
 
+    .brand h1 {
+      color: var(--gold);
 
-    .brand-text h1 {
+      font-size: 1.55rem;
 
-      color:
-        var(--gold);
-
-      font-size:
-        1.5rem;
-
-      line-height:
-        1.1;
-
+      line-height: 1;
     }
 
+    .brand p {
+      color: var(--muted);
 
-    .brand-text p {
+      font-size: 0.82rem;
 
-      color:
-        var(--muted);
-
-      font-size:
-        0.82rem;
-
-      margin-top:
-        3px;
-
+      margin-top: 5px;
     }
-
 
     .nav-actions {
-
-      display:
-        flex;
-
-      gap:
-        10px;
-
-      flex-wrap:
-        wrap;
-
+      display: flex;
+      gap: 10px;
     }
-
 
     /* =====================================================
        BUTTONS
        ===================================================== */
 
     .button {
+      display: inline-flex;
 
-      display:
-        inline-flex;
+      align-items: center;
+      justify-content: center;
 
-      align-items:
-        center;
+      padding: 10px 16px;
 
-      justify-content:
-        center;
+      min-height: 42px;
 
-      min-height:
-        42px;
-
-      padding:
-        10px 16px;
-
-      border-radius:
-        11px;
+      border-radius: 10px;
 
       border:
         1px solid
-        rgba(255, 194, 82, 0.16);
+        rgba(255, 194, 82, 0.18);
 
-      cursor:
-        pointer;
+      font-weight: bold;
 
-      font-weight:
-        bold;
+      cursor: pointer;
 
       transition:
         0.2s ease;
 
+      color: var(--gold);
+
+      background:
+        rgba(255, 183, 77, 0.055);
     }
 
-
     .button:hover {
-
       transform:
         translateY(-2px);
 
+      border-color:
+        rgba(255, 194, 82, 0.36);
     }
-
 
     .button.primary {
+      color: #130f08;
 
-      color:
-        #15100a;
+      border: none;
 
       background:
-
         linear-gradient(
           135deg,
-          var(--orange-dark),
-          var(--gold-2)
+          var(--orange2),
+          var(--gold2)
         );
+    }
 
-      border:
-        none;
-
+    .button.primary:hover {
       box-shadow:
-        0 12px 30px
-        rgba(217, 119, 6, 0.18);
-
+        0 10px 30px
+        rgba(217, 119, 6, 0.24);
     }
-
-
-    .button.secondary {
-
-      color:
-        var(--gold);
-
-      background:
-        rgba(255, 183, 77, 0.06);
-
-    }
-
-
-    .button.danger {
-
-      color:
-        #ffc8bb;
-
-      background:
-        rgba(170, 50, 35, 0.10);
-
-      border-color:
-        rgba(255, 100, 75, 0.18);
-
-    }
-
 
     .button:disabled {
+      cursor: default;
 
-      opacity:
-        0.55;
+      opacity: 0.45;
 
-      cursor:
-        default;
-
-      transform:
-        none;
-
+      transform: none;
     }
 
-
     /* =====================================================
-       PAGE
+       LAYOUT
        ===================================================== */
 
     .page {
-
       width:
         min(
           1180px,
           calc(100% - 40px)
         );
 
-      margin:
-        0 auto;
+      margin: 0 auto;
 
       padding:
-        50px 0 80px;
-
+        42px 0 80px;
     }
 
-
-    .page-heading {
-
-      display:
-        flex;
-
-      align-items:
-        flex-end;
-
-      justify-content:
-        space-between;
-
-      gap:
-        24px;
-
-      margin-bottom:
-        28px;
-
+    .page-title {
+      margin-bottom: 22px;
     }
 
-
-    .eyebrow {
-
-      display:
-        inline-block;
-
-      padding:
-        6px 11px;
-
-      border-radius:
-        999px;
-
-      border:
-        1px solid
-        rgba(255, 194, 82, 0.15);
-
-      background:
-        rgba(255, 183, 77, 0.06);
-
-      color:
-        var(--gold);
-
-      font-size:
-        0.74rem;
-
-      font-weight:
-        bold;
-
-      margin-bottom:
-        10px;
-
-    }
-
-
-    .page-heading h2 {
-
-      color:
-        var(--gold);
+    .page-title h2 {
+      color: var(--gold);
 
       font-size:
         clamp(
-          2.4rem,
-          5vw,
-          4rem
+          2.2rem,
+          4vw,
+          3.5rem
         );
 
-      line-height:
-        1;
-
-      margin-bottom:
-        10px;
-
+      margin-bottom: 5px;
     }
 
-
-    .page-heading p {
-
-      color:
-        var(--muted);
-
-      max-width:
-        720px;
-
+    .page-title p {
+      color: var(--muted);
     }
-
-
-    .account-card {
-
-      min-width:
-        250px;
-
-      padding:
-        16px;
-
-      border-radius:
-        14px;
-
-      background:
-        var(--panel);
-
-      border:
-        1px solid
-        var(--line);
-
-      box-shadow:
-        0 16px 38px
-        rgba(0, 0, 0, 0.34);
-
-    }
-
-
-    .account-card strong {
-
-      color:
-        var(--gold);
-
-    }
-
-
-    .account-card p {
-
-      color:
-        var(--muted);
-
-      font-size:
-        0.82rem;
-
-      margin-top:
-        3px;
-
-    }
-
 
     /* =====================================================
-       ACCESS STATES
+       LOADING / DENIED
        ===================================================== */
 
     .loading,
-    .access-denied {
-
-      max-width:
-        650px;
+    .denied {
+      max-width: 650px;
 
       margin:
-        80px auto;
+        90px auto;
 
-      padding:
-        30px;
+      padding: 32px;
 
-      text-align:
-        center;
+      text-align: center;
 
-      border-radius:
-        18px;
-
-      background:
-        var(--panel);
+      background: var(--panel);
 
       border:
         1px solid
         var(--line);
 
+      border-radius: 18px;
     }
-
 
     .loading {
-
-      color:
-        var(--muted);
-
+      color: var(--muted);
     }
 
-
-    .access-denied {
-
-      display:
-        none;
-
+    .denied {
+      display: none;
     }
 
+    .denied h3 {
+      color: var(--red);
 
-    .access-denied h3 {
-
-      color:
-        var(--red);
-
-      margin-bottom:
-        10px;
-
-      font-size:
-        1.6rem;
-
+      margin-bottom: 10px;
     }
 
+    .denied p {
+      color: var(--muted);
 
-    .access-denied p {
-
-      color:
-        #c9a79f;
-
-      margin-bottom:
-        18px;
-
+      margin-bottom: 18px;
     }
 
+    #publisher {
+      display: none;
+    }
 
     /* =====================================================
-       FORM PANEL
+       UPLOAD BOX
        ===================================================== */
 
-    .upload-wrap {
-
-      display:
-        none;
-
-    }
-
-
     .upload-panel {
+      padding: 26px;
 
-      display:
-        grid;
-
-      grid-template-columns:
-        1.35fr 0.65fr;
-
-      gap:
-        22px;
-
-      align-items:
-        start;
-
-    }
-
-
-    .form-card,
-    .side-card {
-
-      border-radius:
-        18px;
+      border-radius: 18px;
 
       background:
-
         linear-gradient(
           180deg,
-          rgba(23, 27, 34, 0.97),
-          rgba(11, 14, 19, 0.97)
+          rgba(24, 29, 40, 0.96),
+          rgba(14, 18, 26, 0.96)
         );
 
       border:
@@ -636,601 +339,616 @@
         var(--line);
 
       box-shadow:
-        0 20px 50px
+        0 20px 60px
         rgba(0, 0, 0, 0.38);
-
     }
 
+    .package-help {
+      padding: 14px 16px;
 
-    .form-card {
+      margin-bottom: 16px;
 
-      padding:
-        28px;
+      background:
+        rgba(255, 190, 75, 0.04);
 
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.10);
+
+      border-radius: 10px;
+
+      color: var(--muted);
+
+      font-size: 0.9rem;
     }
 
-
-    .side-card {
-
-      padding:
-        22px;
-
+    .package-help strong {
+      color: var(--gold);
     }
 
+    .drop-zone {
+      min-height: 220px;
 
-    .side-card + .side-card {
+      display: flex;
 
-      margin-top:
-        18px;
+      flex-direction: column;
 
+      justify-content: center;
+      align-items: center;
+
+      text-align: center;
+
+      gap: 9px;
+
+      padding: 30px;
+
+      border:
+        2px dashed
+        rgba(255, 175, 45, 0.42);
+
+      border-radius: 13px;
+
+      background:
+        rgba(255, 180, 50, 0.025);
+
+      cursor: pointer;
+
+      transition:
+        0.2s ease;
     }
 
+    .drop-zone:hover,
+    .drop-zone.dragging {
+      border-color:
+        rgba(255, 195, 85, 0.82);
 
-    .side-card h3 {
+      background:
+        rgba(255, 166, 35, 0.06);
 
-      color:
-        var(--gold);
-
-      margin-bottom:
-        10px;
-
-      font-size:
-        1.25rem;
-
+      box-shadow:
+        inset 0 0 30px
+        rgba(255, 150, 20, 0.04);
     }
 
+    .upload-icon {
+      font-size: 2.6rem;
 
-    .side-card p,
-    .side-card li {
-
-      color:
-        var(--muted);
-
-      font-size:
-        0.9rem;
-
-      line-height:
-        1.55;
-
+      color: var(--gold);
     }
 
+    .drop-zone strong {
+      color: var(--gold);
 
-    .side-card ul {
-
-      padding-left:
-        18px;
-
-      margin-top:
-        10px;
-
-      display:
-        grid;
-
-      gap:
-        7px;
-
+      font-size: 1.15rem;
     }
 
+    .drop-zone p {
+      color: var(--muted);
+    }
+
+    .drop-zone small {
+      color: #796e59;
+    }
+
+    #zipInput {
+      display: none;
+    }
 
     /* =====================================================
-       FORM
+       SCANNING
        ===================================================== */
 
-    .form-grid {
+    .scan-status {
+      display: none;
 
-      display:
-        grid;
+      margin-top: 18px;
+
+      padding: 16px;
+
+      border-radius: 11px;
+
+      color: var(--gold);
+
+      background:
+        rgba(255, 180, 50, 0.04);
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.12);
+    }
+
+    /* =====================================================
+       PACKAGE RESULTS
+       ===================================================== */
+
+    .package-results {
+      display: none;
+
+      margin-top: 22px;
+    }
+
+    .package-header {
+      display: grid;
+
+      grid-template-columns:
+        125px 1fr;
+
+      gap: 22px;
+
+      align-items: center;
+
+      padding: 22px;
+
+      border-radius: 15px;
+
+      background:
+        rgba(7, 10, 15, 0.55);
+
+      border:
+        1px solid
+        var(--line);
+    }
+
+    .mod-icon {
+      width: 125px;
+      height: 125px;
+
+      border-radius: 14px;
+
+      object-fit: cover;
+
+      background: #05070a;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.16);
+    }
+
+    .package-name {
+      color: var(--gold);
+
+      font-size: 2rem;
+
+      line-height: 1.1;
+    }
+
+    .package-version {
+      display: inline-block;
+
+      margin-top: 8px;
+
+      padding: 5px 9px;
+
+      border-radius: 999px;
+
+      font-size: 0.76rem;
+
+      color: var(--gold);
+
+      background:
+        rgba(255, 183, 77, 0.07);
+
+      border:
+        1px solid
+        var(--line);
+    }
+
+    .package-description {
+      color: var(--muted);
+
+      margin-top: 12px;
+
+      max-width: 700px;
+    }
+
+    /* =====================================================
+       VALIDATION
+       ===================================================== */
+
+    .validation {
+      margin-top: 18px;
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 10px;
+    }
+
+    .check {
+      padding: 12px;
+
+      text-align: center;
+
+      border-radius: 9px;
+
+      font-size: 0.83rem;
+
+      border:
+        1px solid
+        var(--line);
+
+      background:
+        rgba(7, 10, 15, 0.55);
+    }
+
+    .check.good {
+      color: #caffbb;
+
+      border-color:
+        rgba(118, 205, 90, 0.25);
+
+      background:
+        rgba(80, 150, 60, 0.08);
+    }
+
+    .check.bad {
+      color: #ffc2b5;
+
+      border-color:
+        rgba(220, 80, 55, 0.25);
+
+      background:
+        rgba(160, 45, 30, 0.08);
+    }
+
+    /* =====================================================
+       DETAILS
+       ===================================================== */
+
+    .details-grid {
+      display: grid;
 
       grid-template-columns:
         1fr 1fr;
 
-      gap:
-        18px;
+      gap: 18px;
 
+      margin-top: 18px;
     }
 
+    .box {
+      padding: 20px;
 
-    .field {
-
-      margin-bottom:
-        18px;
-
-    }
-
-
-    .field.full {
-
-      grid-column:
-        1 / -1;
-
-    }
-
-
-    label {
-
-      display:
-        block;
-
-      margin-bottom:
-        7px;
-
-      color:
-        #edd49c;
-
-      font-weight:
-        bold;
-
-    }
-
-
-    .hint {
-
-      display:
-        block;
-
-      margin-top:
-        6px;
-
-      color:
-        #8e8065;
-
-      font-size:
-        0.77rem;
-
-    }
-
-
-    input,
-    textarea,
-    select {
-
-      width:
-        100%;
-
-      color:
-        #fff1cf;
+      border-radius: 13px;
 
       background:
-        rgba(5, 8, 12, 0.86);
+        rgba(8, 11, 16, 0.58);
 
       border:
-        1px solid
-        rgba(255, 194, 82, 0.14);
-
-      border-radius:
-        11px;
-
-      outline:
-        none;
-
-      padding:
-        12px 13px;
-
-      transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-
-    }
-
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-
-      border-color:
-        rgba(255, 184, 65, 0.48);
-
-      box-shadow:
-        0 0 16px
-        rgba(255, 145, 20, 0.10);
-
-    }
-
-
-    textarea {
-
-      resize:
-        vertical;
-
-      min-height:
-        130px;
-
-    }
-
-
-    textarea.large {
-
-      min-height:
-        210px;
-
-    }
-
-
-    select option {
-
-      background:
-        #11151b;
-
-      color:
-        #f4e5b5;
-
-    }
-
-
-    input[type="file"] {
-
-      cursor:
-        pointer;
-
-      padding:
-        10px;
-
-    }
-
-
-    /* =====================================================
-       FILE BOX
-       ===================================================== */
-
-    .file-box {
-
-      border:
-        1px dashed
-        rgba(255, 194, 82, 0.22);
-
-      background:
-        rgba(255, 183, 77, 0.025);
-
-      border-radius:
-        13px;
-
-      padding:
-        16px;
-
-    }
-
-
-    .file-name {
-
-      margin-top:
-        8px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        0.82rem;
-
-      word-break:
-        break-all;
-
-    }
-
-
-    /* =====================================================
-       ICON PREVIEW
-       ===================================================== */
-
-    .preview-box {
-
-      display:
-        none;
-
-      margin-top:
-        12px;
-
-      width:
-        110px;
-
-      height:
-        110px;
-
-      overflow:
-        hidden;
-
-      border-radius:
-        13px;
-
-      border:
-        1px solid
-        rgba(255, 194, 82, 0.14);
-
-      background:
-        #07090d;
-
-    }
-
-
-    .preview-box img {
-
-      width:
-        100%;
-
-      height:
-        100%;
-
-      object-fit:
-        cover;
-
-    }
-
-
-    /* =====================================================
-       SUBMIT AREA
-       ===================================================== */
-
-    .submit-area {
-
-      margin-top:
-        12px;
-
-      padding-top:
-        22px;
-
-      border-top:
         1px solid
         var(--line);
-
     }
 
+    .box h3 {
+      color: var(--gold);
 
-    .submit-area .button {
-
-      width:
-        100%;
-
-      min-height:
-        50px;
-
-      font-size:
-        1rem;
-
+      margin-bottom: 12px;
     }
 
+    .file-list,
+    .dependency-list {
+      list-style: none;
+
+      display: grid;
+
+      gap: 7px;
+
+      color: var(--muted);
+
+      font-size: 0.88rem;
+    }
+
+    .file-list li::before {
+      content: "✓ ";
+
+      color: var(--green);
+    }
+
+    .dependency-list li::before {
+      content: "• ";
+
+      color: var(--orange);
+    }
+
+    /* =====================================================
+       README
+       ===================================================== */
+
+    .readme-box {
+      margin-top: 18px;
+
+      padding: 22px;
+
+      border-radius: 13px;
+
+      background:
+        rgba(8, 11, 16, 0.58);
+
+      border:
+        1px solid
+        var(--line);
+    }
+
+    .readme-box h3 {
+      color: var(--gold);
+
+      margin-bottom: 13px;
+    }
+
+    .readme-preview {
+      max-height: 420px;
+
+      overflow-y: auto;
+
+      padding: 18px;
+
+      white-space: pre-wrap;
+
+      word-break: break-word;
+
+      color: #cdbb91;
+
+      font-family:
+        Consolas,
+        monospace;
+
+      font-size: 0.84rem;
+
+      line-height: 1.6;
+
+      background:
+        #080b10;
+
+      border-radius: 9px;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.08);
+    }
+
+    /* =====================================================
+       PUBLISH
+       ===================================================== */
+
+    .publish-box {
+      margin-top: 18px;
+
+      padding: 22px;
+
+      border-radius: 13px;
+
+      background:
+        rgba(8, 11, 16, 0.58);
+
+      border:
+        1px solid
+        var(--line);
+    }
+
+    .publish-box h3 {
+      color: var(--gold);
+
+      margin-bottom: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 16px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field.full {
+      grid-column:
+        1 / -1;
+    }
+
+    label {
+      display: block;
+
+      color: #ead39c;
+
+      font-weight: bold;
+
+      margin-bottom: 6px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+
+      padding: 12px 13px;
+
+      border-radius: 9px;
+
+      color: #fff0cb;
+
+      background:
+        #080b10;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.14);
+
+      outline: none;
+    }
+
+    textarea {
+      min-height: 130px;
+
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color:
+        rgba(255, 177, 45, 0.50);
+
+      box-shadow:
+        0 0 15px
+        rgba(255, 150, 20, 0.08);
+    }
+
+    select option {
+      background: #11151b;
+    }
+
+    .publish-button {
+      width: 100%;
+
+      min-height: 52px;
+
+      margin-top: 4px;
+
+      font-size: 1rem;
+    }
+
+    /* =====================================================
+       MESSAGE
+       ===================================================== */
 
     .message {
+      display: none;
 
-      display:
-        none;
+      margin-top: 16px;
 
-      margin-top:
-        16px;
+      padding: 14px;
 
-      padding:
-        13px 14px;
+      text-align: center;
 
-      border-radius:
-        11px;
-
-      text-align:
-        center;
-
-      line-height:
-        1.45;
-
+      border-radius: 10px;
     }
-
 
     .message.success {
+      display: block;
 
-      display:
-        block;
-
-      color:
-        #dfffd2;
+      color: #dfffce;
 
       background:
-        rgba(87, 155, 65, 0.13);
+        rgba(80, 155, 60, 0.12);
 
       border:
         1px solid
-        rgba(130, 210, 105, 0.20);
-
+        rgba(120, 210, 95, 0.20);
     }
-
 
     .message.error {
+      display: block;
 
-      display:
-        block;
-
-      color:
-        #ffd1c6;
+      color: #ffd2c7;
 
       background:
-        rgba(180, 50, 35, 0.13);
+        rgba(170, 45, 30, 0.12);
 
       border:
         1px solid
-        rgba(230, 90, 60, 0.20);
-
+        rgba(230, 80, 55, 0.20);
     }
-
 
     /* =====================================================
        PROGRESS
        ===================================================== */
 
-    .progress-wrap {
+    .progress {
+      display: none;
 
-      display:
-        none;
-
-      margin-top:
-        16px;
-
+      margin-top: 15px;
     }
 
+    .progress-top {
+      display: flex;
 
-    .progress-label {
+      justify-content: space-between;
 
-      display:
-        flex;
+      margin-bottom: 6px;
 
-      justify-content:
-        space-between;
+      color: var(--muted);
 
-      gap:
-        12px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        0.82rem;
-
-      margin-bottom:
-        7px;
-
+      font-size: 0.82rem;
     }
-
 
     .progress-track {
+      height: 9px;
 
-      width:
-        100%;
+      overflow: hidden;
 
-      height:
-        10px;
-
-      border-radius:
-        999px;
+      border-radius: 999px;
 
       background:
-        rgba(255, 255, 255, 0.05);
-
-      overflow:
-        hidden;
-
-      border:
-        1px solid
-        rgba(255, 194, 82, 0.08);
-
+        rgba(255,255,255,0.05);
     }
 
-
     .progress-bar {
+      width: 0%;
 
-      width:
-        0%;
-
-      height:
-        100%;
+      height: 100%;
 
       background:
-
         linear-gradient(
           90deg,
-          #d97706,
-          #f2c15b
+          var(--orange2),
+          var(--gold2)
         );
 
       transition:
         width 0.2s ease;
-
     }
-
 
     /* =====================================================
-       RESPONSIVE
+       MOBILE
        ===================================================== */
 
-    @media (
-      max-width: 900px
-    ) {
-
-      .upload-panel {
-
-        grid-template-columns:
-          1fr;
-
-      }
-
-
-      .page-heading {
-
-        flex-direction:
-          column;
-
-        align-items:
-          flex-start;
-
-      }
-
-
-      .account-card {
-
-        width:
-          100%;
-
-      }
-
-    }
-
-
-    @media (
-      max-width: 680px
-    ) {
+    @media (max-width: 800px) {
 
       .nav {
+        flex-direction: column;
 
-        align-items:
-          flex-start;
+        align-items: flex-start;
 
-        flex-direction:
-          column;
-
-        padding:
-          13px 0;
-
+        padding: 12px 0;
       }
 
+      .package-header {
+        grid-template-columns: 1fr;
 
-      .nav-actions {
-
-        width:
-          100%;
-
+        text-align: center;
       }
 
-
-      .nav-actions .button {
-
-        flex:
-          1;
-
+      .mod-icon {
+        margin:
+          0 auto;
       }
 
+      .validation {
+        grid-template-columns:
+          1fr 1fr;
+      }
 
+      .details-grid,
       .form-grid {
-
         grid-template-columns:
           1fr;
-
       }
-
 
       .field.full {
-
         grid-column:
           auto;
-
       }
-
-
-      .page {
-
-        padding-top:
-          36px;
-
-      }
-
     }
 
   </style>
 
 </head>
-
 
 <body>
 
@@ -1241,9 +959,7 @@
 
   <header class="topbar">
 
-
     <div class="nav">
-
 
       <a
         href="/"
@@ -1255,8 +971,7 @@
           alt="YMIR Mods"
         />
 
-
-        <div class="brand-text">
+        <div>
 
           <h1>
             YMIR MODS
@@ -1275,24 +990,21 @@
 
         <a
           href="/dashboard"
-          class="button secondary"
+          class="button"
         >
           Dashboard
         </a>
 
-
         <a
           href="/"
-          class="button secondary"
+          class="button"
         >
           View Website
         </a>
 
       </div>
 
-
     </div>
-
 
   </header>
 
@@ -1300,29 +1012,27 @@
   <main class="page">
 
 
-    <!-- LOADING -->
+    <!-- ACCESS CHECK -->
 
     <div
       id="loading"
       class="loading"
     >
-      Checking your YMIR uploader permissions...
+      Checking your YMIR uploader access...
     </div>
 
 
-    <!-- ACCESS DENIED -->
-
     <div
-      id="accessDenied"
-      class="access-denied"
+      id="denied"
+      class="denied"
     >
 
       <h3>
         Upload Access Required
       </h3>
 
-      <p id="accessDeniedMessage">
-        Your account is not permitted to upload mods.
+      <p id="deniedText">
+        You don't currently have permission to upload mods.
       </p>
 
       <a
@@ -1335,364 +1045,412 @@
     </div>
 
 
-    <!-- UPLOAD PAGE -->
+    <!-- ===================================================
+         PUBLISHER
+         =================================================== -->
 
-    <div
-      id="uploadWrap"
-      class="upload-wrap"
-    >
-
-
-      <section class="page-heading">
+    <div id="publisher">
 
 
-        <div>
+      <div class="page-title">
 
-          <span class="eyebrow">
-            YMIR CREATOR TOOLS
-          </span>
+        <h2>
+          Submit a Mod
+        </h2>
 
-          <h2>
-            Upload New Mod
-          </h2>
+        <p>
+          Drop a Thunderstore-compatible package below.
+          YMIR will read the package automatically.
+        </p>
 
-          <p>
-            Publish a mod directly to YMIR Mods.
-            Your package will be stored in Cloudflare R2
-            and the mod information will be saved in
-            the YMIR database.
-          </p>
+      </div>
+
+
+      <section class="upload-panel">
+
+
+        <div class="package-help">
+
+          Upload a ZIP containing
+
+          <strong>manifest.json</strong>,
+
+          <strong>icon.png</strong>,
+
+          <strong>README.md</strong>
+
+          and your mod DLL.
+
+          YMIR will automatically extract the mod
+          information before publishing.
 
         </div>
 
 
-        <div class="account-card">
+        <!-- DROP ZONE -->
 
-          <strong id="accountName">
-            Creator
+        <div
+          id="dropZone"
+          class="drop-zone"
+        >
+
+          <div class="upload-icon">
+            ↑
+          </div>
+
+          <strong>
+            Select a file or drag a ZIP here
           </strong>
 
-          <p id="accountEmail">
-            Loading...
+          <p id="dropMessage">
+            YMIR will scan your package automatically.
           </p>
 
-          <p id="accountRole">
-            Checking permissions...
-          </p>
+          <small>
+            Maximum package size: 100 MB
+          </small>
+
+          <input
+            id="zipInput"
+            type="file"
+            accept=".zip,application/zip"
+          />
 
         </div>
 
 
-      </section>
+        <!-- SCANNING -->
 
-
-      <div class="upload-panel">
+        <div
+          id="scanStatus"
+          class="scan-status"
+        >
+          Scanning package...
+        </div>
 
 
         <!-- =================================================
-             FORM
+             RESULTS
              ================================================= -->
 
-        <section class="form-card">
+        <div
+          id="packageResults"
+          class="package-results"
+        >
 
 
-          <form id="uploadForm">
+          <!-- HEADER -->
 
+          <div class="package-header">
 
-            <div class="form-grid">
+            <img
+              id="packageIcon"
+              class="mod-icon"
+              alt="Mod icon"
+            />
 
 
-              <!-- MOD NAME -->
+            <div>
 
-              <div class="field">
+              <h3
+                id="packageName"
+                class="package-name"
+              >
+                Mod Name
+              </h3>
 
-                <label for="name">
-                  Mod Name
-                </label>
 
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  maxlength="80"
-                  placeholder="Example: BeastMarketOutpost"
-                  required
-                />
+              <span
+                id="packageVersion"
+                class="package-version"
+              >
+                Version
+              </span>
 
-              </div>
 
+              <p
+                id="packageDescription"
+                class="package-description"
+              ></p>
 
-              <!-- VERSION -->
+            </div>
 
-              <div class="field">
+          </div>
 
-                <label for="version">
-                  Version
-                </label>
 
-                <input
-                  id="version"
-                  name="version"
-                  type="text"
-                  maxlength="32"
-                  placeholder="Example: 1.0.0"
-                  required
-                />
+          <!-- VALIDATION -->
 
-              </div>
+          <div class="validation">
 
+            <div
+              id="manifestCheck"
+              class="check"
+            >
+              manifest.json
+            </div>
 
-              <!-- CATEGORY -->
+            <div
+              id="readmeCheck"
+              class="check"
+            >
+              README.md
+            </div>
 
-              <div class="field full">
+            <div
+              id="iconCheck"
+              class="check"
+            >
+              icon.png
+            </div>
 
-                <label for="category">
-                  Category
-                </label>
+            <div
+              id="dllCheck"
+              class="check"
+            >
+              DLL
+            </div>
 
-                <select
-                  id="category"
-                  name="category"
-                  required
-                >
+          </div>
 
-                  <option value="">
-                    Select category
-                  </option>
 
-                  <option value="Adventure">
-                    Adventure
-                  </option>
+          <!-- PACKAGE INFO -->
 
-                  <option value="Building">
-                    Building
-                  </option>
+          <div class="details-grid">
 
-                  <option value="Combat">
-                    Combat
-                  </option>
 
-                  <option value="Companions">
-                    Companions
-                  </option>
+            <div class="box">
 
-                  <option value="Creatures">
-                    Creatures
-                  </option>
+              <h3>
+                Package Contents
+              </h3>
 
-                  <option value="Gameplay">
-                    Gameplay
-                  </option>
-
-                  <option value="Magic">
-                    Magic
-                  </option>
-
-                  <option value="Mounts">
-                    Mounts
-                  </option>
-
-                  <option value="Quests">
-                    Quests
-                  </option>
-
-                  <option value="Server">
-                    Server
-                  </option>
-
-                  <option value="Trading">
-                    Trading
-                  </option>
-
-                  <option value="Utility">
-                    Utility
-                  </option>
-
-                  <option value="World">
-                    World
-                  </option>
-
-                  <option value="Other">
-                    Other
-                  </option>
-
-                </select>
-
-              </div>
-
-
-              <!-- SHORT DESCRIPTION -->
-
-              <div class="field full">
-
-                <label for="shortDescription">
-                  Short Description
-                </label>
-
-                <textarea
-                  id="shortDescription"
-                  name="short_description"
-                  maxlength="250"
-                  placeholder="A short summary that will appear on mod cards."
-                  required
-                ></textarea>
-
-                <span
-                  id="shortCounter"
-                  class="hint"
-                >
-                  0 / 250 characters
-                </span>
-
-              </div>
-
-
-              <!-- FULL DESCRIPTION -->
-
-              <div class="field full">
-
-                <label for="fullDescription">
-                  Full Description
-                </label>
-
-                <textarea
-                  id="fullDescription"
-                  class="large"
-                  name="full_description"
-                  maxlength="10000"
-                  placeholder="Describe the mod, its features, requirements, controls, progression, compatibility, and anything players should know."
-                ></textarea>
-
-              </div>
-
-
-              <!-- CHANGELOG -->
-
-              <div class="field full">
-
-                <label for="changelog">
-                  Changelog
-                </label>
-
-                <textarea
-                  id="changelog"
-                  name="changelog"
-                  maxlength="10000"
-                  placeholder="Example:
-- Added companion commands
-- Fixed mount animation
-- Improved server sync"
-                ></textarea>
-
-              </div>
-
-
-              <!-- MOD ZIP -->
-
-              <div class="field full">
-
-                <label for="modFile">
-                  Mod ZIP
-                </label>
-
-                <div class="file-box">
-
-                  <input
-                    id="modFile"
-                    name="mod_file"
-                    type="file"
-                    accept=".zip,application/zip"
-                    required
-                  />
-
-                  <div
-                    id="modFileName"
-                    class="file-name"
-                  >
-                    No ZIP selected.
-                  </div>
-
-                </div>
-
-                <span class="hint">
-                  Required. Maximum size currently set to 100 MB.
-                </span>
-
-              </div>
-
-
-              <!-- ICON -->
-
-              <div class="field full">
-
-                <label for="iconFile">
-                  Mod Icon
-                </label>
-
-                <div class="file-box">
-
-                  <input
-                    id="iconFile"
-                    name="icon_file"
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                  />
-
-                  <div
-                    id="iconFileName"
-                    class="file-name"
-                  >
-                    No icon selected.
-                  </div>
-
-
-                  <div
-                    id="iconPreview"
-                    class="preview-box"
-                  >
-
-                    <img
-                      id="iconPreviewImage"
-                      alt="Icon preview"
-                    />
-
-                  </div>
-
-                </div>
-
-                <span class="hint">
-                  Optional. PNG, JPG or WebP. Maximum 5 MB.
-                </span>
-
-              </div>
-
+              <ul
+                id="fileList"
+                class="file-list"
+              ></ul>
 
             </div>
 
 
-            <!-- SUBMIT -->
+            <div class="box">
 
-            <div class="submit-area">
+              <h3>
+                Dependencies
+              </h3>
+
+              <ul
+                id="dependencyList"
+                class="dependency-list"
+              ></ul>
+
+            </div>
+
+
+          </div>
+
+
+          <!-- README -->
+
+          <div class="readme-box">
+
+            <h3>
+              README Preview
+            </h3>
+
+            <div
+              id="readmePreview"
+              class="readme-preview"
+            ></div>
+
+          </div>
+
+
+          <!-- PUBLISH SETTINGS -->
+
+          <div class="publish-box">
+
+            <h3>
+              Publish to YMIR Mods
+            </h3>
+
+
+            <form id="publishForm">
+
+
+              <div class="form-grid">
+
+
+                <div class="field">
+
+                  <label for="nameField">
+                    Mod Name
+                  </label>
+
+                  <input
+                    id="nameField"
+                    maxlength="80"
+                    required
+                  />
+
+                </div>
+
+
+                <div class="field">
+
+                  <label for="versionField">
+                    Version
+                  </label>
+
+                  <input
+                    id="versionField"
+                    maxlength="32"
+                    required
+                  />
+
+                </div>
+
+
+                <div class="field full">
+
+                  <label for="categoryField">
+                    YMIR Category
+                  </label>
+
+                  <select
+                    id="categoryField"
+                    required
+                  >
+
+                    <option value="">
+                      Select category
+                    </option>
+
+                    <option value="Adventure">
+                      Adventure
+                    </option>
+
+                    <option value="Building">
+                      Building
+                    </option>
+
+                    <option value="Combat">
+                      Combat
+                    </option>
+
+                    <option value="Companions">
+                      Companions
+                    </option>
+
+                    <option value="Creatures">
+                      Creatures
+                    </option>
+
+                    <option value="Gameplay">
+                      Gameplay
+                    </option>
+
+                    <option value="Magic">
+                      Magic
+                    </option>
+
+                    <option value="Mounts">
+                      Mounts
+                    </option>
+
+                    <option value="Quests">
+                      Quests
+                    </option>
+
+                    <option value="Server">
+                      Server
+                    </option>
+
+                    <option value="Trading">
+                      Trading
+                    </option>
+
+                    <option value="Utility">
+                      Utility
+                    </option>
+
+                    <option value="World">
+                      World
+                    </option>
+
+                    <option value="Other">
+                      Other
+                    </option>
+
+                  </select>
+
+                </div>
+
+
+                <div class="field full">
+
+                  <label for="shortField">
+                    Short Description
+                  </label>
+
+                  <textarea
+                    id="shortField"
+                    maxlength="250"
+                    required
+                  ></textarea>
+
+                </div>
+
+
+                <div class="field full">
+
+                  <label for="descriptionField">
+                    Full Description
+                  </label>
+
+                  <textarea
+                    id="descriptionField"
+                    style="min-height:240px;"
+                  ></textarea>
+
+                </div>
+
+
+                <div class="field full">
+
+                  <label for="changelogField">
+                    Changelog
+                  </label>
+
+                  <textarea
+                    id="changelogField"
+                    placeholder="Optional release notes for this version."
+                  ></textarea>
+
+                </div>
+
+
+              </div>
 
 
               <button
-                id="submitButton"
-                class="button primary"
+                id="publishButton"
+                class="button primary publish-button"
                 type="submit"
+                disabled
               >
-                Upload Mod
+                Publish Mod
               </button>
 
 
               <div
-                id="progressWrap"
-                class="progress-wrap"
+                id="progress"
+                class="progress"
               >
 
-                <div class="progress-label">
+                <div class="progress-top">
 
                   <span id="progressText">
-                    Uploading...
+                    Publishing...
                   </span>
 
                   <span id="progressPercent">
@@ -1700,7 +1458,6 @@
                   </span>
 
                 </div>
-
 
                 <div class="progress-track">
 
@@ -1720,85 +1477,15 @@
               ></div>
 
 
-            </div>
-
-
-          </form>
-
-
-        </section>
-
-
-        <!-- =================================================
-             SIDE INFO
-             ================================================= -->
-
-        <aside>
-
-
-          <div class="side-card">
-
-            <h3>
-              Upload Requirements
-            </h3>
-
-            <ul>
-
-              <li>
-                You must be logged into a YMIR account.
-              </li>
-
-              <li>
-                Your account must have uploader permission.
-              </li>
-
-              <li>
-                Mod package must be a ZIP file.
-              </li>
-
-              <li>
-                Use a clear version number such as 1.0.0.
-              </li>
-
-              <li>
-                Icons should ideally be square.
-              </li>
-
-            </ul>
+            </form>
 
           </div>
 
 
-          <div class="side-card">
-
-            <h3>
-              What Happens Next?
-            </h3>
-
-            <p>
-              The ZIP and icon are stored in
-              YMIR's R2 storage.
-            </p>
-
-            <p style="margin-top:10px;">
-              The mod's name, version, description,
-              category, file location and changelog
-              are saved into D1.
-            </p>
-
-            <p style="margin-top:10px;">
-              Next we'll create proper public mod pages
-              so uploaded mods automatically appear
-              on the main website.
-            </p>
-
-          </div>
+        </div>
 
 
-        </aside>
-
-
-      </div>
+      </section>
 
 
     </div>
@@ -1810,146 +1497,132 @@
   <script>
 
     /* =====================================================
+       STATE
+       ===================================================== */
+
+    let selectedZipFile = null;
+    let extractedIconFile = null;
+    let packageIsValid = false;
+
+    let packageManifest = null;
+    let packageReadme = "";
+
+
+    /* =====================================================
        ELEMENTS
        ===================================================== */
 
     const loading =
-      document.getElementById(
-        "loading"
-      );
+      document.getElementById("loading");
+
+    const denied =
+      document.getElementById("denied");
+
+    const deniedText =
+      document.getElementById("deniedText");
+
+    const publisher =
+      document.getElementById("publisher");
 
 
-    const accessDenied =
-      document.getElementById(
-        "accessDenied"
-      );
+    const dropZone =
+      document.getElementById("dropZone");
+
+    const zipInput =
+      document.getElementById("zipInput");
+
+    const dropMessage =
+      document.getElementById("dropMessage");
+
+    const scanStatus =
+      document.getElementById("scanStatus");
+
+    const packageResults =
+      document.getElementById("packageResults");
 
 
-    const accessDeniedMessage =
-      document.getElementById(
-        "accessDeniedMessage"
-      );
+    const packageIcon =
+      document.getElementById("packageIcon");
+
+    const packageName =
+      document.getElementById("packageName");
+
+    const packageVersion =
+      document.getElementById("packageVersion");
+
+    const packageDescription =
+      document.getElementById("packageDescription");
 
 
-    const uploadWrap =
-      document.getElementById(
-        "uploadWrap"
-      );
+    const manifestCheck =
+      document.getElementById("manifestCheck");
+
+    const readmeCheck =
+      document.getElementById("readmeCheck");
+
+    const iconCheck =
+      document.getElementById("iconCheck");
+
+    const dllCheck =
+      document.getElementById("dllCheck");
 
 
-    const accountName =
-      document.getElementById(
-        "accountName"
-      );
+    const fileList =
+      document.getElementById("fileList");
+
+    const dependencyList =
+      document.getElementById("dependencyList");
+
+    const readmePreview =
+      document.getElementById("readmePreview");
 
 
-    const accountEmail =
-      document.getElementById(
-        "accountEmail"
-      );
+    const publishForm =
+      document.getElementById("publishForm");
 
+    const nameField =
+      document.getElementById("nameField");
 
-    const accountRole =
-      document.getElementById(
-        "accountRole"
-      );
+    const versionField =
+      document.getElementById("versionField");
 
+    const categoryField =
+      document.getElementById("categoryField");
 
-    const form =
-      document.getElementById(
-        "uploadForm"
-      );
+    const shortField =
+      document.getElementById("shortField");
 
+    const descriptionField =
+      document.getElementById("descriptionField");
 
-    const submitButton =
-      document.getElementById(
-        "submitButton"
-      );
+    const changelogField =
+      document.getElementById("changelogField");
+
+    const publishButton =
+      document.getElementById("publishButton");
 
 
     const message =
-      document.getElementById(
-        "message"
-      );
+      document.getElementById("message");
 
-
-    const modFile =
-      document.getElementById(
-        "modFile"
-      );
-
-
-    const modFileName =
-      document.getElementById(
-        "modFileName"
-      );
-
-
-    const iconFile =
-      document.getElementById(
-        "iconFile"
-      );
-
-
-    const iconFileName =
-      document.getElementById(
-        "iconFileName"
-      );
-
-
-    const iconPreview =
-      document.getElementById(
-        "iconPreview"
-      );
-
-
-    const iconPreviewImage =
-      document.getElementById(
-        "iconPreviewImage"
-      );
-
-
-    const shortDescription =
-      document.getElementById(
-        "shortDescription"
-      );
-
-
-    const shortCounter =
-      document.getElementById(
-        "shortCounter"
-      );
-
-
-    const progressWrap =
-      document.getElementById(
-        "progressWrap"
-      );
-
+    const progress =
+      document.getElementById("progress");
 
     const progressBar =
-      document.getElementById(
-        "progressBar"
-      );
-
+      document.getElementById("progressBar");
 
     const progressText =
-      document.getElementById(
-        "progressText"
-      );
-
+      document.getElementById("progressText");
 
     const progressPercent =
-      document.getElementById(
-        "progressPercent"
-      );
+      document.getElementById("progressPercent");
 
 
     /* =====================================================
-       CHECK LOGIN + UPLOAD PERMISSION
+       CHECK ACCOUNT
        ===================================================== */
 
-    async function checkUploaderAccess() {
+    async function checkAccess() {
 
       try {
 
@@ -1957,14 +1630,8 @@
           await fetch(
             "/api/me",
             {
-              method:
-                "GET",
-
-              credentials:
-                "same-origin",
-
-              cache:
-                "no-store"
+              credentials: "same-origin",
+              cache: "no-store"
             }
           );
 
@@ -1974,75 +1641,42 @@
 
 
         if (
-          !response.ok ||
-          !result.success
-        ) {
-
-          denyAccess(
-            "Unable to verify your YMIR account."
-          );
-
-          return;
-        }
-
-
-        if (
+          !result.success ||
           !result.authenticated ||
           !result.user
         ) {
 
-          denyAccess(
-            "You must be logged in before uploading mods."
+          showDenied(
+            "You must be logged into YMIR Mods to upload."
           );
 
           return;
+
         }
 
 
-        if (
-          !result.user.can_upload
-        ) {
+        if (!result.user.can_upload) {
 
-          denyAccess(
-            "Your YMIR account does not currently have uploader permission."
+          showDenied(
+            "Your YMIR account does not have uploader permission."
           );
 
           return;
+
         }
-
-
-        accountName.textContent =
-          result.user.username;
-
-
-        accountEmail.textContent =
-          result.user.email;
-
-
-        accountRole.textContent =
-          String(
-            result.user.role
-          ).toUpperCase()
-          +
-          " • UPLOADER";
 
 
         loading.style.display =
           "none";
 
-
-        accessDenied.style.display =
-          "none";
-
-
-        uploadWrap.style.display =
+        publisher.style.display =
           "block";
 
 
-      } catch (error) {
+      } catch {
 
-        denyAccess(
-          "Unable to contact the YMIR server."
+        showDenied(
+          "Unable to verify your YMIR account."
         );
 
       }
@@ -2050,256 +1684,908 @@
     }
 
 
-    function denyAccess(
-      text
-    ) {
+    function showDenied(text) {
 
       loading.style.display =
         "none";
 
-
-      uploadWrap.style.display =
+      publisher.style.display =
         "none";
 
-
-      accessDenied.style.display =
+      denied.style.display =
         "block";
 
-
-      accessDeniedMessage.textContent =
+      deniedText.textContent =
         text;
 
     }
 
 
     /* =====================================================
-       DESCRIPTION COUNTER
+       DROP ZONE
        ===================================================== */
 
-    shortDescription.addEventListener(
-      "input",
+    dropZone.addEventListener(
+      "click",
+      () => zipInput.click()
+    );
+
+
+    zipInput.addEventListener(
+      "change",
       () => {
 
-        shortCounter.textContent =
-          shortDescription
-            .value
-            .length
-          +
-          " / 250 characters";
+        const file =
+          zipInput.files[0];
+
+        if (file) {
+          scanPackage(file);
+        }
 
       }
     );
 
 
-    /* =====================================================
-       MOD FILE NAME
-       ===================================================== */
+    dropZone.addEventListener(
+      "dragover",
+      event => {
 
-    modFile.addEventListener(
-      "change",
-      () => {
+        event.preventDefault();
 
-        const file =
-          modFile.files[0];
-
-
-        if (!file) {
-
-          modFileName.textContent =
-            "No ZIP selected.";
-
-          return;
-
-        }
-
-
-        modFileName.textContent =
-          file.name
-          +
-          " • "
-          +
-          formatBytes(
-            file.size
-          );
-
-      }
-    );
-
-
-    /* =====================================================
-       ICON PREVIEW
-       ===================================================== */
-
-    iconFile.addEventListener(
-      "change",
-      () => {
-
-        const file =
-          iconFile.files[0];
-
-
-        if (!file) {
-
-          iconFileName.textContent =
-            "No icon selected.";
-
-
-          iconPreview.style.display =
-            "none";
-
-
-          iconPreviewImage.removeAttribute(
-            "src"
-          );
-
-
-          return;
-
-        }
-
-
-        iconFileName.textContent =
-          file.name
-          +
-          " • "
-          +
-          formatBytes(
-            file.size
-          );
-
-
-        const reader =
-          new FileReader();
-
-
-        reader.onload =
-          (event) => {
-
-            iconPreviewImage.src =
-              event.target.result;
-
-
-            iconPreview.style.display =
-              "block";
-
-          };
-
-
-        reader.readAsDataURL(
-          file
+        dropZone.classList.add(
+          "dragging"
         );
 
       }
     );
 
 
-    /* =====================================================
-       UPLOAD FORM
-       ===================================================== */
+    dropZone.addEventListener(
+      "dragleave",
+      () => {
 
-    form.addEventListener(
-      "submit",
-      async (event) => {
+        dropZone.classList.remove(
+          "dragging"
+        );
+
+      }
+    );
+
+
+    dropZone.addEventListener(
+      "drop",
+      event => {
 
         event.preventDefault();
+
+        dropZone.classList.remove(
+          "dragging"
+        );
+
+
+        const file =
+          event.dataTransfer.files[0];
+
+
+        if (file) {
+          scanPackage(file);
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       SCAN PACKAGE
+       ===================================================== */
+
+    async function scanPackage(file) {
+
+      resetPackage();
+
+
+      if (
+        !file.name
+          .toLowerCase()
+          .endsWith(".zip")
+      ) {
+
+        showMessage(
+          "Please select a ZIP package.",
+          false
+        );
+
+        return;
+
+      }
+
+
+      if (
+        file.size >
+        100 * 1024 * 1024
+      ) {
+
+        showMessage(
+          "The package is larger than the current 100 MB YMIR upload limit.",
+          false
+        );
+
+        return;
+
+      }
+
+
+      selectedZipFile =
+        file;
+
+
+      dropMessage.textContent =
+        file.name
+        +
+        " • "
+        +
+        formatBytes(file.size);
+
+
+      scanStatus.style.display =
+        "block";
+
+      scanStatus.textContent =
+        "Opening ZIP and scanning package...";
+
+
+      try {
+
+        const zip =
+          await JSZip.loadAsync(file);
+
+
+        const allFiles =
+          Object.keys(zip.files)
+            .filter(
+              path =>
+                !zip.files[path].dir
+            );
+
+
+        /*
+          Find manifest.
+
+          This works with either:
+
+          manifest.json
+
+          or:
+
+          MyMod/manifest.json
+        */
+
+        const manifestPaths =
+          allFiles
+            .filter(
+              path =>
+                path
+                  .toLowerCase()
+                  .endsWith(
+                    "manifest.json"
+                  )
+            )
+            .sort(
+              (a, b) =>
+                a.split("/").length -
+                b.split("/").length
+            );
+
+
+        const manifestPath =
+          manifestPaths[0] || null;
+
+
+        let baseFolder =
+          "";
+
+
+        if (manifestPath) {
+
+          const slash =
+            manifestPath.lastIndexOf("/");
+
+
+          if (slash !== -1) {
+
+            baseFolder =
+              manifestPath.slice(
+                0,
+                slash + 1
+              );
+
+          }
+
+        }
+
+
+        const readmePath =
+          findPackageFile(
+            allFiles,
+            baseFolder,
+            [
+              "README.md",
+              "readme.md"
+            ]
+          );
+
+
+        const iconPath =
+          findPackageFile(
+            allFiles,
+            baseFolder,
+            [
+              "icon.png"
+            ]
+          );
+
+
+        const changelogPath =
+          findPackageFile(
+            allFiles,
+            baseFolder,
+            [
+              "CHANGELOG.md",
+              "changelog.md"
+            ]
+          );
+
+
+        const dllPaths =
+          allFiles.filter(
+            path =>
+              path
+                .toLowerCase()
+                .endsWith(".dll")
+          );
+
+
+        /* -----------------------------------------------
+           VALIDATION DISPLAY
+           ----------------------------------------------- */
+
+        setCheck(
+          manifestCheck,
+          Boolean(manifestPath)
+        );
+
+
+        setCheck(
+          readmeCheck,
+          Boolean(readmePath)
+        );
+
+
+        setCheck(
+          iconCheck,
+          Boolean(iconPath)
+        );
+
+
+        setCheck(
+          dllCheck,
+          dllPaths.length > 0
+        );
+
+
+        packageResults.style.display =
+          "block";
+
+
+        /* -----------------------------------------------
+           MANIFEST
+           ----------------------------------------------- */
+
+        if (!manifestPath) {
+
+          scanStatus.textContent =
+            "Package scan failed: manifest.json is missing.";
+
+          return;
+
+        }
+
+
+        const manifestText =
+          await zip
+            .file(manifestPath)
+            .async("string");
+
+
+        try {
+
+          packageManifest =
+            JSON.parse(
+              manifestText
+            );
+
+        } catch {
+
+          scanStatus.textContent =
+            "Package scan failed: manifest.json contains invalid JSON.";
+
+          return;
+
+        }
+
+
+        const modName =
+          String(
+            packageManifest.name ||
+            ""
+          ).trim();
+
+
+        const version =
+          String(
+            packageManifest.version_number ||
+            packageManifest.version ||
+            ""
+          ).trim();
+
+
+        const description =
+          String(
+            packageManifest.description ||
+            ""
+          ).trim();
+
+
+        const dependencies =
+          Array.isArray(
+            packageManifest.dependencies
+          )
+            ? packageManifest.dependencies
+            : [];
+
+
+        /* -----------------------------------------------
+           README
+           ----------------------------------------------- */
+
+        packageReadme =
+          readmePath
+            ? await zip
+                .file(readmePath)
+                .async("string")
+            : "";
+
+
+        /* -----------------------------------------------
+           CHANGELOG
+           ----------------------------------------------- */
+
+        let changelogText =
+          "";
+
+
+        if (changelogPath) {
+
+          changelogText =
+            await zip
+              .file(changelogPath)
+              .async("string");
+
+        }
+
+
+        /* -----------------------------------------------
+           ICON
+           ----------------------------------------------- */
+
+        if (iconPath) {
+
+          const iconBlob =
+            await zip
+              .file(iconPath)
+              .async("blob");
+
+
+          extractedIconFile =
+            new File(
+              [
+                iconBlob
+              ],
+              "icon.png",
+              {
+                type:
+                  "image/png"
+              }
+            );
+
+
+          packageIcon.src =
+            URL.createObjectURL(
+              iconBlob
+            );
+
+
+          packageIcon.style.display =
+            "block";
+
+        } else {
+
+          extractedIconFile =
+            null;
+
+
+          packageIcon.removeAttribute(
+            "src"
+          );
+
+
+          packageIcon.style.display =
+            "none";
+
+        }
+
+
+        /* -----------------------------------------------
+           DISPLAY PACKAGE
+           ----------------------------------------------- */
+
+        packageName.textContent =
+          modName ||
+          "Unnamed Mod";
+
+
+        packageVersion.textContent =
+          version
+            ? "Version " + version
+            : "Version missing";
+
+
+        packageDescription.textContent =
+          description ||
+          "No description was found in manifest.json.";
+
+
+        /* -----------------------------------------------
+           AUTO FILL
+           ----------------------------------------------- */
+
+        nameField.value =
+          modName;
+
+
+        versionField.value =
+          version;
+
+
+        shortField.value =
+          description.slice(
+            0,
+            250
+          );
+
+
+        descriptionField.value =
+          packageReadme;
+
+
+        changelogField.value =
+          changelogText;
+
+
+        readmePreview.textContent =
+          packageReadme ||
+          "README.md was not found in this package.";
+
+
+        /* -----------------------------------------------
+           FILE LIST
+           ----------------------------------------------- */
+
+        fileList.innerHTML =
+          "";
+
+
+        const displayFiles =
+          allFiles
+            .slice(
+              0,
+              30
+            );
+
+
+        for (
+          const path of displayFiles
+        ) {
+
+          const li =
+            document.createElement(
+              "li"
+            );
+
+
+          li.textContent =
+            path;
+
+
+          fileList.appendChild(
+            li
+          );
+
+        }
+
+
+        if (
+          allFiles.length >
+          30
+        ) {
+
+          const li =
+            document.createElement(
+              "li"
+            );
+
+
+          li.textContent =
+            "+"
+            +
+            (
+              allFiles.length -
+              30
+            )
+            +
+            " more files";
+
+
+          fileList.appendChild(
+            li
+          );
+
+        }
+
+
+        /* -----------------------------------------------
+           DEPENDENCIES
+           ----------------------------------------------- */
+
+        dependencyList.innerHTML =
+          "";
+
+
+        if (
+          dependencies.length === 0
+        ) {
+
+          const li =
+            document.createElement(
+              "li"
+            );
+
+
+          li.textContent =
+            "No dependencies listed.";
+
+
+          dependencyList.appendChild(
+            li
+          );
+
+        } else {
+
+          for (
+            const dependency of dependencies
+          ) {
+
+            const li =
+              document.createElement(
+                "li"
+              );
+
+
+            li.textContent =
+              dependency;
+
+
+            dependencyList.appendChild(
+              li
+            );
+
+          }
+
+        }
+
+
+        /* -----------------------------------------------
+           FINAL VALIDATION
+           ----------------------------------------------- */
+
+        packageIsValid =
+          Boolean(
+            manifestPath &&
+            readmePath &&
+            iconPath &&
+            dllPaths.length > 0 &&
+            modName &&
+            version &&
+            description
+          );
+
+
+        if (packageIsValid) {
+
+          scanStatus.textContent =
+            "Package scan complete. Everything required was found.";
+
+          publishButton.disabled =
+            false;
+
+        } else {
+
+          scanStatus.textContent =
+            "Package scanned, but one or more required package files or manifest fields are missing.";
+
+          publishButton.disabled =
+            true;
+
+        }
+
+
+      } catch (error) {
+
+        console.error(error);
+
+
+        scanStatus.textContent =
+          "YMIR could not read this ZIP package.";
+
+
+        packageIsValid =
+          false;
+
+
+        publishButton.disabled =
+          true;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       FIND FILE RELATIVE TO MANIFEST
+       ===================================================== */
+
+    function findPackageFile(
+      files,
+      baseFolder,
+      names
+    ) {
+
+      /*
+        First try beside manifest.json
+      */
+
+      for (
+        const name of names
+      ) {
+
+        const expected =
+          (
+            baseFolder +
+            name
+          ).toLowerCase();
+
+
+        const match =
+          files.find(
+            path =>
+              path.toLowerCase() ===
+              expected
+          );
+
+
+        if (match) {
+          return match;
+        }
+
+      }
+
+
+      /*
+        Fallback:
+        find shallowest matching filename.
+      */
+
+      const matches =
+        files
+          .filter(
+            path => {
+
+              const filename =
+                path
+                  .split("/")
+                  .pop()
+                  .toLowerCase();
+
+
+              return names.some(
+                name =>
+                  filename ===
+                  name.toLowerCase()
+              );
+
+            }
+          )
+          .sort(
+            (a, b) =>
+              a.split("/").length -
+              b.split("/").length
+          );
+
+
+      return matches[0] || null;
+
+    }
+
+
+    /* =====================================================
+       VALIDATION UI
+       ===================================================== */
+
+    function setCheck(
+      element,
+      good
+    ) {
+
+      element.classList.remove(
+        "good",
+        "bad"
+      );
+
+
+      element.classList.add(
+        good
+          ? "good"
+          : "bad"
+      );
+
+
+      const original =
+        element.textContent
+          .replace(
+            /^✓\s|^✗\s/,
+            ""
+          );
+
+
+      element.textContent =
+        (
+          good
+            ? "✓ "
+            : "✗ "
+        )
+        +
+        original;
+
+    }
+
+
+    /* =====================================================
+       PUBLISH
+       ===================================================== */
+
+    publishForm.addEventListener(
+      "submit",
+      async event => {
+
+        event.preventDefault();
+
+
+        if (
+          !packageIsValid ||
+          !selectedZipFile
+        ) {
+
+          showMessage(
+            "Please scan a valid mod package first.",
+            false
+          );
+
+          return;
+
+        }
+
+
+        if (
+          !categoryField.value
+        ) {
+
+          showMessage(
+            "Please choose a YMIR category.",
+            false
+          );
+
+          return;
+
+        }
+
+
+        const data =
+          new FormData();
+
+
+        data.append(
+          "name",
+          nameField.value.trim()
+        );
+
+
+        data.append(
+          "version",
+          versionField.value.trim()
+        );
+
+
+        data.append(
+          "category",
+          categoryField.value
+        );
+
+
+        data.append(
+          "short_description",
+          shortField.value.trim()
+        );
+
+
+        data.append(
+          "full_description",
+          descriptionField.value
+        );
+
+
+        data.append(
+          "changelog",
+          changelogField.value
+        );
+
+
+        data.append(
+          "mod_file",
+          selectedZipFile,
+          selectedZipFile.name
+        );
+
+
+        if (extractedIconFile) {
+
+          data.append(
+            "icon_file",
+            extractedIconFile,
+            "icon.png"
+          );
+
+        }
+
+
+        publishButton.disabled =
+          true;
+
+
+        publishButton.textContent =
+          "Publishing...";
+
+
+        progress.style.display =
+          "block";
 
 
         message.className =
           "message";
 
 
-        message.textContent =
-          "";
-
-
-        const selectedModFile =
-          modFile.files[0];
-
-
-        if (!selectedModFile) {
-
-          showMessage(
-            "Please choose a mod ZIP file.",
-            false
-          );
-
-          return;
-
-        }
-
-
-        if (
-          !selectedModFile.name
-            .toLowerCase()
-            .endsWith(".zip")
-        ) {
-
-          showMessage(
-            "The mod package must be a ZIP file.",
-            false
-          );
-
-          return;
-
-        }
-
-
-        if (
-          selectedModFile.size >
-          100 * 1024 * 1024
-        ) {
-
-          showMessage(
-            "The mod ZIP is larger than 100 MB.",
-            false
-          );
-
-          return;
-
-        }
-
-
-        const selectedIconFile =
-          iconFile.files[0];
-
-
-        if (
-          selectedIconFile &&
-          selectedIconFile.size >
-          5 * 1024 * 1024
-        ) {
-
-          showMessage(
-            "The icon is larger than 5 MB.",
-            false
-          );
-
-          return;
-
-        }
-
-
-        const formData =
-          new FormData(
-            form
-          );
-
-
-        submitButton.disabled =
-          true;
-
-
-        submitButton.textContent =
-          "Uploading...";
-
-
-        progressWrap.style.display =
-          "block";
-
-
         setProgress(
           15,
-          "Preparing upload..."
+          "Preparing package..."
         );
 
 
@@ -2307,7 +2593,7 @@
 
           setProgress(
             35,
-            "Sending files to YMIR..."
+            "Uploading package to YMIR..."
           );
 
 
@@ -2322,7 +2608,7 @@
                   "same-origin",
 
                 body:
-                  formData
+                  data
               }
             );
 
@@ -2344,11 +2630,9 @@
           } catch {
 
             result = {
-              success:
-                false,
-
+              success: false,
               message:
-                "The YMIR server returned an invalid response."
+                "The server returned an invalid response."
             };
 
           }
@@ -2361,15 +2645,23 @@
 
             showMessage(
               result.message ||
-              "Unable to upload mod.",
+              "Unable to publish mod.",
               false
             );
 
 
             setProgress(
               0,
-              "Upload failed."
+              "Publish failed."
             );
+
+
+            publishButton.disabled =
+              false;
+
+
+            publishButton.textContent =
+              "Publish Mod";
 
 
             return;
@@ -2379,7 +2671,7 @@
 
           setProgress(
             100,
-            "Upload complete."
+            "Published!"
           );
 
 
@@ -2390,40 +2682,18 @@
             +
             result.mod.version
             +
-            " uploaded successfully!",
+            " has been published to YMIR Mods.",
             true
           );
 
 
-          form.reset();
-
-
-          modFileName.textContent =
-            "No ZIP selected.";
-
-
-          iconFileName.textContent =
-            "No icon selected.";
-
-
-          iconPreview.style.display =
-            "none";
-
-
-          iconPreviewImage.removeAttribute(
-            "src"
-          );
-
-
-          shortCounter.textContent =
-            "0 / 250 characters";
+          publishButton.textContent =
+            "Published";
 
 
         } catch (error) {
 
-          console.error(
-            error
-          );
+          console.error(error);
 
 
           showMessage(
@@ -2434,18 +2704,16 @@
 
           setProgress(
             0,
-            "Upload failed."
+            "Publish failed."
           );
 
 
-        } finally {
-
-          submitButton.disabled =
+          publishButton.disabled =
             false;
 
 
-          submitButton.textContent =
-            "Upload Mod";
+          publishButton.textContent =
+            "Publish Mod";
 
         }
 
@@ -2454,7 +2722,57 @@
 
 
     /* =====================================================
-       STATUS MESSAGE
+       RESET
+       ===================================================== */
+
+    function resetPackage() {
+
+      packageIsValid =
+        false;
+
+
+      packageManifest =
+        null;
+
+
+      packageReadme =
+        "";
+
+
+      extractedIconFile =
+        null;
+
+
+      publishButton.disabled =
+        true;
+
+
+      publishButton.textContent =
+        "Publish Mod";
+
+
+      packageResults.style.display =
+        "none";
+
+
+      message.className =
+        "message";
+
+
+      progress.style.display =
+        "none";
+
+
+      setProgress(
+        0,
+        ""
+      );
+
+    }
+
+
+    /* =====================================================
+       MESSAGE
        ===================================================== */
 
     function showMessage(
@@ -2498,16 +2816,12 @@
 
 
     /* =====================================================
-       FILE SIZE
+       SIZE
        ===================================================== */
 
-    function formatBytes(
-      bytes
-    ) {
+    function formatBytes(bytes) {
 
-      if (
-        bytes === 0
-      ) {
+      if (!bytes) {
         return "0 B";
       }
 
@@ -2521,13 +2835,16 @@
 
 
       const index =
-        Math.floor(
-          Math.log(bytes) /
-          Math.log(1024)
+        Math.min(
+          Math.floor(
+            Math.log(bytes) /
+            Math.log(1024)
+          ),
+          units.length - 1
         );
 
 
-      const value =
+      const number =
         bytes /
         Math.pow(
           1024,
@@ -2537,7 +2854,7 @@
 
       return (
         Math.round(
-          value * 10
+          number * 10
         ) / 10
       )
       +
@@ -2552,10 +2869,9 @@
        START
        ===================================================== */
 
-    checkUploaderAccess();
+    checkAccess();
 
   </script>
-
 
 </body>
 
