@@ -5,6 +5,17 @@
 
   "assets": {
     "directory": ".",
-    "binding": "ASSETS"
-  }
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ymirmods-db",
+      "database_id": "64f33365-bf85-4c70-bc19-68747ca43b87"
+    }
+  ]
 }
