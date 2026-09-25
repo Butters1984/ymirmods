@@ -30,7 +30,7 @@ export default {
           {
             success: false,
             message: "Backend is running, but database connection failed",
-            error: error.message
+            error: error?.message || String(error)
           },
           500
         );
@@ -51,7 +51,7 @@ export default {
 
 
     /* =======================================================
-       BLOCK WRONG METHOD
+       BLOCK WRONG REGISTER METHOD
        ======================================================= */
 
     if (
@@ -85,18 +85,26 @@ async function handleRegister(request, env) {
   try {
     let body;
 
+    /* -------------------------
+       READ JSON
+       ------------------------- */
+
     try {
       body = await request.json();
     } catch {
       return jsonResponse(
         {
           success: false,
-          message: "Invalid request."
+          message: "Invalid request body."
         },
         400
       );
     }
 
+
+    /* -------------------------
+       NORMALIZE INPUT
+       ------------------------- */
 
     const username =
       String(body.username ?? "")
@@ -229,12 +237,16 @@ async function handleRegister(request, env) {
       .run();
 
 
+    /* =======================================================
+       SUCCESS RESPONSE
+       ======================================================= */
+
     return jsonResponse(
       {
         success: true,
         message: "YMIR Mods account created successfully.",
         user: {
-          id: result.meta.last_row_id,
+          id: result?.meta?.last_row_id ?? null,
           username: username,
           role: "member",
           can_upload: false
@@ -244,16 +256,24 @@ async function handleRegister(request, env) {
     );
 
   } catch (error) {
+
     console.error(
       "Registration error:",
       error
     );
 
 
+    /* TEMPORARY DEBUG MESSAGE */
     return jsonResponse(
       {
         success: false,
-        message: "Unable to create account."
+
+        message:
+          "Unable to create account: " +
+          (
+            error?.message ||
+            String(error)
+          )
       },
       500
     );
@@ -279,10 +299,18 @@ async function hashPassword(password) {
   const keyMaterial =
     await crypto.subtle.importKey(
       "raw",
+
       encoder.encode(password),
-      "PBKDF2",
+
+      {
+        name: "PBKDF2"
+      },
+
       false,
-      ["deriveBits"]
+
+      [
+        "deriveBits"
+      ]
     );
 
 
@@ -329,7 +357,7 @@ async function hashPassword(password) {
 
 
 /* =========================================================
-   HELPERS
+   BASE64 HELPER
    ========================================================= */
 
 function bytesToBase64(bytes) {
@@ -350,11 +378,19 @@ function bytesToBase64(bytes) {
 }
 
 
+/* =========================================================
+   EMAIL VALIDATION
+   ========================================================= */
+
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     .test(email);
 }
 
+
+/* =========================================================
+   JSON RESPONSE HELPER
+   ========================================================= */
 
 function jsonResponse(
   data,
@@ -362,6 +398,7 @@ function jsonResponse(
 ) {
   return new Response(
     JSON.stringify(data),
+
     {
       status: status,
 
