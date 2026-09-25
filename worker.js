@@ -77,6 +77,30 @@ export default {
 
 
     /* =====================================================
+       PUBLIC MOD LIST
+       ===================================================== */
+
+    if (
+      url.pathname === "/api/mods" &&
+      request.method === "GET"
+    ) {
+      return handlePublicMods(env);
+    }
+
+
+    /* =====================================================
+       CURRENT USER'S MODS
+       ===================================================== */
+
+    if (
+      url.pathname === "/api/my-mods" &&
+      request.method === "GET"
+    ) {
+      return handleMyMods(request, env);
+    }
+
+
+    /* =====================================================
        UPLOAD MOD
        ===================================================== */
 
@@ -112,6 +136,8 @@ export default {
       url.pathname === "/api/register" ||
       url.pathname === "/api/login" ||
       url.pathname === "/api/logout" ||
+      url.pathname === "/api/mods" ||
+      url.pathname === "/api/my-mods" ||
       url.pathname === "/api/mods/upload"
     ) {
       return jsonResponse(
@@ -170,6 +196,186 @@ async function handleTest(env) {
         success: false,
         message:
           "Backend or database connection failed."
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   PUBLIC MOD LIST
+   ========================================================= */
+
+async function handlePublicMods(env) {
+  try {
+
+    const result =
+      await env.DB
+        .prepare(`
+          SELECT
+            mods.id,
+            mods.name,
+            mods.slug,
+            mods.version,
+            mods.category,
+            mods.short_description,
+            mods.full_description,
+            mods.icon_url,
+            mods.download_url,
+            mods.changelog,
+            mods.is_published,
+            mods.created_at,
+            mods.updated_at,
+
+            users.id AS author_id,
+            users.username AS author
+
+          FROM mods
+
+          LEFT JOIN users
+            ON users.id = mods.owner_user_id
+
+          WHERE mods.is_published = 1
+
+          ORDER BY
+            datetime(mods.updated_at) DESC,
+            mods.id DESC
+
+          LIMIT 50
+        `)
+        .all();
+
+
+    return jsonResponse({
+      success: true,
+      mods: result.results || []
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Public mods error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success: false,
+        message:
+          "Unable to load mods.",
+        error:
+          error.message
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   CURRENT USER'S MODS
+   ========================================================= */
+
+async function handleMyMods(
+  request,
+  env
+) {
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (!user) {
+      return jsonResponse(
+        {
+          success: false,
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    const result =
+      await env.DB
+        .prepare(`
+          SELECT
+            id,
+            name,
+            slug,
+            version,
+            category,
+            short_description,
+            full_description,
+            icon_url,
+            download_url,
+            changelog,
+            is_published,
+            created_at,
+            updated_at
+
+          FROM mods
+
+          WHERE owner_user_id = ?
+
+          ORDER BY
+            datetime(updated_at) DESC,
+            id DESC
+        `)
+        .bind(
+          user.id
+        )
+        .all();
+
+
+    return jsonResponse({
+      success: true,
+
+      user: {
+        id:
+          user.id,
+
+        username:
+          user.username,
+
+        email:
+          user.email,
+
+        role:
+          user.role,
+
+        can_upload:
+          Boolean(
+            user.can_upload
+          )
+      },
+
+      mods:
+        result.results || []
+    });
+
+  } catch (error) {
+
+    console.error(
+      "My mods error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success: false,
+        message:
+          "Unable to load your mods.",
+        error:
+          error.message
       },
       500
     );
@@ -1329,9 +1535,7 @@ async function handleModUpload(
 
     try {
 
-      if (
-        modId
-      ) {
+      if (modId) {
         await env.DB
           .prepare(`
             DELETE FROM mods
@@ -1342,17 +1546,13 @@ async function handleModUpload(
       }
 
 
-      if (
-        packageKey
-      ) {
+      if (packageKey) {
         await env.MOD_FILES
           .delete(packageKey);
       }
 
 
-      if (
-        iconKey
-      ) {
+      if (iconKey) {
         await env.MOD_FILES
           .delete(iconKey);
       }
