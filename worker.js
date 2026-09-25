@@ -2,15 +2,32 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Test API route
     if (url.pathname === "/api/test") {
-      return Response.json({
-        success: true,
-        message: "YMIR Mods backend is running"
-      });
+      try {
+        const result = await env.DB
+          .prepare("SELECT COUNT(*) AS count FROM users")
+          .first();
+
+        return Response.json({
+          success: true,
+          message: "YMIR Mods backend is running",
+          database: "connected",
+          users: result.count
+        });
+      } catch (error) {
+        return Response.json(
+          {
+            success: false,
+            message: "Backend is running, but database connection failed",
+            error: error.message
+          },
+          {
+            status: 500
+          }
+        );
+      }
     }
 
-    // Everything else continues to use the normal website files
     return env.ASSETS.fetch(request);
   }
 };
