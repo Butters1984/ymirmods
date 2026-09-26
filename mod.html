@@ -1,0 +1,3730 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>YMIR Mods</title>
+
+  <meta
+    name="description"
+    content="YMIR Mods - Valheim mod page."
+  />
+
+  <style>
+    :root {
+      --bg: #07090d;
+      --bg2: #0b1117;
+
+      --panel: rgba(18,21,27,0.94);
+      --panel2: rgba(12,16,21,0.96);
+
+      --text: #f4e5b5;
+      --muted: #bca97a;
+
+      --gold: #f2c15b;
+      --gold2: #ffdc8c;
+
+      --orange: #d97706;
+      --orange2: #ff9f1c;
+
+      --line: rgba(255,192,76,0.15);
+
+      --shadow:
+        0 20px 60px
+        rgba(0,0,0,0.45);
+
+      --max: 1220px;
+    }
+
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+
+    body {
+      min-height: 100vh;
+
+      position: relative;
+
+      overflow-x: hidden;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      line-height: 1.65;
+
+      color:
+        var(--text);
+
+      background:
+
+        radial-gradient(
+          circle at 15% 20%,
+          rgba(255,180,60,0.10),
+          transparent 23%
+        ),
+
+        radial-gradient(
+          circle at 82% 18%,
+          rgba(255,120,0,0.09),
+          transparent 20%
+        ),
+
+        radial-gradient(
+          circle at 78% 72%,
+          rgba(255,196,80,0.07),
+          transparent 19%
+        ),
+
+        linear-gradient(
+          180deg,
+          #05070a,
+          #0a0f14 35%,
+          #0b1117 70%,
+          #090d12
+        );
+    }
+
+
+    body::before {
+      content: "";
+
+      position: fixed;
+
+      inset: 0;
+
+      pointer-events: none;
+
+      z-index: 0;
+
+      background:
+
+        radial-gradient(
+          circle at 50% 0%,
+          rgba(255,189,74,0.08),
+          transparent 45%
+        ),
+
+        radial-gradient(
+          circle at 10% 60%,
+          rgba(255,110,0,0.05),
+          transparent 35%
+        );
+    }
+
+
+    a {
+      color: inherit;
+
+      text-decoration: none;
+    }
+
+
+    button {
+      font-family: inherit;
+    }
+
+
+    .container {
+      width:
+        min(
+          var(--max),
+          calc(100% - 40px)
+        );
+
+      margin: 0 auto;
+
+      position: relative;
+
+      z-index: 2;
+    }
+
+
+    /* =====================================================
+       GALAXY
+       ===================================================== */
+
+    #galaxy-stars {
+      position: fixed;
+
+      inset: 0;
+
+      overflow: hidden;
+
+      pointer-events: none;
+
+      z-index: 0;
+    }
+
+
+    .galaxy-star {
+      position: absolute;
+
+      display: block;
+
+      width:
+        var(--star-size);
+
+      height:
+        var(--star-size);
+
+      border-radius: 50%;
+
+      color:
+        white;
+
+      background:
+        currentColor;
+
+      opacity:
+        var(--min-opacity);
+
+      box-shadow:
+        0 0
+        var(--star-glow)
+        currentColor;
+
+      animation:
+
+        starTwinkle
+        var(--twinkle-speed)
+        ease-in-out
+        infinite
+        alternate,
+
+        starDrift
+        var(--float-speed)
+        ease-in-out
+        infinite
+        alternate;
+
+      animation-delay:
+        var(--delay);
+    }
+
+
+    .galaxy-star.aesir-star {
+      box-shadow:
+
+        0 0 6px
+        currentColor,
+
+        0 0 14px
+        currentColor,
+
+        0 0 30px
+        rgba(255,166,40,0.35);
+    }
+
+
+    @keyframes starTwinkle {
+
+      from {
+        opacity:
+          var(--min-opacity);
+      }
+
+      to {
+        opacity:
+          var(--max-opacity);
+      }
+    }
+
+
+    @keyframes starDrift {
+
+      from {
+        transform:
+          translate3d(
+            0,
+            0,
+            0
+          );
+      }
+
+      to {
+        transform:
+          translate3d(
+            var(--drift-x),
+            var(--drift-y),
+            0
+          );
+      }
+    }
+
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
+    .topbar {
+      position: sticky;
+
+      top: 0;
+
+      z-index: 100;
+
+      backdrop-filter:
+        blur(14px);
+
+      background:
+        rgba(5,7,10,0.90);
+
+      border-bottom:
+        1px solid
+        rgba(255,195,84,0.13);
+
+      box-shadow:
+        0 8px 30px
+        rgba(0,0,0,0.28);
+    }
+
+
+    .nav {
+      min-height: 88px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 24px;
+    }
+
+
+    .header-brand {
+      display: flex;
+
+      align-items: center;
+
+      gap: 13px;
+
+      flex-shrink: 0;
+    }
+
+
+    .header-logo {
+      width: 58px;
+
+      height: 58px;
+
+      border-radius: 11px;
+
+      object-fit: cover;
+
+      filter:
+
+        drop-shadow(
+          0 0 8px
+          rgba(255,174,35,0.45)
+        )
+
+        drop-shadow(
+          0 0 18px
+          rgba(255,110,0,0.18)
+        );
+    }
+
+
+    .brand h1 {
+      color:
+        var(--gold2);
+
+      font-size:
+        1.75rem;
+
+      line-height:
+        1.1;
+
+      letter-spacing:
+        1px;
+    }
+
+
+    .brand p {
+      color:
+        var(--muted);
+
+      font-size:
+        0.84rem;
+
+      white-space:
+        nowrap;
+    }
+
+
+    .nav-links {
+      margin-left: auto;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 20px;
+    }
+
+
+    .nav-links a {
+      color:
+        #e9d6a3;
+
+      font-weight:
+        700;
+
+      font-size:
+        0.92rem;
+
+      transition:
+        color 0.2s ease,
+        text-shadow 0.2s ease;
+    }
+
+
+    .nav-links a:hover {
+      color:
+        #ffe09a;
+
+      text-shadow:
+        0 0 10px
+        rgba(255,175,45,0.35);
+    }
+
+
+    .account-area {
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      padding-left: 18px;
+
+      border-left:
+        1px solid
+        rgba(255,194,82,0.12);
+    }
+
+
+    .account-loading {
+      color:
+        var(--muted);
+
+      font-size:
+        0.78rem;
+    }
+
+
+    .account-login {
+      display: none;
+    }
+
+
+    .account-user {
+      display: none;
+
+      align-items: center;
+
+      gap: 8px;
+    }
+
+
+    .account-name {
+      color:
+        var(--gold2);
+
+      font-weight:
+        bold;
+
+      font-size:
+        0.9rem;
+
+      max-width:
+        110px;
+
+      overflow:
+        hidden;
+
+      text-overflow:
+        ellipsis;
+
+      white-space:
+        nowrap;
+    }
+
+
+    .account-button {
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      min-height: 35px;
+
+      padding:
+        7px 11px;
+
+      border-radius:
+        9px;
+
+      border:
+        1px solid
+        rgba(255,194,82,0.17);
+
+      background:
+        rgba(255,183,77,0.055);
+
+      color:
+        var(--gold2);
+
+      font-weight:
+        bold;
+
+      cursor:
+        pointer;
+    }
+
+
+    .account-button.login {
+      background:
+
+        linear-gradient(
+          135deg,
+          rgba(217,119,6,0.95),
+          rgba(242,193,91,0.95)
+        );
+
+      color:
+        #15100a;
+
+      border:
+        none;
+    }
+
+
+    .account-button.logout {
+      color:
+        #ffc5b6;
+
+      border-color:
+        rgba(255,100,75,0.17);
+
+      background:
+        rgba(170,50,35,0.08);
+    }
+
+
+    /* =====================================================
+       PAGE
+       ===================================================== */
+
+    main {
+      position:
+        relative;
+
+      z-index:
+        2;
+    }
+
+
+    .mod-page {
+      padding:
+        54px 0 90px;
+    }
+
+
+    .back-link {
+      display:
+        inline-flex;
+
+      align-items:
+        center;
+
+      gap:
+        8px;
+
+      margin-bottom:
+        24px;
+
+      color:
+        #d4b972;
+
+      font-weight:
+        700;
+
+      transition:
+        color 0.2s ease,
+        text-shadow 0.2s ease;
+    }
+
+
+    .back-link:hover {
+      color:
+        #ffd97e;
+
+      text-shadow:
+        0 0 12px
+        rgba(255,155,20,0.30);
+    }
+
+
+    .loading-panel,
+    .error-panel {
+      padding:
+        50px 30px;
+
+      border-radius:
+        20px;
+
+      text-align:
+        center;
+
+      color:
+        var(--muted);
+
+      background:
+
+        linear-gradient(
+          180deg,
+          rgba(22,27,34,0.96),
+          rgba(12,16,21,0.96)
+        );
+
+      border:
+        1px solid
+        rgba(255,194,82,0.14);
+
+      box-shadow:
+        var(--shadow);
+    }
+
+
+    .error-panel h2 {
+      color:
+        var(--gold2);
+
+      margin-bottom:
+        10px;
+    }
+
+
+    #modContent {
+      display:
+        none;
+    }
+
+
+    /* =====================================================
+       MOD HERO
+       ===================================================== */
+
+    .mod-hero {
+      position:
+        relative;
+
+      overflow:
+        hidden;
+
+      isolation:
+        isolate;
+
+      display:
+        grid;
+
+      grid-template-columns:
+        190px minmax(0,1fr) auto;
+
+      gap:
+        28px;
+
+      align-items:
+        center;
+
+      padding:
+        30px;
+
+      border-radius:
+        22px;
+
+      background:
+
+        radial-gradient(
+          circle at 8% 18%,
+          rgba(255,155,25,0.10),
+          transparent 34%
+        ),
+
+        linear-gradient(
+          180deg,
+          rgba(24,27,32,0.97),
+          rgba(12,15,20,0.97)
+        );
+
+      border:
+        1px solid
+        rgba(255,194,82,0.22);
+
+      box-shadow:
+
+        0 25px 65px
+        rgba(0,0,0,0.48),
+
+        0 0 28px
+        rgba(255,130,15,0.06);
+    }
+
+
+    .mod-hero::before {
+      content:
+        "";
+
+      position:
+        absolute;
+
+      width:
+        420px;
+
+      height:
+        420px;
+
+      top:
+        -260px;
+
+      left:
+        -150px;
+
+      border-radius:
+        50%;
+
+      pointer-events:
+        none;
+
+      z-index:
+        -1;
+
+      background:
+
+        radial-gradient(
+          circle,
+          rgba(255,215,110,0.20),
+          rgba(255,130,10,0.08) 38%,
+          transparent 70%
+        );
+    }
+
+
+    .mod-icon-shell {
+      width:
+        170px;
+
+      height:
+        170px;
+
+      padding:
+        6px;
+
+      border-radius:
+        20px;
+
+      background:
+
+        linear-gradient(
+          135deg,
+          rgba(255,220,125,0.72),
+          rgba(255,130,10,0.42),
+          rgba(255,190,65,0.70)
+        );
+
+      box-shadow:
+
+        0 0 14px
+        rgba(255,215,120,0.20),
+
+        0 0 30px
+        rgba(255,130,10,0.17);
+    }
+
+
+    .mod-icon {
+      width:
+        100%;
+
+      height:
+        100%;
+
+      display:
+        block;
+
+      object-fit:
+        cover;
+
+      border-radius:
+        15px;
+
+      background:
+        #080b0f;
+    }
+
+
+    .mod-category {
+      display:
+        inline-block;
+
+      margin-bottom:
+        10px;
+
+      padding:
+        6px 12px;
+
+      border-radius:
+        999px;
+
+      color:
+        #ffe3a0;
+
+      background:
+        rgba(255,155,25,0.11);
+
+      border:
+        1px solid
+        rgba(255,195,70,0.30);
+
+      font-size:
+        0.78rem;
+
+      font-weight:
+        700;
+    }
+
+
+    .mod-title {
+      color:
+        #ffe2a0;
+
+      font-size:
+        clamp(
+          2.3rem,
+          5vw,
+          4rem
+        );
+
+      line-height:
+        1.05;
+
+      margin-bottom:
+        7px;
+
+      text-shadow:
+
+        0 0 10px
+        rgba(255,225,150,0.18),
+
+        0 0 28px
+        rgba(255,130,10,0.12);
+    }
+
+
+    .mod-author {
+      color:
+        #ad9a70;
+
+      margin-bottom:
+        15px;
+    }
+
+
+    .mod-author strong {
+      color:
+        var(--orange2);
+    }
+
+
+    .mod-summary {
+      max-width:
+        720px;
+
+      color:
+        #d2bd8b;
+
+      font-size:
+        1rem;
+    }
+
+
+    .download-area {
+      min-width:
+        210px;
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      align-items:
+        stretch;
+
+      gap:
+        10px;
+    }
+
+
+    .current-version {
+      text-align:
+        center;
+
+      color:
+        #bba673;
+
+      font-size:
+        0.82rem;
+    }
+
+
+    .current-version strong {
+      color:
+        #ffd16a;
+    }
+
+
+    .download-button {
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      min-height:
+        55px;
+
+      padding:
+        14px 20px;
+
+      border-radius:
+        13px;
+
+      color:
+        #171006;
+
+      font-size:
+        1.02rem;
+
+      font-weight:
+        900;
+
+      background:
+
+        linear-gradient(
+          135deg,
+          #d77808,
+          #ffad28 48%,
+          #f1c45c
+        );
+
+      border:
+        1px solid
+        rgba(255,220,130,0.65);
+
+      box-shadow:
+
+        0 0 14px
+        rgba(255,180,40,0.17),
+
+        0 0 30px
+        rgba(255,100,0,0.10);
+
+      transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease;
+    }
+
+
+    .download-button:hover {
+      transform:
+        translateY(-3px);
+
+      box-shadow:
+
+        0 0 10px
+        rgba(255,230,160,0.30),
+
+        0 0 26px
+        rgba(255,170,40,0.30),
+
+        0 0 50px
+        rgba(255,100,0,0.17);
+    }
+
+
+    /* =====================================================
+       CONTENT LAYOUT
+       ===================================================== */
+
+    .content-grid {
+      display:
+        grid;
+
+      grid-template-columns:
+        minmax(0,1fr) 320px;
+
+      gap:
+        24px;
+
+      align-items:
+        start;
+
+      margin-top:
+        24px;
+    }
+
+
+    .panel {
+      border-radius:
+        20px;
+
+      background:
+
+        linear-gradient(
+          180deg,
+          rgba(22,26,32,0.94),
+          rgba(12,15,20,0.94)
+        );
+
+      border:
+        1px solid
+        rgba(255,192,80,0.12);
+
+      box-shadow:
+        var(--shadow);
+    }
+
+
+    .main-panel {
+      padding:
+        30px;
+    }
+
+
+    .sidebar {
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        18px;
+    }
+
+
+    .sidebar-panel {
+      padding:
+        22px;
+    }
+
+
+    .panel-title {
+      color:
+        var(--gold2);
+
+      font-size:
+        1.45rem;
+
+      margin-bottom:
+        16px;
+
+      padding-bottom:
+        10px;
+
+      border-bottom:
+        1px solid
+        rgba(255,195,75,0.12);
+
+      text-shadow:
+        0 0 12px
+        rgba(255,145,20,0.10);
+    }
+
+
+    /* =====================================================
+       README
+       ===================================================== */
+
+    .readme {
+      color:
+        #d3c095;
+
+      line-height:
+        1.72;
+
+      overflow-wrap:
+        anywhere;
+    }
+
+
+    .readme h1,
+    .readme h2,
+    .readme h3,
+    .readme h4 {
+      color:
+        #f2d797;
+
+      line-height:
+        1.25;
+
+      margin:
+        26px 0 12px;
+    }
+
+
+    .readme h1 {
+      font-size:
+        2rem;
+    }
+
+
+    .readme h2 {
+      font-size:
+        1.65rem;
+
+      padding-bottom:
+        8px;
+
+      border-bottom:
+        1px solid
+        rgba(255,190,70,0.12);
+    }
+
+
+    .readme h3 {
+      font-size:
+        1.35rem;
+    }
+
+
+    .readme p {
+      margin:
+        0 0 15px;
+    }
+
+
+    .readme ul,
+    .readme ol {
+      margin:
+        10px 0 18px 23px;
+    }
+
+
+    .readme li {
+      margin-bottom:
+        5px;
+    }
+
+
+    .readme strong {
+      color:
+        #ffe09a;
+    }
+
+
+    .readme code {
+      padding:
+        2px 6px;
+
+      border-radius:
+        5px;
+
+      color:
+        #ffd77a;
+
+      background:
+        rgba(255,160,30,0.08);
+
+      border:
+        1px solid
+        rgba(255,190,70,0.10);
+    }
+
+
+    .readme pre {
+      overflow-x:
+        auto;
+
+      margin:
+        16px 0;
+
+      padding:
+        16px;
+
+      border-radius:
+        12px;
+
+      background:
+        #080b0f;
+
+      border:
+        1px solid
+        rgba(255,190,70,0.12);
+    }
+
+
+    .readme pre code {
+      padding:
+        0;
+
+      background:
+        transparent;
+
+      border:
+        none;
+    }
+
+
+    .readme a {
+      color:
+        var(--orange2);
+
+      text-decoration:
+        underline;
+
+      text-decoration-color:
+        rgba(255,159,28,0.35);
+    }
+
+
+    .readme a:hover {
+      color:
+        #ffd477;
+    }
+
+
+    .readme img {
+      max-width:
+        100%;
+
+      height:
+        auto;
+
+      margin:
+        15px 0;
+
+      border-radius:
+        12px;
+
+      border:
+        1px solid
+        rgba(255,190,70,0.12);
+    }
+
+
+    .readme blockquote {
+      margin:
+        18px 0;
+
+      padding:
+        10px 16px;
+
+      color:
+        #c8b684;
+
+      border-left:
+        3px solid
+        var(--orange2);
+
+      background:
+        rgba(255,150,20,0.045);
+    }
+
+
+    .readme hr {
+      border:
+        none;
+
+      height:
+        1px;
+
+      margin:
+        26px 0;
+
+      background:
+
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(255,190,65,0.40),
+          transparent
+        );
+    }
+
+
+    /* =====================================================
+       DETAILS
+       ===================================================== */
+
+    .detail-row {
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      gap:
+        15px;
+
+      padding:
+        10px 0;
+
+      border-bottom:
+        1px solid
+        rgba(255,195,80,0.07);
+    }
+
+
+    .detail-row:last-child {
+      border-bottom:
+        none;
+    }
+
+
+    .detail-label {
+      color:
+        #8f8367;
+
+      font-size:
+        0.86rem;
+    }
+
+
+    .detail-value {
+      color:
+        #ead39a;
+
+      text-align:
+        right;
+
+      font-size:
+        0.87rem;
+
+      font-weight:
+        700;
+    }
+
+
+    /* =====================================================
+       CHANGELOG
+       ===================================================== */
+
+    .changelog-text {
+      color:
+        #ccb98c;
+
+      white-space:
+        pre-wrap;
+
+      overflow-wrap:
+        anywhere;
+
+      font-size:
+        0.91rem;
+    }
+
+
+    .empty-text {
+      color:
+        #83785f;
+
+      font-style:
+        italic;
+    }
+
+
+    /* =====================================================
+       VERSION HISTORY
+       ===================================================== */
+
+    .version-list {
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        9px;
+    }
+
+
+    .version-item {
+      padding:
+        13px;
+
+      border-radius:
+        11px;
+
+      background:
+        rgba(255,170,30,0.035);
+
+      border:
+        1px solid
+        rgba(255,192,70,0.09);
+    }
+
+
+    .version-top {
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      gap:
+        12px;
+
+      align-items:
+        center;
+    }
+
+
+    .version-name {
+      color:
+        #ffd16d;
+
+      font-weight:
+        800;
+    }
+
+
+    .version-download {
+      color:
+        var(--orange2);
+
+      font-size:
+        0.82rem;
+
+      font-weight:
+        700;
+    }
+
+
+    .version-meta {
+      margin-top:
+        5px;
+
+      color:
+        #82775f;
+
+      font-size:
+        0.73rem;
+    }
+
+
+    /* =====================================================
+       RUNIC DIVIDER
+       ===================================================== */
+
+    .runic-divider {
+      width:
+        min(
+          850px,
+          90%
+        );
+
+      margin:
+        42px auto 0;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      gap:
+        22px;
+
+      pointer-events:
+        none;
+    }
+
+
+    .runic-divider::before,
+    .runic-divider::after {
+      content:
+        "";
+
+      height:
+        1px;
+
+      flex:
+        1;
+
+      background:
+
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(255,120,10,0.35),
+          rgba(255,205,95,0.95)
+        );
+
+      box-shadow:
+
+        0 0 7px
+        rgba(255,157,30,0.45),
+
+        0 0 18px
+        rgba(255,105,0,0.18);
+    }
+
+
+    .runic-divider::after {
+      transform:
+        scaleX(-1);
+    }
+
+
+    .runic-divider span {
+      color:
+        #f8cf73;
+
+      font-size:
+        1.25rem;
+
+      letter-spacing:
+        10px;
+
+      white-space:
+        nowrap;
+
+      text-shadow:
+
+        0 0 6px
+        rgba(255,220,135,0.80),
+
+        0 0 14px
+        rgba(255,164,35,0.55),
+
+        0 0 28px
+        rgba(255,105,0,0.22);
+    }
+
+
+    /* =====================================================
+       FOOTER
+       ===================================================== */
+
+    footer {
+      position:
+        relative;
+
+      z-index:
+        2;
+
+      padding:
+        28px 0 38px;
+
+      border-top:
+        1px solid
+        rgba(255,194,82,0.10);
+    }
+
+
+    .footer-grid {
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      gap:
+        20px;
+    }
+
+
+    footer p {
+      color:
+        var(--muted);
+    }
+
+
+    .footer-links {
+      display:
+        flex;
+
+      gap:
+        18px;
+
+      color:
+        #cfbb88;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (
+      max-width: 980px
+    ) {
+
+      .mod-hero {
+        grid-template-columns:
+          150px 1fr;
+      }
+
+
+      .mod-icon-shell {
+        width:
+          140px;
+
+        height:
+          140px;
+      }
+
+
+      .download-area {
+        grid-column:
+          1 / -1;
+
+        flex-direction:
+          row;
+
+        align-items:
+          center;
+      }
+
+
+      .download-button {
+        flex:
+          1;
+      }
+
+
+      .content-grid {
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .sidebar {
+        display:
+          grid;
+
+        grid-template-columns:
+          repeat(
+            2,
+            minmax(0,1fr)
+          );
+      }
+    }
+
+
+    @media (
+      max-width: 760px
+    ) {
+
+      .nav {
+        flex-wrap:
+          wrap;
+
+        padding:
+          12px 0;
+      }
+
+
+      .nav-links {
+        display:
+          none;
+      }
+
+
+      .account-area {
+        margin-left:
+          auto;
+      }
+
+
+      .mod-page {
+        padding-top:
+          32px;
+      }
+
+
+      .mod-hero {
+        grid-template-columns:
+          1fr;
+
+        text-align:
+          center;
+      }
+
+
+      .mod-icon-shell {
+        margin:
+          0 auto;
+      }
+
+
+      .mod-summary {
+        margin:
+          0 auto;
+      }
+
+
+      .download-area {
+        grid-column:
+          auto;
+
+        flex-direction:
+          column;
+      }
+
+
+      .sidebar {
+        display:
+          flex;
+      }
+
+
+      .footer-grid {
+        flex-direction:
+          column;
+      }
+    }
+
+
+    @media (
+      max-width: 520px
+    ) {
+
+      .container {
+        width:
+          calc(100% - 24px);
+      }
+
+
+      .brand p {
+        display:
+          none;
+      }
+
+
+      .account-name {
+        display:
+          none;
+      }
+
+
+      .mod-hero,
+      .main-panel {
+        padding:
+          20px;
+      }
+
+
+      .mod-icon-shell {
+        width:
+          125px;
+
+        height:
+          125px;
+      }
+
+
+      .mod-title {
+        font-size:
+          2.35rem;
+      }
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <div
+    id="galaxy-stars"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header class="topbar">
+
+    <div class="container nav">
+
+
+      <a
+        href="/"
+        class="header-brand"
+      >
+
+        <img
+          class="header-logo"
+          src="/ymirmodwebsiteicon.png"
+          alt="YMIR Mods"
+        />
+
+
+        <div class="brand">
+
+          <h1>
+            YMIR MODS
+          </h1>
+
+          <p>
+            Valheim mods, downloads, updates &amp; community
+          </p>
+
+        </div>
+
+      </a>
+
+
+      <nav class="nav-links">
+
+        <a href="/">
+          Home
+        </a>
+
+        <a href="/#mods">
+          Mods
+        </a>
+
+        <a href="/#updates">
+          Updates
+        </a>
+
+        <a href="/#community">
+          Community
+        </a>
+
+      </nav>
+
+
+      <div class="account-area">
+
+
+        <span
+          id="accountLoading"
+          class="account-loading"
+        >
+          ...
+        </span>
+
+
+        <div
+          id="accountLoggedOut"
+          class="account-login"
+        >
+
+          <a
+            class="account-button login"
+            href="/login"
+          >
+            Login
+          </a>
+
+        </div>
+
+
+        <div
+          id="accountLoggedIn"
+          class="account-user"
+        >
+
+          <span
+            id="headerUsername"
+            class="account-name"
+          >
+            User
+          </span>
+
+
+          <a
+            class="account-button"
+            href="/dashboard"
+          >
+            Dashboard
+          </a>
+
+
+          <button
+            id="headerLogout"
+            class="account-button logout"
+            type="button"
+          >
+            Logout
+          </button>
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <section class="mod-page">
+
+      <div class="container">
+
+
+        <a
+          class="back-link"
+          href="/"
+        >
+          ← Back to YMIR Mods
+        </a>
+
+
+        <!-- LOADING -->
+
+        <div
+          id="loadingPanel"
+          class="loading-panel"
+        >
+          Loading mod from the halls of YMIR...
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+          id="errorPanel"
+          class="error-panel"
+          style="display:none;"
+        >
+
+          <h2>
+            Mod Not Found
+          </h2>
+
+          <p id="errorMessage">
+            YMIR could not find this mod.
+          </p>
+
+        </div>
+
+
+        <!-- MOD CONTENT -->
+
+        <div id="modContent">
+
+
+          <!-- HERO -->
+
+          <div class="mod-hero">
+
+
+            <div class="mod-icon-shell">
+
+              <img
+                id="modIcon"
+                class="mod-icon"
+                src="/ymirmodwebsiteicon.png"
+                alt="Mod icon"
+              />
+
+            </div>
+
+
+            <div class="mod-info">
+
+
+              <span
+                id="modCategory"
+                class="mod-category"
+              >
+                Valheim Mod
+              </span>
+
+
+              <h1
+                id="modTitle"
+                class="mod-title"
+              >
+                Mod
+              </h1>
+
+
+              <div class="mod-author">
+
+                Created by
+
+                <strong id="modAuthor">
+                  Unknown Creator
+                </strong>
+
+              </div>
+
+
+              <p
+                id="modSummary"
+                class="mod-summary"
+              ></p>
+
+
+            </div>
+
+
+            <div class="download-area">
+
+
+              <div class="current-version">
+
+                Current Version
+
+                <strong id="modVersion">
+                  -
+                </strong>
+
+              </div>
+
+
+              <a
+                id="downloadButton"
+                class="download-button"
+                href="#"
+              >
+                Download Mod
+              </a>
+
+
+            </div>
+
+
+          </div>
+
+
+          <!-- CONTENT -->
+
+          <div class="content-grid">
+
+
+            <!-- README -->
+
+            <div class="panel main-panel">
+
+              <h2 class="panel-title">
+                About This Mod
+              </h2>
+
+              <div
+                id="readmeContent"
+                class="readme"
+              ></div>
+
+            </div>
+
+
+            <!-- SIDEBAR -->
+
+            <aside class="sidebar">
+
+
+              <!-- DETAILS -->
+
+              <div class="panel sidebar-panel">
+
+                <h2 class="panel-title">
+                  Mod Details
+                </h2>
+
+
+                <div class="detail-row">
+
+                  <span class="detail-label">
+                    Creator
+                  </span>
+
+                  <span
+                    id="detailAuthor"
+                    class="detail-value"
+                  >
+                    -
+                  </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                  <span class="detail-label">
+                    Version
+                  </span>
+
+                  <span
+                    id="detailVersion"
+                    class="detail-value"
+                  >
+                    -
+                  </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                  <span class="detail-label">
+                    Category
+                  </span>
+
+                  <span
+                    id="detailCategory"
+                    class="detail-value"
+                  >
+                    -
+                  </span>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                  <span class="detail-label">
+                    Updated
+                  </span>
+
+                  <span
+                    id="detailUpdated"
+                    class="detail-value"
+                  >
+                    -
+                  </span>
+
+                </div>
+
+
+              </div>
+
+
+              <!-- CHANGELOG -->
+
+              <div class="panel sidebar-panel">
+
+                <h2 class="panel-title">
+                  Changelog
+                </h2>
+
+                <div
+                  id="changelogContent"
+                  class="changelog-text"
+                ></div>
+
+              </div>
+
+
+              <!-- VERSIONS -->
+
+              <div class="panel sidebar-panel">
+
+                <h2 class="panel-title">
+                  Version History
+                </h2>
+
+                <div
+                  id="versionList"
+                  class="version-list"
+                ></div>
+
+              </div>
+
+
+            </aside>
+
+
+          </div>
+
+
+          <div
+            class="runic-divider"
+            aria-hidden="true"
+          >
+            <span>
+              ᛃ ᛗ ᛁ ᚱ
+            </span>
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <footer>
+
+    <div class="container footer-grid">
+
+      <p>
+        &copy;
+        <span id="year"></span>
+        YMIR Mods.
+        All rights reserved.
+      </p>
+
+
+      <div class="footer-links">
+
+        <a href="/">
+          Home
+        </a>
+
+        <a href="/#mods">
+          Mods
+        </a>
+
+        <a href="/#community">
+          Community
+        </a>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <script>
+
+    /* =====================================================
+       YEAR
+       ===================================================== */
+
+    document
+      .getElementById(
+        "year"
+      )
+      .textContent =
+        new Date()
+          .getFullYear();
+
+
+    /* =====================================================
+       ACCOUNT
+       ===================================================== */
+
+    const accountLoading =
+      document.getElementById(
+        "accountLoading"
+      );
+
+
+    const accountLoggedOut =
+      document.getElementById(
+        "accountLoggedOut"
+      );
+
+
+    const accountLoggedIn =
+      document.getElementById(
+        "accountLoggedIn"
+      );
+
+
+    const headerUsername =
+      document.getElementById(
+        "headerUsername"
+      );
+
+
+    const headerLogout =
+      document.getElementById(
+        "headerLogout"
+      );
+
+
+    async function loadAccountStatus() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/me",
+            {
+              credentials:
+                "same-origin",
+
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        accountLoading.style.display =
+          "none";
+
+
+        if (
+          response.ok &&
+          result.success &&
+          result.authenticated &&
+          result.user
+        ) {
+
+          headerUsername.textContent =
+            result.user.username;
+
+
+          accountLoggedIn.style.display =
+            "flex";
+
+
+          accountLoggedOut.style.display =
+            "none";
+
+        } else {
+
+          accountLoggedIn.style.display =
+            "none";
+
+
+          accountLoggedOut.style.display =
+            "block";
+        }
+
+
+      } catch (error) {
+
+        accountLoading.style.display =
+          "none";
+
+
+        accountLoggedIn.style.display =
+          "none";
+
+
+        accountLoggedOut.style.display =
+          "block";
+      }
+    }
+
+
+    headerLogout.addEventListener(
+      "click",
+      async () => {
+
+        try {
+
+          await fetch(
+            "/api/logout",
+            {
+              method:
+                "POST",
+
+              credentials:
+                "same-origin"
+            }
+          );
+
+        } catch (error) {
+
+          console.error(
+            error
+          );
+        }
+
+
+        window.location.href =
+          "/";
+      }
+    );
+
+
+    loadAccountStatus();
+
+
+    /* =====================================================
+       GET MOD SLUG
+       ===================================================== */
+
+    function getModSlug() {
+
+      const parts =
+        window.location.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      if (
+        parts.length >= 2 &&
+        parts[0] === "mod"
+      ) {
+
+        return decodeURIComponent(
+          parts[1]
+        );
+      }
+
+
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+
+      return (
+        params.get("slug") ||
+        ""
+      );
+    }
+
+
+    /* =====================================================
+       LOAD MOD
+       ===================================================== */
+
+    async function loadMod() {
+
+      const slug =
+        getModSlug();
+
+
+      if (!slug) {
+
+        showError(
+          "No mod was specified."
+        );
+
+        return;
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/mod/" +
+            encodeURIComponent(
+              slug
+            ),
+            {
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success ||
+          !result.mod
+        ) {
+
+          throw new Error(
+            result.message ||
+            "Unable to load mod."
+          );
+        }
+
+
+        renderMod(
+          result.mod
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Mod page error:",
+          error
+        );
+
+
+        showError(
+          error.message ||
+          "Unable to load this mod."
+        );
+      }
+    }
+
+
+    /* =====================================================
+       RENDER MOD
+       ===================================================== */
+
+    function renderMod(mod) {
+
+      document
+        .getElementById(
+          "loadingPanel"
+        )
+        .style.display =
+          "none";
+
+
+      document
+        .getElementById(
+          "modContent"
+        )
+        .style.display =
+          "block";
+
+
+      /* PAGE TITLE */
+
+      document.title =
+        mod.name +
+        " | YMIR Mods";
+
+
+      /* ICON */
+
+      const icon =
+        document.getElementById(
+          "modIcon"
+        );
+
+
+      icon.src =
+        mod.icon_url ||
+        "/ymirmodwebsiteicon.png";
+
+
+      icon.alt =
+        mod.name +
+        " icon";
+
+
+      icon.onerror =
+        () => {
+
+          icon.onerror =
+            null;
+
+
+          icon.src =
+            "/ymirmodwebsiteicon.png";
+        };
+
+
+      /* HERO */
+
+      setText(
+        "modCategory",
+        mod.category ||
+        "Valheim Mod"
+      );
+
+
+      setText(
+        "modTitle",
+        mod.name ||
+        "Unnamed Mod"
+      );
+
+
+      setText(
+        "modAuthor",
+        mod.author ||
+        "Unknown Creator"
+      );
+
+
+      setText(
+        "modSummary",
+        mod.short_description ||
+        ""
+      );
+
+
+      setText(
+        "modVersion",
+        mod.version
+          ? "v" + mod.version
+          : "-"
+      );
+
+
+      /* DOWNLOAD */
+
+      const download =
+        document.getElementById(
+          "downloadButton"
+        );
+
+
+      if (
+        mod.download_url
+      ) {
+
+        download.href =
+          mod.download_url;
+
+
+        download.setAttribute(
+          "download",
+          ""
+        );
+
+      } else {
+
+        download.href =
+          "#";
+
+
+        download.textContent =
+          "Download Unavailable";
+      }
+
+
+      /* DETAILS */
+
+      setText(
+        "detailAuthor",
+        mod.author ||
+        "-"
+      );
+
+
+      setText(
+        "detailVersion",
+        mod.version
+          ? "v" + mod.version
+          : "-"
+      );
+
+
+      setText(
+        "detailCategory",
+        mod.category ||
+        "-"
+      );
+
+
+      setText(
+        "detailUpdated",
+        formatDate(
+          mod.updated_at
+        )
+      );
+
+
+      /* README */
+
+      const readme =
+        document.getElementById(
+          "readmeContent"
+        );
+
+
+      if (
+        mod.full_description
+      ) {
+
+        readme.innerHTML =
+          renderMarkdown(
+            mod.full_description
+          );
+
+      } else {
+
+        readme.innerHTML =
+          `
+            <p class="empty-text">
+              No detailed description has been provided yet.
+            </p>
+          `;
+      }
+
+
+      /* CHANGELOG */
+
+      const changelog =
+        document.getElementById(
+          "changelogContent"
+        );
+
+
+      if (
+        mod.changelog &&
+        mod.changelog.trim()
+      ) {
+
+        changelog.textContent =
+          mod.changelog;
+
+      } else {
+
+        changelog.innerHTML =
+          `
+            <span class="empty-text">
+              No changelog available.
+            </span>
+          `;
+      }
+
+
+      /* VERSIONS */
+
+      renderVersions(
+        Array.isArray(
+          mod.versions
+        )
+          ? mod.versions
+          : []
+      );
+    }
+
+
+    /* =====================================================
+       VERSION LIST
+       ===================================================== */
+
+    function renderVersions(
+      versions
+    ) {
+
+      const list =
+        document.getElementById(
+          "versionList"
+        );
+
+
+      list.innerHTML =
+        "";
+
+
+      if (
+        versions.length === 0
+      ) {
+
+        list.innerHTML =
+          `
+            <span class="empty-text">
+              No version history available.
+            </span>
+          `;
+
+        return;
+      }
+
+
+      for (
+        const version of versions
+      ) {
+
+        const item =
+          document.createElement(
+            "div"
+          );
+
+
+        item.className =
+          "version-item";
+
+
+        const top =
+          document.createElement(
+            "div"
+          );
+
+
+        top.className =
+          "version-top";
+
+
+        const name =
+          document.createElement(
+            "span"
+          );
+
+
+        name.className =
+          "version-name";
+
+
+        name.textContent =
+          "v" +
+          (
+            version.version ||
+            "Unknown"
+          );
+
+
+        const download =
+          document.createElement(
+            "a"
+          );
+
+
+        download.className =
+          "version-download";
+
+
+        download.textContent =
+          "Download";
+
+
+        download.href =
+          version.file_url ||
+          "#";
+
+
+        if (
+          version.file_url
+        ) {
+
+          download.setAttribute(
+            "download",
+            ""
+          );
+        }
+
+
+        top.appendChild(
+          name
+        );
+
+
+        top.appendChild(
+          download
+        );
+
+
+        const meta =
+          document.createElement(
+            "div"
+          );
+
+
+        meta.className =
+          "version-meta";
+
+
+        const pieces =
+          [];
+
+
+        if (
+          version.file_size
+        ) {
+
+          pieces.push(
+            formatFileSize(
+              version.file_size
+            )
+          );
+        }
+
+
+        pieces.push(
+          formatNumber(
+            version.downloads ||
+            0
+          ) +
+          " downloads"
+        );
+
+
+        if (
+          version.created_at
+        ) {
+
+          pieces.push(
+            formatDate(
+              version.created_at
+            )
+          );
+        }
+
+
+        meta.textContent =
+          pieces.join(
+            " • "
+          );
+
+
+        item.appendChild(
+          top
+        );
+
+
+        item.appendChild(
+          meta
+        );
+
+
+        list.appendChild(
+          item
+        );
+      }
+    }
+
+
+    /* =====================================================
+       SIMPLE SAFE MARKDOWN
+       ===================================================== */
+
+    function renderMarkdown(
+      value
+    ) {
+
+      let text =
+        escapeHtml(
+          String(
+            value ||
+            ""
+          )
+        );
+
+
+      /* IMAGES */
+
+      text =
+        text.replace(
+          /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g,
+          '<img src="$2" alt="$1" loading="lazy">'
+        );
+
+
+      /* LINKS */
+
+      text =
+        text.replace(
+          /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+          '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+        );
+
+
+      /* BOLD */
+
+      text =
+        text.replace(
+          /\*\*([^*]+)\*\*/g,
+          "<strong>$1</strong>"
+        );
+
+
+      /* INLINE CODE */
+
+      text =
+        text.replace(
+          /`([^`\n]+)`/g,
+          "<code>$1</code>"
+        );
+
+
+      const lines =
+        text.split(
+          /\r?\n/
+        );
+
+
+      let html =
+        "";
+
+
+      let inList =
+        false;
+
+
+      let inOrderedList =
+        false;
+
+
+      for (
+        const rawLine of lines
+      ) {
+
+        const line =
+          rawLine.trim();
+
+
+        if (
+          !line
+        ) {
+
+          if (
+            inList
+          ) {
+
+            html +=
+              "</ul>";
+
+
+            inList =
+              false;
+          }
+
+
+          if (
+            inOrderedList
+          ) {
+
+            html +=
+              "</ol>";
+
+
+            inOrderedList =
+              false;
+          }
+
+
+          continue;
+        }
+
+
+        if (
+          line === "---" ||
+          line === "***"
+        ) {
+
+          html +=
+            "<hr>";
+
+          continue;
+        }
+
+
+        if (
+          line.startsWith(
+            "#### "
+          )
+        ) {
+
+          html +=
+            "<h4>" +
+            line.slice(5) +
+            "</h4>";
+
+          continue;
+        }
+
+
+        if (
+          line.startsWith(
+            "### "
+          )
+        ) {
+
+          html +=
+            "<h3>" +
+            line.slice(4) +
+            "</h3>";
+
+          continue;
+        }
+
+
+        if (
+          line.startsWith(
+            "## "
+          )
+        ) {
+
+          html +=
+            "<h2>" +
+            line.slice(3) +
+            "</h2>";
+
+          continue;
+        }
+
+
+        if (
+          line.startsWith(
+            "# "
+          )
+        ) {
+
+          html +=
+            "<h1>" +
+            line.slice(2) +
+            "</h1>";
+
+          continue;
+        }
+
+
+        if (
+          line.startsWith(
+            "> "
+          )
+        ) {
+
+          html +=
+            "<blockquote>" +
+            line.slice(2) +
+            "</blockquote>";
+
+          continue;
+        }
+
+
+        if (
+          /^[-*]\s+/.test(
+            line
+          )
+        ) {
+
+          if (
+            !inList
+          ) {
+
+            if (
+              inOrderedList
+            ) {
+
+              html +=
+                "</ol>";
+
+
+              inOrderedList =
+                false;
+            }
+
+
+            html +=
+              "<ul>";
+
+
+            inList =
+              true;
+          }
+
+
+          html +=
+            "<li>" +
+            line.replace(
+              /^[-*]\s+/,
+              ""
+            ) +
+            "</li>";
+
+          continue;
+        }
+
+
+        if (
+          /^\d+\.\s+/.test(
+            line
+          )
+        ) {
+
+          if (
+            !inOrderedList
+          ) {
+
+            if (
+              inList
+            ) {
+
+              html +=
+                "</ul>";
+
+
+              inList =
+                false;
+            }
+
+
+            html +=
+              "<ol>";
+
+
+            inOrderedList =
+              true;
+          }
+
+
+          html +=
+            "<li>" +
+            line.replace(
+              /^\d+\.\s+/,
+              ""
+            ) +
+            "</li>";
+
+          continue;
+        }
+
+
+        if (
+          inList
+        ) {
+
+          html +=
+            "</ul>";
+
+
+          inList =
+            false;
+        }
+
+
+        if (
+          inOrderedList
+        ) {
+
+          html +=
+            "</ol>";
+
+
+          inOrderedList =
+            false;
+        }
+
+
+        html +=
+          "<p>" +
+          line +
+          "</p>";
+      }
+
+
+      if (
+        inList
+      ) {
+
+        html +=
+          "</ul>";
+      }
+
+
+      if (
+        inOrderedList
+      ) {
+
+        html +=
+          "</ol>";
+      }
+
+
+      return html;
+    }
+
+
+    /* =====================================================
+       HELPERS
+       ===================================================== */
+
+    function escapeHtml(
+      value
+    ) {
+
+      return String(
+        value
+      )
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+    }
+
+
+    function setText(
+      id,
+      value
+    ) {
+
+      const element =
+        document.getElementById(
+          id
+        );
+
+
+      if (
+        element
+      ) {
+
+        element.textContent =
+          value;
+      }
+    }
+
+
+    function formatDate(
+      value
+    ) {
+
+      if (
+        !value
+      ) {
+
+        return "-";
+      }
+
+
+      const date =
+        new Date(
+          value.replace(
+            " ",
+            "T"
+          ) +
+          (
+            value.includes("Z")
+              ? ""
+              : "Z"
+          )
+        );
+
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+
+        return value;
+      }
+
+
+      return date.toLocaleDateString(
+        undefined,
+        {
+          year:
+            "numeric",
+
+          month:
+            "short",
+
+          day:
+            "numeric"
+        }
+      );
+    }
+
+
+    function formatFileSize(
+      bytes
+    ) {
+
+      const size =
+        Number(
+          bytes
+        );
+
+
+      if (
+        !size ||
+        size <= 0
+      ) {
+
+        return "0 B";
+      }
+
+
+      const units =
+        [
+          "B",
+          "KB",
+          "MB",
+          "GB"
+        ];
+
+
+      const index =
+        Math.min(
+          Math.floor(
+            Math.log(size) /
+            Math.log(1024)
+          ),
+          units.length - 1
+        );
+
+
+      const amount =
+        size /
+        Math.pow(
+          1024,
+          index
+        );
+
+
+      return (
+        amount.toFixed(
+          index === 0
+            ? 0
+            : 1
+        ) +
+        " " +
+        units[index]
+      );
+    }
+
+
+    function formatNumber(
+      value
+    ) {
+
+      return Number(
+        value ||
+        0
+      ).toLocaleString();
+    }
+
+
+    function showError(
+      message
+    ) {
+
+      document
+        .getElementById(
+          "loadingPanel"
+        )
+        .style.display =
+          "none";
+
+
+      document
+        .getElementById(
+          "modContent"
+        )
+        .style.display =
+          "none";
+
+
+      document
+        .getElementById(
+          "errorPanel"
+        )
+        .style.display =
+          "block";
+
+
+      setText(
+        "errorMessage",
+        message
+      );
+    }
+
+
+    loadMod();
+
+
+    /* =====================================================
+       GALAXY
+       ===================================================== */
+
+    const galaxy =
+      document.getElementById(
+        "galaxy-stars"
+      );
+
+
+    const starColours =
+      [
+        "#ffffff",
+        "#fff8df",
+        "#ffe7aa",
+        "#ffd36b",
+        "#ffba45",
+        "#ff9825"
+      ];
+
+
+    const isMobile =
+      window.matchMedia(
+        "(max-width:760px)"
+      ).matches;
+
+
+    const STAR_COUNT =
+      isMobile
+        ? 85
+        : 155;
+
+
+    const AESIR_STAR_COUNT =
+      isMobile
+        ? 4
+        : 8;
+
+
+    for (
+      let i = 0;
+      i < STAR_COUNT;
+      i++
+    ) {
+
+      const star =
+        document.createElement(
+          "span"
+        );
+
+
+      star.className =
+        "galaxy-star";
+
+
+      star.style.left =
+        Math.random() *
+        100 +
+        "%";
+
+
+      star.style.top =
+        Math.random() *
+        100 +
+        "%";
+
+
+      let size =
+        Math.random() *
+        1.5 +
+        0.45;
+
+
+      if (
+        Math.random() >
+        0.94
+      ) {
+
+        size =
+          Math.random() *
+          1.8 +
+          1.8;
+      }
+
+
+      star.style.setProperty(
+        "--star-size",
+        size + "px"
+      );
+
+
+      const colour =
+        starColours[
+          Math.floor(
+            Math.random() *
+            starColours.length
+          )
+        ];
+
+
+      star.style.color =
+        colour;
+
+
+      star.style.setProperty(
+        "--min-opacity",
+        (
+          Math.random() *
+          0.18 +
+          0.08
+        ).toFixed(2)
+      );
+
+
+      star.style.setProperty(
+        "--max-opacity",
+        (
+          Math.random() *
+          0.45 +
+          0.40
+        ).toFixed(2)
+      );
+
+
+      star.style.setProperty(
+        "--star-glow",
+        (
+          Math.random() *
+          5 +
+          2
+        ) +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--twinkle-speed",
+        (
+          Math.random() *
+          6 +
+          3
+        ) +
+        "s"
+      );
+
+
+      star.style.setProperty(
+        "--float-speed",
+        (
+          Math.random() *
+          100 +
+          80
+        ) +
+        "s"
+      );
+
+
+      star.style.setProperty(
+        "--drift-x",
+        (
+          Math.random() *
+          90 -
+          45
+        ) +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--drift-y",
+        (
+          Math.random() *
+          90 -
+          45
+        ) +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--delay",
+        -(
+          Math.random() *
+          15
+        ) +
+        "s"
+      );
+
+
+      galaxy.appendChild(
+        star
+      );
+    }
+
+
+    const generatedStars =
+      galaxy.querySelectorAll(
+        ".galaxy-star"
+      );
+
+
+    const availableIndexes =
+      Array.from(
+        {
+          length:
+            generatedStars.length
+        },
+
+        (_, index) =>
+          index
+      );
+
+
+    for (
+      let i = 0;
+      i < AESIR_STAR_COUNT;
+      i++
+    ) {
+
+      const randomPosition =
+        Math.floor(
+          Math.random() *
+          availableIndexes.length
+        );
+
+
+      const starIndex =
+        availableIndexes.splice(
+          randomPosition,
+          1
+        )[0];
+
+
+      const star =
+        generatedStars[
+          starIndex
+        ];
+
+
+      star.classList.add(
+        "aesir-star"
+      );
+
+
+      star.style.setProperty(
+        "--star-size",
+        (
+          Math.random() *
+          1.8 +
+          2.2
+        ) +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--max-opacity",
+        "0.95"
+      );
+
+
+      star.style.setProperty(
+        "--star-glow",
+        "8px"
+      );
+    }
+
+  </script>
+
+</body>
+
+</html>
