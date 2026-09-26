@@ -36,7 +36,10 @@ export default {
       url.pathname === "/api/register" &&
       request.method === "POST"
     ) {
-      return handleRegister(request, env);
+      return handleRegister(
+        request,
+        env
+      );
     }
 
 
@@ -48,7 +51,10 @@ export default {
       url.pathname === "/api/login" &&
       request.method === "POST"
     ) {
-      return handleLogin(request, env);
+      return handleLogin(
+        request,
+        env
+      );
     }
 
 
@@ -60,7 +66,10 @@ export default {
       url.pathname === "/api/logout" &&
       request.method === "POST"
     ) {
-      return handleLogout(request, env);
+      return handleLogout(
+        request,
+        env
+      );
     }
 
 
@@ -72,7 +81,10 @@ export default {
       url.pathname === "/api/me" &&
       request.method === "GET"
     ) {
-      return handleCurrentUser(request, env);
+      return handleCurrentUser(
+        request,
+        env
+      );
     }
 
 
@@ -84,7 +96,9 @@ export default {
       url.pathname === "/api/mods" &&
       request.method === "GET"
     ) {
-      return handlePublicMods(env);
+      return handlePublicMods(
+        env
+      );
     }
 
 
@@ -96,7 +110,38 @@ export default {
       url.pathname === "/api/my-mods" &&
       request.method === "GET"
     ) {
-      return handleMyMods(request, env);
+      return handleMyMods(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       SINGLE PUBLIC MOD API
+
+       Example:
+       /api/mod/themist
+       ===================================================== */
+
+    if (
+      url.pathname.startsWith("/api/mod/") &&
+      request.method === "GET"
+    ) {
+      const slug =
+        decodeURIComponent(
+          url.pathname.slice(
+            "/api/mod/".length
+          )
+        )
+          .trim()
+          .toLowerCase();
+
+
+      return handlePublicMod(
+        env,
+        slug
+      );
     }
 
 
@@ -108,7 +153,56 @@ export default {
       url.pathname === "/api/mods/upload" &&
       request.method === "POST"
     ) {
-      return handleModUpload(request, env);
+      return handleModUpload(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       CLEAN MOD PAGE URL
+
+       Example:
+       /mod/themist
+
+       This will serve mod.html later.
+       ===================================================== */
+
+    if (
+      url.pathname.startsWith("/mod/") &&
+      request.method === "GET"
+    ) {
+      const slug =
+        decodeURIComponent(
+          url.pathname.slice(
+            "/mod/".length
+          )
+        ).trim();
+
+
+      if (
+        slug &&
+        !slug.includes("/")
+      ) {
+        const pageUrl =
+          new URL(
+            "/mod.html",
+            request.url
+          );
+
+
+        const pageRequest =
+          new Request(
+            pageUrl.toString(),
+            request
+          );
+
+
+        return env.ASSETS.fetch(
+          pageRequest
+        );
+      }
     }
 
 
@@ -138,7 +232,8 @@ export default {
       url.pathname === "/api/logout" ||
       url.pathname === "/api/mods" ||
       url.pathname === "/api/my-mods" ||
-      url.pathname === "/api/mods/upload"
+      url.pathname === "/api/mods/upload" ||
+      url.pathname.startsWith("/api/mod/")
     ) {
       return jsonResponse(
         {
@@ -154,13 +249,15 @@ export default {
        NORMAL WEBSITE FILES
        ===================================================== */
 
-    return env.ASSETS.fetch(request);
+    return env.ASSETS.fetch(
+      request
+    );
   }
 };
 
 
 /* =========================================================
-   TEST BACKEND
+   BACKEND TEST
    ========================================================= */
 
 async function handleTest(env) {
@@ -175,12 +272,20 @@ async function handleTest(env) {
 
     return jsonResponse({
       success: true,
-      message: "YMIR Mods backend is running",
-      database: "connected",
-      r2: env.MOD_FILES
-        ? "connected"
-        : "missing",
-      users: userResult?.count ?? 0
+
+      message:
+        "YMIR Mods backend is running",
+
+      database:
+        "connected",
+
+      r2:
+        env.MOD_FILES
+          ? "connected"
+          : "missing",
+
+      users:
+        userResult?.count ?? 0
     });
 
   } catch (error) {
@@ -194,6 +299,7 @@ async function handleTest(env) {
     return jsonResponse(
       {
         success: false,
+
         message:
           "Backend or database connection failed."
       },
@@ -249,7 +355,9 @@ async function handlePublicMods(env) {
 
     return jsonResponse({
       success: true,
-      mods: result.results || []
+
+      mods:
+        result.results || []
     });
 
   } catch (error) {
@@ -263,8 +371,150 @@ async function handlePublicMods(env) {
     return jsonResponse(
       {
         success: false,
+
         message:
           "Unable to load mods.",
+
+        error:
+          error.message
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   SINGLE PUBLIC MOD
+   ========================================================= */
+
+async function handlePublicMod(
+  env,
+  slug
+) {
+  try {
+
+    if (
+      !slug ||
+      slug.length > 100 ||
+      !/^[a-z0-9-]+$/.test(slug)
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+
+          message:
+            "Invalid mod."
+        },
+        400
+      );
+    }
+
+
+    const mod =
+      await env.DB
+        .prepare(`
+          SELECT
+            mods.id,
+            mods.owner_user_id,
+            mods.name,
+            mods.slug,
+            mods.version,
+            mods.category,
+            mods.short_description,
+            mods.full_description,
+            mods.icon_url,
+            mods.download_url,
+            mods.changelog,
+            mods.is_published,
+            mods.created_at,
+            mods.updated_at,
+
+            users.id AS author_id,
+            users.username AS author
+
+          FROM mods
+
+          LEFT JOIN users
+            ON users.id = mods.owner_user_id
+
+          WHERE mods.slug = ?
+            AND mods.is_published = 1
+
+          LIMIT 1
+        `)
+        .bind(
+          slug
+        )
+        .first();
+
+
+    if (!mod) {
+      return jsonResponse(
+        {
+          success: false,
+
+          message:
+            "Mod not found."
+        },
+        404
+      );
+    }
+
+
+    const versionsResult =
+      await env.DB
+        .prepare(`
+          SELECT
+            id,
+            version,
+            file_url,
+            changelog,
+            file_size,
+            downloads,
+            created_at
+
+          FROM mod_versions
+
+          WHERE mod_id = ?
+
+          ORDER BY
+            datetime(created_at) DESC,
+            id DESC
+        `)
+        .bind(
+          mod.id
+        )
+        .all();
+
+
+    return jsonResponse({
+      success: true,
+
+      mod: {
+        ...mod,
+
+        versions:
+          versionsResult.results ||
+          []
+      }
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Single mod error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success: false,
+
+        message:
+          "Unable to load mod.",
+
         error:
           error.message
       },
@@ -295,6 +545,7 @@ async function handleMyMods(
       return jsonResponse(
         {
           success: false,
+
           message:
             "You must be logged in."
         },
@@ -372,8 +623,10 @@ async function handleMyMods(
     return jsonResponse(
       {
         success: false,
+
         message:
           "Unable to load your mods.",
+
         error:
           error.message
       },
@@ -384,7 +637,7 @@ async function handleMyMods(
 
 
 /* =========================================================
-   REGISTER USER
+   REGISTER
    ========================================================= */
 
 async function handleRegister(
@@ -392,15 +645,20 @@ async function handleRegister(
   env
 ) {
   try {
+
     let body;
+
 
     try {
       body =
         await request.json();
+
     } catch {
+
       return jsonResponse(
         {
           success: false,
+
           message:
             "Invalid request body."
         },
@@ -436,6 +694,7 @@ async function handleRegister(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Username must be between 3 and 24 characters."
         },
@@ -452,6 +711,7 @@ async function handleRegister(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Username can only contain letters, numbers, underscores and hyphens."
         },
@@ -466,6 +726,7 @@ async function handleRegister(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Please enter a valid email address."
         },
@@ -481,6 +742,7 @@ async function handleRegister(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Password must be between 10 and 128 characters."
         },
@@ -493,9 +755,12 @@ async function handleRegister(
       await env.DB
         .prepare(`
           SELECT id
+
           FROM users
+
           WHERE LOWER(username) = LOWER(?)
              OR LOWER(email) = LOWER(?)
+
           LIMIT 1
         `)
         .bind(
@@ -509,6 +774,7 @@ async function handleRegister(
       return jsonResponse(
         {
           success: false,
+
           message:
             "That username or email is already registered."
         },
@@ -518,7 +784,9 @@ async function handleRegister(
 
 
     const passwordHash =
-      await hashPassword(password);
+      await hashPassword(
+        password
+      );
 
 
     const result =
@@ -531,6 +799,7 @@ async function handleRegister(
             role,
             can_upload
           )
+
           VALUES (
             ?,
             ?,
@@ -550,6 +819,7 @@ async function handleRegister(
     return jsonResponse(
       {
         success: true,
+
         message:
           "YMIR Mods account created successfully.",
 
@@ -583,6 +853,7 @@ async function handleRegister(
     return jsonResponse(
       {
         success: false,
+
         message:
           "Unable to create account."
       },
@@ -601,15 +872,20 @@ async function handleLogin(
   env
 ) {
   try {
+
     let body;
+
 
     try {
       body =
         await request.json();
+
     } catch {
+
       return jsonResponse(
         {
           success: false,
+
           message:
             "Invalid request body."
         },
@@ -637,6 +913,7 @@ async function handleLogin(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Username/email and password are required."
         },
@@ -655,9 +932,12 @@ async function handleLogin(
             password_hash,
             role,
             can_upload
+
           FROM users
+
           WHERE LOWER(username) = LOWER(?)
              OR LOWER(email) = LOWER(?)
+
           LIMIT 1
         `)
         .bind(
@@ -671,6 +951,7 @@ async function handleLogin(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Invalid username/email or password."
         },
@@ -690,6 +971,7 @@ async function handleLogin(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Invalid username/email or password."
         },
@@ -707,9 +989,12 @@ async function handleLogin(
     await env.DB
       .prepare(`
         DELETE FROM sessions
+
         WHERE expires_at <= ?
       `)
-      .bind(now)
+      .bind(
+        now
+      )
       .run();
 
 
@@ -735,6 +1020,7 @@ async function handleLogin(
           token_hash,
           expires_at
         )
+
         VALUES (?, ?, ?)
       `)
       .bind(
@@ -753,10 +1039,17 @@ async function handleLogin(
           "Login successful.",
 
         user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          role: user.role,
+          id:
+            user.id,
+
+          username:
+            user.username,
+
+          email:
+            user.email,
+
+          role:
+            user.role,
 
           can_upload:
             Boolean(
@@ -784,6 +1077,7 @@ async function handleLogin(
     return jsonResponse(
       {
         success: false,
+
         message:
           "Unable to log in."
       },
@@ -802,6 +1096,7 @@ async function handleCurrentUser(
   env
 ) {
   try {
+
     const user =
       await getAuthenticatedUser(
         request,
@@ -812,8 +1107,12 @@ async function handleCurrentUser(
     if (!user) {
       return jsonResponse({
         success: true,
-        authenticated: false,
-        user: null
+
+        authenticated:
+          false,
+
+        user:
+          null
       });
     }
 
@@ -855,6 +1154,7 @@ async function handleCurrentUser(
     return jsonResponse(
       {
         success: false,
+
         message:
           "Unable to check login."
       },
@@ -873,6 +1173,7 @@ async function handleLogout(
   env
 ) {
   try {
+
     const sessionToken =
       getCookie(
         request,
@@ -881,6 +1182,7 @@ async function handleLogout(
 
 
     if (sessionToken) {
+
       const tokenHash =
         await hashSessionToken(
           sessionToken
@@ -890,6 +1192,7 @@ async function handleLogout(
       await env.DB
         .prepare(`
           DELETE FROM sessions
+
           WHERE token_hash = ?
         `)
         .bind(
@@ -902,6 +1205,7 @@ async function handleLogout(
     return jsonResponse(
       {
         success: true,
+
         message:
           "Logged out successfully."
       },
@@ -923,6 +1227,7 @@ async function handleLogout(
     return jsonResponse(
       {
         success: false,
+
         message:
           "Unable to log out."
       },
@@ -940,15 +1245,17 @@ async function handleModUpload(
   request,
   env
 ) {
-  let packageKey = null;
-  let iconKey = null;
-  let modId = null;
+  let packageKey =
+    null;
+
+  let iconKey =
+    null;
+
+  let modId =
+    null;
+
 
   try {
-
-    /* -----------------------------------------------------
-       VERIFY USER
-       ----------------------------------------------------- */
 
     const user =
       await getAuthenticatedUser(
@@ -961,6 +1268,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "You must be logged in."
         },
@@ -977,6 +1285,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Your account does not have upload permission."
         },
@@ -989,6 +1298,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "YMIR file storage is not connected."
         },
@@ -996,10 +1306,6 @@ async function handleModUpload(
       );
     }
 
-
-    /* -----------------------------------------------------
-       READ FORM
-       ----------------------------------------------------- */
 
     const form =
       await request.formData();
@@ -1025,28 +1331,38 @@ async function handleModUpload(
 
     const shortDescription =
       String(
-        form.get("short_description") ?? ""
+        form.get(
+          "short_description"
+        ) ?? ""
       ).trim();
 
 
     const fullDescription =
       String(
-        form.get("full_description") ?? ""
+        form.get(
+          "full_description"
+        ) ?? ""
       ).trim();
 
 
     const changelog =
       String(
-        form.get("changelog") ?? ""
+        form.get(
+          "changelog"
+        ) ?? ""
       ).trim();
 
 
     const modFile =
-      form.get("mod_file");
+      form.get(
+        "mod_file"
+      );
 
 
     const iconFile =
-      form.get("icon_file");
+      form.get(
+        "icon_file"
+      );
 
 
     /* -----------------------------------------------------
@@ -1060,6 +1376,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Mod name must be between 2 and 80 characters."
         },
@@ -1075,6 +1392,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Please enter a valid mod version."
         },
@@ -1090,6 +1408,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Please select a mod category."
         },
@@ -1105,6 +1424,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Short description must be between 10 and 250 characters."
         },
@@ -1114,11 +1434,13 @@ async function handleModUpload(
 
 
     if (
-      fullDescription.length > 10000
+      fullDescription.length >
+      10000
     ) {
       return jsonResponse(
         {
           success: false,
+
           message:
             "Full description is too long."
         },
@@ -1128,11 +1450,13 @@ async function handleModUpload(
 
 
     if (
-      changelog.length > 10000
+      changelog.length >
+      10000
     ) {
       return jsonResponse(
         {
           success: false,
+
           message:
             "Changelog is too long."
         },
@@ -1152,6 +1476,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Please choose a mod ZIP file."
         },
@@ -1167,6 +1492,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Mod package is too large."
         },
@@ -1183,6 +1509,7 @@ async function handleModUpload(
       return jsonResponse(
         {
           success: false,
+
           message:
             "Mod package must be a ZIP file."
         },
@@ -1207,6 +1534,7 @@ async function handleModUpload(
         return jsonResponse(
           {
             success: false,
+
             message:
               "Mod icon is too large."
           },
@@ -1215,11 +1543,12 @@ async function handleModUpload(
       }
 
 
-      const allowedIconTypes = [
-        "image/png",
-        "image/jpeg",
-        "image/webp"
-      ];
+      const allowedIconTypes =
+        [
+          "image/png",
+          "image/jpeg",
+          "image/webp"
+        ];
 
 
       if (
@@ -1230,13 +1559,13 @@ async function handleModUpload(
         return jsonResponse(
           {
             success: false,
+
             message:
               "Mod icon must be PNG, JPG or WebP."
           },
           400
         );
       }
-
     }
 
 
@@ -1245,13 +1574,16 @@ async function handleModUpload(
        ----------------------------------------------------- */
 
     let slug =
-      createSlug(name);
+      createSlug(
+        name
+      );
 
 
     if (!slug) {
       return jsonResponse(
         {
           success: false,
+
           message:
             "Unable to create a valid mod URL."
         },
@@ -1264,15 +1596,21 @@ async function handleModUpload(
       await env.DB
         .prepare(`
           SELECT id
+
           FROM mods
+
           WHERE slug = ?
+
           LIMIT 1
         `)
-        .bind(slug)
+        .bind(
+          slug
+        )
         .first();
 
 
     if (existingSlug) {
+
       slug =
         slug +
         "-" +
@@ -1309,6 +1647,7 @@ async function handleModUpload(
       modFile.stream(),
       {
         httpMetadata: {
+
           contentType:
             modFile.type ||
             "application/zip",
@@ -1318,6 +1657,7 @@ async function handleModUpload(
         },
 
         customMetadata: {
+
           uploader:
             user.username,
 
@@ -1355,6 +1695,7 @@ async function handleModUpload(
         iconFile.stream(),
         {
           httpMetadata: {
+
             contentType:
               iconFile.type,
 
@@ -1363,7 +1704,6 @@ async function handleModUpload(
           }
         }
       );
-
     }
 
 
@@ -1373,13 +1713,17 @@ async function handleModUpload(
 
     const packageUrl =
       "/files/" +
-      encodeURI(packageKey);
+      encodeURI(
+        packageKey
+      );
 
 
     const iconUrl =
       iconKey
         ? "/files/" +
-          encodeURI(iconKey)
+          encodeURI(
+            iconKey
+          )
         : null;
 
 
@@ -1405,6 +1749,7 @@ async function handleModUpload(
             created_at,
             updated_at
           )
+
           VALUES (
             ?,
             ?,
@@ -1463,6 +1808,7 @@ async function handleModUpload(
           downloads,
           created_at
         )
+
         VALUES (
           ?,
           ?,
@@ -1536,40 +1882,56 @@ async function handleModUpload(
     try {
 
       if (modId) {
+
         await env.DB
           .prepare(`
             DELETE FROM mods
+
             WHERE id = ?
           `)
-          .bind(modId)
+          .bind(
+            modId
+          )
           .run();
       }
 
 
-      if (packageKey) {
+      if (
+        packageKey &&
+        env.MOD_FILES
+      ) {
         await env.MOD_FILES
-          .delete(packageKey);
+          .delete(
+            packageKey
+          );
       }
 
 
-      if (iconKey) {
+      if (
+        iconKey &&
+        env.MOD_FILES
+      ) {
         await env.MOD_FILES
-          .delete(iconKey);
+          .delete(
+            iconKey
+          );
       }
 
-    } catch (cleanupError) {
+    } catch (
+      cleanupError
+    ) {
 
       console.error(
         "Upload cleanup error:",
         cleanupError
       );
-
     }
 
 
     return jsonResponse(
       {
         success: false,
+
         message:
           "Unable to upload mod."
       },
@@ -1580,7 +1942,7 @@ async function handleModUpload(
 
 
 /* =========================================================
-   SERVE FILE FROM R2
+   SERVE R2 FILE
    ========================================================= */
 
 async function handleStoredFile(
@@ -1695,6 +2057,7 @@ async function getAuthenticatedUser(
   request,
   env
 ) {
+
   const sessionToken =
     getCookie(
       request,
@@ -1728,6 +2091,7 @@ async function getAuthenticatedUser(
           users.email,
           users.role,
           users.can_upload
+
         FROM sessions
 
         INNER JOIN users
@@ -1757,6 +2121,7 @@ async function getAuthenticatedUser(
 async function hashPassword(
   password
 ) {
+
   const encoder =
     new TextEncoder();
 
@@ -1770,11 +2135,18 @@ async function hashPassword(
   const keyMaterial =
     await crypto.subtle.importKey(
       "raw",
-      encoder.encode(password),
+
+      encoder.encode(
+        password
+      ),
+
       {
-        name: "PBKDF2"
+        name:
+          "PBKDF2"
       },
+
       false,
+
       [
         "deriveBits"
       ]
@@ -1829,7 +2201,9 @@ async function verifyPassword(
   password,
   storedHash
 ) {
+
   try {
+
     const parts =
       String(
         storedHash
@@ -1951,6 +2325,7 @@ async function verifyPassword(
    ========================================================= */
 
 function generateSessionToken() {
+
   return bytesToBase64Url(
     crypto.getRandomValues(
       new Uint8Array(32)
@@ -1962,6 +2337,7 @@ function generateSessionToken() {
 async function hashSessionToken(
   token
 ) {
+
   const encoder =
     new TextEncoder();
 
@@ -1991,6 +2367,7 @@ async function hashSessionToken(
 function createSessionCookie(
   token
 ) {
+
   return [
     `${SESSION_COOKIE_NAME}=${token}`,
     "Path=/",
@@ -2003,6 +2380,7 @@ function createSessionCookie(
 
 
 function clearSessionCookie() {
+
   return [
     `${SESSION_COOKIE_NAME}=`,
     "Path=/",
@@ -2018,6 +2396,7 @@ function getCookie(
   request,
   name
 ) {
+
   const cookieHeader =
     request.headers.get(
       "Cookie"
@@ -2036,6 +2415,7 @@ function getCookie(
   for (
     const cookie of cookies
   ) {
+
     const separatorIndex =
       cookie.indexOf("=");
 
@@ -2084,6 +2464,7 @@ function getCookie(
 function createSlug(
   value
 ) {
+
   return String(value)
     .toLowerCase()
     .trim()
@@ -2105,6 +2486,7 @@ function createSlug(
 function sanitizeFilename(
   filename
 ) {
+
   return String(filename)
     .replace(
       /[^A-Za-z0-9._-]/g,
@@ -2123,6 +2505,7 @@ function sanitizeFilename(
 function getImageExtension(
   mime
 ) {
+
   if (
     mime ===
     "image/jpeg"
@@ -2150,7 +2533,9 @@ function getImageExtension(
 function bytesToBase64(
   bytes
 ) {
-  let binary = "";
+
+  let binary =
+    "";
 
 
   for (
@@ -2158,6 +2543,7 @@ function bytesToBase64(
     i < bytes.length;
     i++
   ) {
+
     binary +=
       String.fromCharCode(
         bytes[i]
@@ -2165,15 +2551,20 @@ function bytesToBase64(
   }
 
 
-  return btoa(binary);
+  return btoa(
+    binary
+  );
 }
 
 
 function base64ToBytes(
   value
 ) {
+
   const binary =
-    atob(value);
+    atob(
+      value
+    );
 
 
   const bytes =
@@ -2187,8 +2578,11 @@ function base64ToBytes(
     i < binary.length;
     i++
   ) {
+
     bytes[i] =
-      binary.charCodeAt(i);
+      binary.charCodeAt(
+        i
+      );
   }
 
 
@@ -2199,6 +2593,7 @@ function base64ToBytes(
 function bytesToBase64Url(
   bytes
 ) {
+
   return bytesToBase64(
     bytes
   )
@@ -2220,8 +2615,11 @@ function bytesToBase64Url(
 function bytesToHex(
   bytes
 ) {
+
   return Array
-    .from(bytes)
+    .from(
+      bytes
+    )
     .map(
       byte =>
         byte
@@ -2243,6 +2641,7 @@ function constantTimeEqual(
   first,
   second
 ) {
+
   if (
     first.length !==
     second.length
@@ -2260,6 +2659,7 @@ function constantTimeEqual(
     i < first.length;
     i++
   ) {
+
     difference |=
       first[i] ^
       second[i];
@@ -2278,8 +2678,11 @@ function constantTimeEqual(
 function isValidEmail(
   email
 ) {
+
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    .test(email);
+    .test(
+      email
+    );
 }
 
 
@@ -2292,6 +2695,7 @@ function jsonResponse(
   status = 200,
   extraHeaders = {}
 ) {
+
   const headers =
     new Headers({
       "Content-Type":
@@ -2310,6 +2714,7 @@ function jsonResponse(
       extraHeaders
     )
   ) {
+
     headers.set(
       key,
       value
