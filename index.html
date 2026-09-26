@@ -3715,12 +3715,27 @@
       );
 
 
+      /* Slow natural night-sky drift from right to left */
+      const horizontalDrift =
+        -(
+          Math.random() *
+          80 +
+          25
+        );
+
+
+      const verticalDrift =
+        Math.random() *
+        8 -
+        4;
+
+
       star.style.setProperty(
         "--float-speed",
         (
           Math.random() *
-          100 +
-          80
+          140 +
+          220
         ) +
         "s"
       );
@@ -3728,22 +3743,14 @@
 
       star.style.setProperty(
         "--drift-x",
-        (
-          Math.random() *
-          90 -
-          45
-        ) +
+        horizontalDrift +
         "px"
       );
 
 
       star.style.setProperty(
         "--drift-y",
-        (
-          Math.random() *
-          90 -
-          45
-        ) +
+        verticalDrift +
         "px"
       );
 
