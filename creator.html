@@ -1,0 +1,2731 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Creator | YMIR Mods</title>
+
+  <meta
+    name="description"
+    content="YMIR Mods creator profile and published Valheim mods."
+  />
+
+  <style>
+    :root {
+      --bg: #07090d;
+      --bg2: #0b1117;
+
+      --panel: rgba(18,21,27,0.94);
+
+      --text: #f4e5b5;
+      --muted: #bca97a;
+
+      --gold: #f2c15b;
+      --gold2: #ffdc8c;
+
+      --orange: #d97706;
+      --orange2: #ff9f1c;
+
+      --line: rgba(255,192,76,0.15);
+
+      --shadow:
+        0 20px 60px rgba(0,0,0,0.45);
+
+      --max: 1220px;
+    }
+
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+
+    body {
+      min-height: 100vh;
+
+      overflow-x: hidden;
+
+      position: relative;
+
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+      line-height: 1.6;
+
+      color: var(--text);
+
+      background:
+        radial-gradient(
+          circle at 15% 20%,
+          rgba(255,180,60,0.10),
+          transparent 23%
+        ),
+
+        radial-gradient(
+          circle at 82% 18%,
+          rgba(255,120,0,0.09),
+          transparent 20%
+        ),
+
+        radial-gradient(
+          circle at 78% 72%,
+          rgba(255,196,80,0.07),
+          transparent 19%
+        ),
+
+        linear-gradient(
+          180deg,
+          #05070a,
+          #0a0f14 35%,
+          #0b1117 70%,
+          #090d12
+        );
+    }
+
+
+    body::before {
+      content: "";
+
+      position: fixed;
+      inset: 0;
+
+      pointer-events: none;
+
+      z-index: 0;
+
+      background:
+        radial-gradient(
+          circle at 50% 0%,
+          rgba(255,189,74,0.08),
+          transparent 45%
+        ),
+
+        radial-gradient(
+          circle at 10% 60%,
+          rgba(255,110,0,0.05),
+          transparent 35%
+        );
+    }
+
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+
+    button {
+      font-family: inherit;
+    }
+
+
+    .container {
+      width:
+        min(
+          var(--max),
+          calc(100% - 40px)
+        );
+
+      margin: 0 auto;
+
+      position: relative;
+
+      z-index: 2;
+    }
+
+
+    /* =====================================================
+       GALAXY
+       ===================================================== */
+
+    #galaxy-stars {
+      position: fixed;
+
+      inset: 0;
+
+      overflow: hidden;
+
+      pointer-events: none;
+
+      z-index: 0;
+    }
+
+
+    .galaxy-star {
+      position: absolute;
+
+      display: block;
+
+      width: var(--star-size);
+      height: var(--star-size);
+
+      border-radius: 50%;
+
+      color: white;
+      background: currentColor;
+
+      opacity: var(--min-opacity);
+
+      box-shadow:
+        0 0 var(--star-glow) currentColor;
+
+      animation:
+        starTwinkle
+        var(--twinkle-speed)
+        ease-in-out
+        infinite
+        alternate,
+
+        starDrift
+        var(--float-speed)
+        ease-in-out
+        infinite
+        alternate;
+
+      animation-delay:
+        var(--delay);
+    }
+
+
+    .galaxy-star.aesir-star {
+      box-shadow:
+        0 0 6px currentColor,
+        0 0 14px currentColor,
+        0 0 30px rgba(255,166,40,0.35);
+    }
+
+
+    @keyframes starTwinkle {
+      from {
+        opacity: var(--min-opacity);
+      }
+
+      to {
+        opacity: var(--max-opacity);
+      }
+    }
+
+
+    @keyframes starDrift {
+      from {
+        transform:
+          translate3d(0,0,0);
+      }
+
+      to {
+        transform:
+          translate3d(
+            var(--drift-x),
+            var(--drift-y),
+            0
+          );
+      }
+    }
+
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
+    .topbar {
+      position: sticky;
+
+      top: 0;
+
+      z-index: 100;
+
+      backdrop-filter:
+        blur(14px);
+
+      background:
+        rgba(5,7,10,0.89);
+
+      border-bottom:
+        1px solid
+        rgba(255,195,84,0.13);
+
+      box-shadow:
+        0 8px 30px
+        rgba(0,0,0,0.28);
+    }
+
+
+    .nav {
+      min-height: 88px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 24px;
+    }
+
+
+    .header-brand {
+      display: flex;
+
+      align-items: center;
+
+      gap: 13px;
+
+      flex-shrink: 0;
+    }
+
+
+    .header-logo {
+      width: 58px;
+      height: 58px;
+
+      border-radius: 11px;
+
+      object-fit: cover;
+
+      filter:
+        drop-shadow(
+          0 0 8px
+          rgba(255,174,35,0.45)
+        )
+
+        drop-shadow(
+          0 0 18px
+          rgba(255,110,0,0.18)
+        );
+    }
+
+
+    .brand h1 {
+      color: var(--gold2);
+
+      font-size: 1.75rem;
+
+      line-height: 1.1;
+
+      letter-spacing: 1px;
+    }
+
+
+    .brand p {
+      color: var(--muted);
+
+      font-size: 0.84rem;
+
+      white-space: nowrap;
+    }
+
+
+    .header-right {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: flex-end;
+
+      gap: 22px;
+
+      margin-left: auto;
+    }
+
+
+    .nav-links {
+      display: flex;
+
+      align-items: center;
+
+      gap: 19px;
+    }
+
+
+    .nav-links a {
+      color: #e9d6a3;
+
+      font-weight: 700;
+
+      font-size: 0.92rem;
+
+      transition:
+        color 0.2s ease,
+        text-shadow 0.2s ease;
+    }
+
+
+    .nav-links a:hover {
+      color: #ffe09a;
+
+      text-shadow:
+        0 0 10px
+        rgba(255,175,45,0.35);
+    }
+
+
+    /* =====================================================
+       ACCOUNT
+       ===================================================== */
+
+    .account-area {
+      min-width: 82px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: flex-end;
+
+      gap: 8px;
+
+      padding-left: 17px;
+
+      border-left:
+        1px solid
+        rgba(255,194,82,0.12);
+    }
+
+
+    .account-loading {
+      color: var(--muted);
+
+      font-size: 0.78rem;
+    }
+
+
+    .account-login {
+      display: none;
+    }
+
+
+    .account-user {
+      display: none;
+
+      align-items: center;
+
+      gap: 8px;
+    }
+
+
+    .account-name {
+      color: var(--gold2);
+
+      font-weight: bold;
+
+      font-size: 0.9rem;
+
+      max-width: 110px;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+
+      white-space: nowrap;
+    }
+
+
+    .account-button {
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      min-height: 35px;
+
+      padding: 7px 11px;
+
+      border-radius: 9px;
+
+      border:
+        1px solid
+        rgba(255,194,82,0.17);
+
+      background:
+        rgba(255,183,77,0.055);
+
+      color: var(--gold2);
+
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+
+    .account-button.login {
+      background:
+        linear-gradient(
+          135deg,
+          rgba(217,119,6,0.95),
+          rgba(242,193,91,0.95)
+        );
+
+      color: #15100a;
+
+      border: none;
+    }
+
+
+    .account-button.logout {
+      color: #ffc5b6;
+
+      border-color:
+        rgba(255,100,75,0.17);
+
+      background:
+        rgba(170,50,35,0.08);
+    }
+
+
+    /* =====================================================
+       PAGE
+       ===================================================== */
+
+    main {
+      padding:
+        52px 0 90px;
+
+      position: relative;
+
+      z-index: 2;
+    }
+
+
+    .back-link {
+      display: inline-block;
+
+      margin-bottom: 18px;
+
+      color: var(--gold);
+
+      font-size: 0.92rem;
+
+      font-weight: bold;
+    }
+
+
+    .back-link:hover {
+      color: var(--gold2);
+
+      text-shadow:
+        0 0 10px
+        rgba(255,180,45,0.30);
+    }
+
+
+    /* =====================================================
+       CREATOR HERO
+       ===================================================== */
+
+    .creator-hero {
+      padding:
+        30px 34px;
+
+      border-radius: 20px;
+
+      position: relative;
+
+      overflow: hidden;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(53,40,24,0.96),
+          rgba(18,22,28,0.96) 45%,
+          rgba(12,16,21,0.98)
+        );
+
+      border:
+        1px solid
+        rgba(255,194,82,0.24);
+
+      box-shadow:
+        0 22px 60px
+        rgba(0,0,0,0.42),
+
+        inset 0 0 36px
+        rgba(255,150,25,0.035);
+    }
+
+
+    .creator-hero::before {
+      content: "";
+
+      position: absolute;
+
+      width: 320px;
+      height: 320px;
+
+      top: -150px;
+      right: -80px;
+
+      border-radius: 50%;
+
+      pointer-events: none;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,195,80,0.18),
+          rgba(255,120,0,0.06) 45%,
+          transparent 70%
+        );
+    }
+
+
+    .creator-top {
+      display: flex;
+
+      align-items: center;
+
+      gap: 26px;
+
+      position: relative;
+
+      z-index: 2;
+    }
+
+
+    .creator-avatar {
+      width: 128px;
+      height: 128px;
+
+      flex-shrink: 0;
+
+      border-radius: 18px;
+
+      object-fit: cover;
+
+      background: #090c10;
+
+      border:
+        1px solid
+        rgba(255,200,90,0.30);
+
+      box-shadow:
+        0 0 12px
+        rgba(255,220,130,0.22),
+
+        0 0 30px
+        rgba(255,135,15,0.17);
+    }
+
+
+    .creator-info {
+      min-width: 0;
+    }
+
+
+    .creator-label {
+      display: inline-block;
+
+      margin-bottom: 7px;
+
+      padding: 5px 11px;
+
+      border-radius: 999px;
+
+      background:
+        rgba(255,183,70,0.08);
+
+      border:
+        1px solid
+        rgba(255,195,80,0.18);
+
+      color: var(--gold2);
+
+      font-size: 0.74rem;
+
+      font-weight: bold;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.8px;
+    }
+
+
+    .creator-name {
+      color: #ffe0a0;
+
+      font-size:
+        clamp(
+          2.3rem,
+          5vw,
+          4.2rem
+        );
+
+      line-height: 1;
+
+      margin-bottom: 10px;
+
+      text-shadow:
+        0 0 18px
+        rgba(255,195,90,0.18);
+    }
+
+
+    .creator-subtitle {
+      color: #cdb786;
+
+      font-size: 1rem;
+    }
+
+
+    .creator-stats {
+      margin-top: 24px;
+
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 12px;
+    }
+
+
+    .creator-stat {
+      min-width: 145px;
+
+      padding: 12px 16px;
+
+      border-radius: 12px;
+
+      background:
+        rgba(5,8,11,0.38);
+
+      border:
+        1px solid
+        rgba(255,195,80,0.10);
+    }
+
+
+    .creator-stat-label {
+      display: block;
+
+      color: #9f906c;
+
+      font-size: 0.72rem;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.6px;
+
+      margin-bottom: 3px;
+    }
+
+
+    .creator-stat-value {
+      color: var(--gold2);
+
+      font-weight: bold;
+    }
+
+
+    /* =====================================================
+       MOD SECTION
+       ===================================================== */
+
+    .mods-section {
+      margin-top: 44px;
+    }
+
+
+    .section-heading {
+      display: flex;
+
+      align-items: flex-end;
+
+      justify-content: space-between;
+
+      gap: 20px;
+
+      margin-bottom: 20px;
+    }
+
+
+    .section-heading h2 {
+      color: var(--gold2);
+
+      font-size: 2rem;
+    }
+
+
+    .section-heading p {
+      color: var(--muted);
+
+      font-size: 0.9rem;
+    }
+
+
+    .creator-mod-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          3,
+          minmax(0,1fr)
+        );
+
+      gap: 20px;
+    }
+
+
+    /* =====================================================
+       MOD CARD
+       ===================================================== */
+
+    .creator-mod-card {
+      position: relative;
+
+      min-height: 275px;
+
+      padding: 18px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      overflow: hidden;
+
+      isolation: isolate;
+
+      cursor: pointer;
+
+      border-radius: 17px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(22,27,34,0.96),
+          rgba(12,16,21,0.96)
+        );
+
+      border:
+        1px solid
+        rgba(255,194,82,0.10);
+
+      box-shadow:
+        0 15px 38px
+        rgba(0,0,0,0.34);
+
+      transition:
+        transform 0.28s ease,
+        border-color 0.28s ease,
+        background 0.28s ease,
+        box-shadow 0.28s ease;
+    }
+
+
+    .creator-mod-card::before {
+      content: "";
+
+      position: absolute;
+
+      top: -75px;
+      right: -60px;
+
+      width: 220px;
+      height: 220px;
+
+      z-index: -1;
+
+      border-radius: 50%;
+
+      opacity: 0.65;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,180,50,0.15),
+          rgba(255,120,0,0.05) 45%,
+          transparent 70%
+        );
+
+      transition:
+        transform 0.28s ease,
+        opacity 0.28s ease;
+    }
+
+
+    .creator-mod-card::after {
+      content: "";
+
+      position: absolute;
+
+      inset: 0;
+
+      z-index: -1;
+
+      opacity: 0;
+
+      background:
+        radial-gradient(
+          circle at 17% 18%,
+          rgba(255,220,130,0.21),
+          rgba(255,165,45,0.11) 24%,
+          rgba(255,115,0,0.05) 44%,
+          transparent 64%
+        );
+
+      transition:
+        opacity 0.28s ease;
+    }
+
+
+    .creator-mod-card:hover {
+      transform:
+        translateY(-7px)
+        scale(1.015);
+
+      border-color:
+        rgba(255,192,60,0.72);
+
+      background:
+        radial-gradient(
+          circle at 15% 15%,
+          rgba(255,160,25,0.14),
+          transparent 46%
+        ),
+
+        linear-gradient(
+          180deg,
+          rgba(37,28,20,0.98),
+          rgba(16,18,20,0.98)
+        );
+
+      box-shadow:
+        0 30px 72px
+        rgba(0,0,0,0.56),
+
+        0 0 8px
+        rgba(255,232,150,0.25),
+
+        0 0 18px
+        rgba(255,198,75,0.30),
+
+        0 0 36px
+        rgba(255,145,25,0.24),
+
+        0 0 58px
+        rgba(255,95,0,0.14);
+    }
+
+
+    .creator-mod-card:hover::before {
+      transform:
+        scale(1.15);
+
+      opacity: 1;
+    }
+
+
+    .creator-mod-card:hover::after {
+      opacity: 1;
+    }
+
+
+    .mod-card-top {
+      display: flex;
+
+      align-items: flex-start;
+
+      justify-content: space-between;
+
+      gap: 14px;
+
+      margin-bottom: 13px;
+    }
+
+
+    .mod-main {
+      min-width: 0;
+
+      flex: 1;
+    }
+
+
+    .mod-category {
+      display: inline-block;
+
+      margin-bottom: 8px;
+
+      padding: 5px 10px;
+
+      border-radius: 999px;
+
+      color: var(--gold2);
+
+      background:
+        rgba(255,193,74,0.07);
+
+      border:
+        1px solid
+        rgba(255,196,86,0.14);
+
+      font-size: 0.72rem;
+
+      font-weight: 700;
+    }
+
+
+    .mod-name {
+      color: #f2d797;
+
+      font-size: 1.38rem;
+
+      line-height: 1.2;
+    }
+
+
+    .creator-mod-card:hover
+    .mod-name {
+      color: #ffe4a1;
+
+      text-shadow:
+        0 0 10px
+        rgba(255,195,75,0.45);
+    }
+
+
+    .mod-icon {
+      width: 108px;
+      height: 108px;
+
+      flex-shrink: 0;
+
+      object-fit: cover;
+
+      border-radius: 11px;
+
+      background: #080b0f;
+
+      border:
+        1px solid
+        rgba(255,194,82,0.20);
+
+      box-shadow:
+        0 0 16px
+        rgba(255,150,25,0.14);
+
+      transition:
+        transform 0.28s ease,
+        border-color 0.28s ease,
+        box-shadow 0.28s ease;
+    }
+
+
+    .creator-mod-card:hover
+    .mod-icon {
+      transform:
+        scale(1.045);
+
+      border-color:
+        rgba(255,210,100,0.66);
+
+      box-shadow:
+        0 0 8px
+        rgba(255,225,145,0.30),
+
+        0 0 20px
+        rgba(255,180,55,0.30),
+
+        0 0 38px
+        rgba(255,110,0,0.18);
+    }
+
+
+    .mod-description {
+      color: #cdb786;
+
+      font-size: 0.9rem;
+
+      line-height: 1.5;
+
+      margin-bottom: 16px;
+
+      display: -webkit-box;
+
+      -webkit-box-orient: vertical;
+
+      -webkit-line-clamp: 3;
+
+      overflow: hidden;
+    }
+
+
+    .mod-footer {
+      margin-top: auto;
+
+      padding-top: 12px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      border-top:
+        1px solid
+        rgba(255,194,82,0.08);
+    }
+
+
+    .mod-version {
+      color: #aa986f;
+
+      font-size: 0.8rem;
+    }
+
+
+    .view-mod {
+      color: var(--orange2);
+
+      font-weight: bold;
+
+      font-size: 0.85rem;
+    }
+
+
+    .creator-mod-card:hover
+    .view-mod {
+      color: #ffd57b;
+
+      text-shadow:
+        0 0 10px
+        rgba(255,130,15,0.30);
+    }
+
+
+    /* =====================================================
+       STATUS
+       ===================================================== */
+
+    .status-panel {
+      padding: 36px;
+
+      border-radius: 18px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      background:
+        rgba(16,20,27,0.82);
+
+      border:
+        1px solid
+        var(--line);
+    }
+
+
+    .error-panel {
+      display: none;
+    }
+
+
+    .creator-content {
+      display: none;
+    }
+
+
+    /* =====================================================
+       FOOTER
+       ===================================================== */
+
+    footer {
+      position: relative;
+
+      z-index: 2;
+
+      padding:
+        26px 0 38px;
+
+      border-top:
+        1px solid
+        rgba(255,194,82,0.10);
+    }
+
+
+    .footer-grid {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 20px;
+    }
+
+
+    footer p {
+      color: var(--muted);
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (
+      max-width: 1000px
+    ) {
+
+      .creator-mod-grid {
+        grid-template-columns:
+          repeat(
+            2,
+            minmax(0,1fr)
+          );
+      }
+    }
+
+
+    @media (
+      max-width: 760px
+    ) {
+
+      .nav-links {
+        display: none;
+      }
+
+
+      .creator-top {
+        align-items:
+          flex-start;
+      }
+
+
+      .creator-avatar {
+        width: 100px;
+        height: 100px;
+      }
+
+
+      .creator-mod-grid {
+        grid-template-columns:
+          1fr;
+      }
+    }
+
+
+    @media (
+      max-width: 560px
+    ) {
+
+      .container {
+        width:
+          min(
+            calc(100% - 24px),
+            var(--max)
+          );
+      }
+
+
+      .nav {
+        flex-wrap: wrap;
+      }
+
+
+      .header-right {
+        width: 100%;
+
+        margin-left: 0;
+      }
+
+
+      .creator-hero {
+        padding: 24px 20px;
+      }
+
+
+      .creator-top {
+        flex-direction: column;
+      }
+
+
+      .creator-avatar {
+        width: 112px;
+        height: 112px;
+      }
+
+
+      .section-heading {
+        align-items: flex-start;
+
+        flex-direction: column;
+      }
+
+
+      .mod-icon {
+        width: 92px;
+        height: 92px;
+      }
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <div
+    id="galaxy-stars"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header class="topbar">
+
+    <div class="container nav">
+
+
+      <a
+        href="/"
+        class="header-brand"
+      >
+
+        <img
+          class="header-logo"
+          src="/ymirmodwebsiteicon.png"
+          alt="YMIR Mods"
+        />
+
+
+        <div class="brand">
+
+          <h1>
+            YMIR MODS
+          </h1>
+
+          <p>
+            Valheim mods, downloads, updates &amp; community
+          </p>
+
+        </div>
+
+      </a>
+
+
+      <div class="header-right">
+
+
+        <nav class="nav-links">
+
+          <a href="/">
+            Home
+          </a>
+
+          <a href="/#mods">
+            Mods
+          </a>
+
+          <a href="/#updates">
+            Updates
+          </a>
+
+          <a href="/#community">
+            Community
+          </a>
+
+        </nav>
+
+
+        <div class="account-area">
+
+
+          <span
+            id="accountLoading"
+            class="account-loading"
+          >
+            ...
+          </span>
+
+
+          <div
+            id="accountLoggedOut"
+            class="account-login"
+          >
+
+            <a
+              class="account-button login"
+              href="/login"
+            >
+              Login
+            </a>
+
+          </div>
+
+
+          <div
+            id="accountLoggedIn"
+            class="account-user"
+          >
+
+            <span
+              id="headerUsername"
+              class="account-name"
+            >
+              User
+            </span>
+
+
+            <a
+              class="account-button"
+              href="/dashboard"
+            >
+              Dashboard
+            </a>
+
+
+            <button
+              id="headerLogout"
+              class="account-button logout"
+              type="button"
+            >
+              Logout
+            </button>
+
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       CONTENT
+       ===================================================== -->
+
+  <main>
+
+    <div class="container">
+
+
+      <a
+        href="/"
+        class="back-link"
+      >
+        ← Back to YMIR Mods
+      </a>
+
+
+      <!-- LOADING -->
+
+      <div
+        id="loadingPanel"
+        class="status-panel"
+      >
+        Loading creator...
+      </div>
+
+
+      <!-- ERROR -->
+
+      <div
+        id="errorPanel"
+        class="status-panel error-panel"
+      >
+
+        <h2>
+          Creator Not Found
+        </h2>
+
+        <p id="errorMessage">
+          Unable to load this creator.
+        </p>
+
+      </div>
+
+
+      <!-- CREATOR CONTENT -->
+
+      <div
+        id="creatorContent"
+        class="creator-content"
+      >
+
+
+        <section class="creator-hero">
+
+
+          <div class="creator-top">
+
+
+            <img
+              id="creatorAvatar"
+              class="creator-avatar"
+              src="/ymirmodwebsiteicon.png"
+              alt="Creator"
+            />
+
+
+            <div class="creator-info">
+
+
+              <span class="creator-label">
+                YMIR Creator
+              </span>
+
+
+              <h1
+                id="creatorName"
+                class="creator-name"
+              >
+                Creator
+              </h1>
+
+
+              <p
+                id="creatorSubtitle"
+                class="creator-subtitle"
+              >
+                Valheim mod creator on YMIR Mods
+              </p>
+
+
+            </div>
+
+
+          </div>
+
+
+          <div class="creator-stats">
+
+
+            <div class="creator-stat">
+
+              <span class="creator-stat-label">
+                Published Mods
+              </span>
+
+              <span
+                id="creatorModCount"
+                class="creator-stat-value"
+              >
+                0
+              </span>
+
+            </div>
+
+
+            <div class="creator-stat">
+
+              <span class="creator-stat-label">
+                Role
+              </span>
+
+              <span
+                id="creatorRole"
+                class="creator-stat-value"
+              >
+                Creator
+              </span>
+
+            </div>
+
+
+            <div class="creator-stat">
+
+              <span class="creator-stat-label">
+                Joined YMIR
+              </span>
+
+              <span
+                id="creatorJoined"
+                class="creator-stat-value"
+              >
+                -
+              </span>
+
+            </div>
+
+
+          </div>
+
+
+        </section>
+
+
+        <!-- MODS -->
+
+        <section class="mods-section">
+
+
+          <div class="section-heading">
+
+            <div>
+
+              <h2 id="modsHeading">
+                Published Mods
+              </h2>
+
+              <p>
+                Mods published by this creator on YMIR Mods.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="creatorMods"
+            class="creator-mod-grid"
+          ></div>
+
+
+        </section>
+
+
+      </div>
+
+
+    </div>
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
+  <footer>
+
+    <div class="container footer-grid">
+
+      <p>
+        &copy;
+        <span id="year"></span>
+        YMIR Mods.
+        All rights reserved.
+      </p>
+
+    </div>
+
+  </footer>
+
+
+  <script>
+
+    /* =====================================================
+       YEAR
+       ===================================================== */
+
+    document
+      .getElementById(
+        "year"
+      )
+      .textContent =
+        new Date()
+          .getFullYear();
+
+
+    /* =====================================================
+       ACCOUNT
+       ===================================================== */
+
+    const accountLoading =
+      document.getElementById(
+        "accountLoading"
+      );
+
+
+    const accountLoggedOut =
+      document.getElementById(
+        "accountLoggedOut"
+      );
+
+
+    const accountLoggedIn =
+      document.getElementById(
+        "accountLoggedIn"
+      );
+
+
+    const headerUsername =
+      document.getElementById(
+        "headerUsername"
+      );
+
+
+    const headerLogout =
+      document.getElementById(
+        "headerLogout"
+      );
+
+
+    async function loadAccountStatus() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/me",
+            {
+              credentials:
+                "same-origin",
+
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        accountLoading.style.display =
+          "none";
+
+
+        if (
+          response.ok &&
+          result.success &&
+          result.authenticated &&
+          result.user
+        ) {
+
+          headerUsername.textContent =
+            result.user.username;
+
+
+          accountLoggedIn.style.display =
+            "flex";
+
+
+          accountLoggedOut.style.display =
+            "none";
+
+        } else {
+
+          accountLoggedIn.style.display =
+            "none";
+
+
+          accountLoggedOut.style.display =
+            "block";
+        }
+
+
+      } catch (error) {
+
+        accountLoading.style.display =
+          "none";
+
+
+        accountLoggedIn.style.display =
+          "none";
+
+
+        accountLoggedOut.style.display =
+          "block";
+      }
+    }
+
+
+    headerLogout.addEventListener(
+      "click",
+      async () => {
+
+        try {
+
+          await fetch(
+            "/api/logout",
+            {
+              method:
+                "POST",
+
+              credentials:
+                "same-origin"
+            }
+          );
+
+        } catch (error) {
+
+          console.error(
+            error
+          );
+        }
+
+
+        window.location.href =
+          "/";
+      }
+    );
+
+
+    loadAccountStatus();
+
+
+    /* =====================================================
+       CREATOR USERNAME
+       ===================================================== */
+
+    function getCreatorUsername() {
+
+      const parts =
+        window.location.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      if (
+        parts.length >= 2 &&
+        parts[0] === "creator"
+      ) {
+
+        return decodeURIComponent(
+          parts[1]
+        );
+      }
+
+
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+
+      return (
+        params.get(
+          "username"
+        ) ||
+        ""
+      );
+    }
+
+
+    /* =====================================================
+       LOAD CREATOR
+       ===================================================== */
+
+    async function loadCreator() {
+
+      const username =
+        getCreatorUsername();
+
+
+      if (!username) {
+
+        showError(
+          "No creator was specified."
+        );
+
+        return;
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/creator/" +
+            encodeURIComponent(
+              username
+            ),
+            {
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success ||
+          !result.creator
+        ) {
+
+          throw new Error(
+            result.message ||
+            "Unable to load creator."
+          );
+        }
+
+
+        renderCreator(
+          result.creator,
+          Array.isArray(
+            result.mods
+          )
+            ? result.mods
+            : []
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Creator page error:",
+          error
+        );
+
+
+        showError(
+          error.message ||
+          "Unable to load creator."
+        );
+      }
+    }
+
+
+    /* =====================================================
+       RENDER CREATOR
+       ===================================================== */
+
+    function renderCreator(
+      creator,
+      mods
+    ) {
+
+      document
+        .getElementById(
+          "loadingPanel"
+        )
+        .style.display =
+          "none";
+
+
+      document
+        .getElementById(
+          "errorPanel"
+        )
+        .style.display =
+          "none";
+
+
+      document
+        .getElementById(
+          "creatorContent"
+        )
+        .style.display =
+          "block";
+
+
+      document.title =
+        creator.username +
+        " | YMIR Mods";
+
+
+      setText(
+        "creatorName",
+        creator.username
+      );
+
+
+      setText(
+        "creatorSubtitle",
+        creator.username +
+        " is a Valheim mod creator on YMIR Mods."
+      );
+
+
+      setText(
+        "creatorModCount",
+        formatNumber(
+          creator.mod_count ||
+          mods.length
+        )
+      );
+
+
+      setText(
+        "creatorRole",
+        formatRole(
+          creator.role
+        )
+      );
+
+
+      setText(
+        "creatorJoined",
+        formatDate(
+          creator.created_at
+        )
+      );
+
+
+      setText(
+        "modsHeading",
+        creator.username +
+        "'s Mods"
+      );
+
+
+      renderMods(
+        mods
+      );
+    }
+
+
+    /* =====================================================
+       RENDER MODS
+       ===================================================== */
+
+    function renderMods(
+      mods
+    ) {
+
+      const container =
+        document.getElementById(
+          "creatorMods"
+        );
+
+
+      container.innerHTML =
+        "";
+
+
+      if (
+        mods.length === 0
+      ) {
+
+        const empty =
+          document.createElement(
+            "div"
+          );
+
+
+        empty.className =
+          "status-panel";
+
+
+        empty.textContent =
+          "This creator has no published mods yet.";
+
+
+        container.appendChild(
+          empty
+        );
+
+
+        return;
+      }
+
+
+      for (
+        const mod of mods
+      ) {
+
+        container.appendChild(
+          buildModCard(
+            mod
+          )
+        );
+      }
+    }
+
+
+    /* =====================================================
+       BUILD MOD CARD
+       ===================================================== */
+
+    function buildModCard(
+      mod
+    ) {
+
+      const card =
+        document.createElement(
+          "article"
+        );
+
+
+      card.className =
+        "creator-mod-card";
+
+
+      const modUrl =
+        mod.slug
+          ? "/mod/" +
+            encodeURIComponent(
+              mod.slug
+            )
+          : null;
+
+
+      if (
+        modUrl
+      ) {
+
+        card.setAttribute(
+          "role",
+          "link"
+        );
+
+
+        card.setAttribute(
+          "tabindex",
+          "0"
+        );
+
+
+        card.addEventListener(
+          "click",
+          () => {
+
+            window.location.href =
+              modUrl;
+          }
+        );
+
+
+        card.addEventListener(
+          "keydown",
+          event => {
+
+            if (
+              event.key ===
+                "Enter" ||
+              event.key ===
+                " "
+            ) {
+
+              event.preventDefault();
+
+
+              window.location.href =
+                modUrl;
+            }
+          }
+        );
+      }
+
+
+      const top =
+        document.createElement(
+          "div"
+        );
+
+
+      top.className =
+        "mod-card-top";
+
+
+      const main =
+        document.createElement(
+          "div"
+        );
+
+
+      main.className =
+        "mod-main";
+
+
+      const category =
+        document.createElement(
+          "span"
+        );
+
+
+      category.className =
+        "mod-category";
+
+
+      category.textContent =
+        mod.category ||
+        "Valheim Mod";
+
+
+      const name =
+        document.createElement(
+          "h3"
+        );
+
+
+      name.className =
+        "mod-name";
+
+
+      name.textContent =
+        mod.name ||
+        "Unnamed Mod";
+
+
+      main.appendChild(
+        category
+      );
+
+
+      main.appendChild(
+        name
+      );
+
+
+      const icon =
+        document.createElement(
+          "img"
+        );
+
+
+      icon.className =
+        "mod-icon";
+
+
+      icon.src =
+        mod.icon_url ||
+        "/ymirmodwebsiteicon.png";
+
+
+      icon.alt =
+        mod.name
+          ? mod.name +
+            " icon"
+          : "Mod icon";
+
+
+      icon.loading =
+        "lazy";
+
+
+      icon.onerror =
+        () => {
+
+          icon.onerror =
+            null;
+
+
+          icon.src =
+            "/ymirmodwebsiteicon.png";
+        };
+
+
+      top.appendChild(
+        main
+      );
+
+
+      top.appendChild(
+        icon
+      );
+
+
+      const description =
+        document.createElement(
+          "p"
+        );
+
+
+      description.className =
+        "mod-description";
+
+
+      description.textContent =
+        mod.short_description ||
+        "No description available.";
+
+
+      const footer =
+        document.createElement(
+          "div"
+        );
+
+
+      footer.className =
+        "mod-footer";
+
+
+      const version =
+        document.createElement(
+          "span"
+        );
+
+
+      version.className =
+        "mod-version";
+
+
+      version.textContent =
+        mod.version
+          ? "v" +
+            mod.version
+          : "";
+
+
+      const view =
+        document.createElement(
+          "span"
+        );
+
+
+      view.className =
+        "view-mod";
+
+
+      view.textContent =
+        "View Mod →";
+
+
+      footer.appendChild(
+        version
+      );
+
+
+      footer.appendChild(
+        view
+      );
+
+
+      card.appendChild(
+        top
+      );
+
+
+      card.appendChild(
+        description
+      );
+
+
+      card.appendChild(
+        footer
+      );
+
+
+      return card;
+    }
+
+
+    /* =====================================================
+       HELPERS
+       ===================================================== */
+
+    function setText(
+      id,
+      value
+    ) {
+
+      const element =
+        document.getElementById(
+          id
+        );
+
+
+      if (
+        element
+      ) {
+
+        element.textContent =
+          value;
+      }
+    }
+
+
+    function formatRole(
+      role
+    ) {
+
+      const value =
+        String(
+          role ||
+          "creator"
+        );
+
+
+      return (
+        value
+          .charAt(0)
+          .toUpperCase() +
+        value
+          .slice(1)
+      );
+    }
+
+
+    function formatNumber(
+      value
+    ) {
+
+      return Number(
+        value ||
+        0
+      ).toLocaleString();
+    }
+
+
+    function formatDate(
+      value
+    ) {
+
+      if (!value) {
+
+        return "-";
+      }
+
+
+      const normalised =
+        String(
+          value
+        ).replace(
+          " ",
+          "T"
+        );
+
+
+      const date =
+        new Date(
+          normalised.endsWith(
+            "Z"
+          )
+            ? normalised
+            : normalised +
+              "Z"
+        );
+
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+
+        return value;
+      }
+
+
+      return date.toLocaleDateString(
+        undefined,
+        {
+          year:
+            "numeric",
+
+          month:
+            "short",
+
+          day:
+            "numeric"
+        }
+      );
+    }
+
+
+    function showError(
+      message
+    ) {
+
+      document
+        .getElementById(
+          "loadingPanel"
+        )
+        .style.display =
+          "none";
+
+
+      document
+        .getElementById(
+          "creatorContent"
+        )
+        .style.display =
+          "none";
+
+
+      document
+        .getElementById(
+          "errorPanel"
+        )
+        .style.display =
+          "block";
+
+
+      setText(
+        "errorMessage",
+        message
+      );
+    }
+
+
+    loadCreator();
+
+
+    /* =====================================================
+       GALAXY
+       ===================================================== */
+
+    const galaxy =
+      document.getElementById(
+        "galaxy-stars"
+      );
+
+
+    const starColours = [
+      "#ffffff",
+      "#fff8df",
+      "#ffe7aa",
+      "#ffd36b",
+      "#ffba45",
+      "#ff9825"
+    ];
+
+
+    const isMobile =
+      window.matchMedia(
+        "(max-width:760px)"
+      ).matches;
+
+
+    const STAR_COUNT =
+      isMobile
+        ? 85
+        : 155;
+
+
+    const AESIR_STAR_COUNT =
+      isMobile
+        ? 4
+        : 8;
+
+
+    for (
+      let i = 0;
+      i < STAR_COUNT;
+      i++
+    ) {
+
+      const star =
+        document.createElement(
+          "span"
+        );
+
+
+      star.className =
+        "galaxy-star";
+
+
+      star.style.left =
+        Math.random() *
+        100 +
+        "%";
+
+
+      star.style.top =
+        Math.random() *
+        100 +
+        "%";
+
+
+      let size =
+        Math.random() *
+        1.5 +
+        0.45;
+
+
+      if (
+        Math.random() >
+        0.94
+      ) {
+
+        size =
+          Math.random() *
+          1.8 +
+          1.8;
+      }
+
+
+      star.style.setProperty(
+        "--star-size",
+        size +
+        "px"
+      );
+
+
+      const colour =
+        starColours[
+          Math.floor(
+            Math.random() *
+            starColours.length
+          )
+        ];
+
+
+      star.style.color =
+        colour;
+
+
+      star.style.setProperty(
+        "--min-opacity",
+        (
+          Math.random() *
+          0.18 +
+          0.08
+        ).toFixed(2)
+      );
+
+
+      star.style.setProperty(
+        "--max-opacity",
+        (
+          Math.random() *
+          0.45 +
+          0.40
+        ).toFixed(2)
+      );
+
+
+      star.style.setProperty(
+        "--star-glow",
+        (
+          Math.random() *
+          5 +
+          2
+        ) +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--twinkle-speed",
+        (
+          Math.random() *
+          6 +
+          3
+        ) +
+        "s"
+      );
+
+
+      star.style.setProperty(
+        "--float-speed",
+        (
+          Math.random() *
+          100 +
+          80
+        ) +
+        "s"
+      );
+
+
+      star.style.setProperty(
+        "--drift-x",
+        (
+          Math.random() *
+          90 -
+          45
+        ) +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--drift-y",
+        (
+          Math.random() *
+          90 -
+          45
+        ) +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--delay",
+        -(
+          Math.random() *
+          15
+        ) +
+        "s"
+      );
+
+
+      galaxy.appendChild(
+        star
+      );
+    }
+
+
+    const generatedStars =
+      galaxy.querySelectorAll(
+        ".galaxy-star"
+      );
+
+
+    const availableIndexes =
+      Array.from(
+        {
+          length:
+            generatedStars.length
+        },
+
+        (_, index) =>
+          index
+      );
+
+
+    for (
+      let i = 0;
+      i < AESIR_STAR_COUNT;
+      i++
+    ) {
+
+      const randomPosition =
+        Math.floor(
+          Math.random() *
+          availableIndexes.length
+        );
+
+
+      const starIndex =
+        availableIndexes.splice(
+          randomPosition,
+          1
+        )[0];
+
+
+      const star =
+        generatedStars[
+          starIndex
+        ];
+
+
+      star.classList.add(
+        "aesir-star"
+      );
+
+
+      star.style.setProperty(
+        "--star-size",
+        (
+          Math.random() *
+          1.8 +
+          2.2
+        ) +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--max-opacity",
+        "0.95"
+      );
+
+
+      star.style.setProperty(
+        "--star-glow",
+        "8px"
+      );
+    }
+
+  </script>
+
+</body>
+
+</html>
