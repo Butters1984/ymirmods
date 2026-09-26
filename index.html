@@ -677,16 +677,102 @@
     }
 
 
+    .last-updated-header {
+      display: flex;
+
+      align-items: center;
+
+      justify-content:
+        space-between;
+
+      gap: 18px;
+
+      margin-bottom: 16px;
+    }
+
+
     .last-updated-title {
       color: var(--gold2);
 
       font-size: 1.85rem;
 
-      margin-bottom: 16px;
+      margin: 0;
 
       text-shadow:
         0 0 12px
         rgba(255, 190, 70, 0.12);
+    }
+
+
+    .last-updated-nav {
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      flex-shrink: 0;
+    }
+
+
+    .last-updated-arrow {
+      width: 38px;
+      height: 38px;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      border-radius: 10px;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.18);
+
+      color: var(--gold2);
+
+      background:
+        rgba(255, 183, 77, 0.055);
+
+      font-size: 1.25rem;
+
+      font-weight: bold;
+
+      line-height: 1;
+
+      cursor: pointer;
+
+      transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+
+    .last-updated-arrow:hover:not(:disabled) {
+      transform:
+        translateY(-2px);
+
+      border-color:
+        rgba(255, 194, 82, 0.48);
+
+      background:
+        rgba(255, 174, 45, 0.10);
+
+      box-shadow:
+        0 0 18px
+        rgba(255, 145, 20, 0.15);
+    }
+
+
+    .last-updated-arrow:disabled {
+      opacity: 0.28;
+
+      cursor: default;
     }
 
 
@@ -1025,12 +1111,14 @@
        ===================================================== */
 
     .catalog-toolbar {
-      display: flex;
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
 
       align-items: center;
-
-      justify-content:
-        space-between;
 
       gap: 24px;
 
@@ -1100,6 +1188,123 @@
     }
 
 
+    /* =====================================================
+       MAIN MOD PAGINATION
+       ===================================================== */
+
+    .catalog-pagination {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 6px;
+
+      min-width: 0;
+    }
+
+
+    .catalog-page-button,
+    .catalog-page-arrow {
+      min-width: 36px;
+      height: 36px;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 0 9px;
+
+      border-radius: 9px;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.16);
+
+      color: #dbc58d;
+
+      background:
+        rgba(255, 183, 77, 0.045);
+
+      font-size: 0.82rem;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+      transition:
+        transform 0.18s ease,
+        color 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease,
+        opacity 0.18s ease;
+    }
+
+
+    .catalog-page-button:hover:not(:disabled),
+    .catalog-page-arrow:hover:not(:disabled) {
+      transform:
+        translateY(-1px);
+
+      color: #ffe3a0;
+
+      border-color:
+        rgba(255, 194, 82, 0.48);
+
+      background:
+        rgba(255, 174, 45, 0.09);
+
+      box-shadow:
+        0 0 14px
+        rgba(255, 145, 20, 0.12);
+    }
+
+
+    .catalog-page-button.active {
+      color: #17100a;
+
+      border-color:
+        rgba(255, 205, 105, 0.85);
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--orange),
+          var(--gold)
+        );
+
+      box-shadow:
+        0 0 16px
+        rgba(255, 150, 20, 0.20);
+
+      cursor: default;
+    }
+
+
+    .catalog-page-arrow:disabled {
+      opacity: 0.28;
+
+      cursor: default;
+    }
+
+
+    .catalog-page-ellipsis {
+      min-width: 24px;
+
+      color: #81745a;
+
+      text-align: center;
+
+      font-size: 0.84rem;
+
+      user-select: none;
+    }
+
+
     .catalog-search {
       position: relative;
 
@@ -1109,7 +1314,7 @@
           100%
         );
 
-      flex-shrink: 0;
+      justify-self: end;
     }
 
 
@@ -1809,14 +2014,27 @@
 
 
       .catalog-toolbar {
-        align-items: stretch;
+        grid-template-columns:
+          1fr;
 
-        flex-direction: column;
+        align-items: stretch;
+      }
+
+
+      .catalog-pagination {
+        order: 3;
+
+        flex-wrap: wrap;
+
+        justify-content:
+          flex-start;
       }
 
 
       .catalog-search {
         width: 100%;
+
+        justify-self: stretch;
       }
 
 
@@ -1883,6 +2101,17 @@
       .last-updated-grid {
         grid-template-columns:
           1fr;
+      }
+
+
+      .last-updated-title {
+        font-size: 1.55rem;
+      }
+
+
+      .last-updated-arrow {
+        width: 34px;
+        height: 34px;
       }
 
 
@@ -2102,9 +2331,37 @@
         <div class="last-updated-area">
 
 
-          <h3 class="last-updated-title">
-            Last Updated Mods
-          </h3>
+          <div class="last-updated-header">
+
+            <h3 class="last-updated-title">
+              Last Updated Mods
+            </h3>
+
+
+            <div class="last-updated-nav">
+
+              <button
+                id="latestPrev"
+                class="last-updated-arrow"
+                type="button"
+                aria-label="Previous updated mods"
+              >
+                ‹
+              </button>
+
+
+              <button
+                id="latestNext"
+                class="last-updated-arrow"
+                type="button"
+                aria-label="Next updated mods"
+              >
+                ›
+              </button>
+
+            </div>
+
+          </div>
 
 
           <div
@@ -2183,6 +2440,13 @@
 
 
           </div>
+
+
+          <div
+            id="catalogPagination"
+            class="catalog-pagination"
+            aria-label="Mod pages"
+          ></div>
 
 
           <div class="catalog-search">
@@ -2620,8 +2884,46 @@
       );
 
 
+    const catalogPagination =
+      document.getElementById(
+        "catalogPagination"
+      );
+
+
+    const latestPrev =
+      document.getElementById(
+        "latestPrev"
+      );
+
+
+    const latestNext =
+      document.getElementById(
+        "latestNext"
+      );
+
+
+    const CATALOG_PAGE_SIZE =
+      12;
+
+
+    const LATEST_PAGE_SIZE =
+      6;
+
+
     let allPublishedMods =
       [];
+
+
+    let filteredCatalogMods =
+      [];
+
+
+    let catalogPage =
+      1;
+
+
+    let latestPage =
+      1;
 
 
     /* =====================================================
@@ -2702,15 +3004,25 @@
             : [];
 
 
+        latestPage =
+          1;
+
+
+        catalogPage =
+          1;
+
+
+        filteredCatalogMods =
+          allPublishedMods;
+
+
         renderLatestMods();
 
 
         updateCatalogCounts();
 
 
-        renderCatalog(
-          allPublishedMods
-        );
+        renderCatalogPage();
 
 
       } catch (error) {
@@ -2735,6 +3047,14 @@
               YMIR could not load the mod database.
             </div>
           `;
+
+
+        latestPrev.disabled =
+          true;
+
+
+        latestNext.disabled =
+          true;
       }
     }
 
@@ -2770,7 +3090,7 @@
 
 
     /* =====================================================
-       LATEST MODS
+       LAST UPDATED PAGINATION
        ===================================================== */
 
     function renderLatestMods() {
@@ -2787,23 +3107,60 @@
           `;
 
 
+        latestPrev.disabled =
+          true;
+
+
+        latestNext.disabled =
+          true;
+
+
         return;
       }
+
+
+      const totalPages =
+        Math.max(
+          1,
+          Math.ceil(
+            allPublishedMods.length /
+            LATEST_PAGE_SIZE
+          )
+        );
+
+
+      if (
+        latestPage >
+        totalPages
+      ) {
+
+        latestPage =
+          totalPages;
+      }
+
+
+      const start =
+        (
+          latestPage -
+          1
+        ) *
+        LATEST_PAGE_SIZE;
+
+
+      const visibleMods =
+        allPublishedMods.slice(
+          start,
+          start +
+          LATEST_PAGE_SIZE
+        );
 
 
       lastUpdatedMods.innerHTML =
         "";
 
 
-      const latest =
-        allPublishedMods.slice(
-          0,
-          6
-        );
-
-
       for (
-        const mod of latest
+        const mod of visibleMods
       ) {
 
         lastUpdatedMods.appendChild(
@@ -2812,7 +3169,67 @@
           )
         );
       }
+
+
+      latestPrev.disabled =
+        latestPage <= 1;
+
+
+      latestNext.disabled =
+        latestPage >=
+        totalPages;
     }
+
+
+    latestPrev.addEventListener(
+      "click",
+      () => {
+
+        if (
+          latestPage <= 1
+        ) {
+
+          return;
+        }
+
+
+        latestPage--;
+
+
+        renderLatestMods();
+      }
+    );
+
+
+    latestNext.addEventListener(
+      "click",
+      () => {
+
+        const totalPages =
+          Math.max(
+            1,
+            Math.ceil(
+              allPublishedMods.length /
+              LATEST_PAGE_SIZE
+            )
+          );
+
+
+        if (
+          latestPage >=
+          totalPages
+        ) {
+
+          return;
+        }
+
+
+        latestPage++;
+
+
+        renderLatestMods();
+      }
+    );
 
 
     /* =====================================================
@@ -3076,19 +3493,41 @@
 
 
     /* =====================================================
-       CATALOG
+       MAIN MOD CATALOG PAGINATION
        ===================================================== */
 
-    function renderCatalog(
-      mods
-    ) {
+    function renderCatalogPage() {
 
       allModsGrid.innerHTML =
         "";
 
 
+      const totalMods =
+        filteredCatalogMods.length;
+
+
+      const totalPages =
+        Math.max(
+          1,
+          Math.ceil(
+            totalMods /
+            CATALOG_PAGE_SIZE
+          )
+        );
+
+
       if (
-        mods.length === 0
+        catalogPage >
+        totalPages
+      ) {
+
+        catalogPage =
+          totalPages;
+      }
+
+
+      if (
+        totalMods === 0
       ) {
 
         allModsGrid.innerHTML =
@@ -3099,12 +3538,33 @@
           `;
 
 
+        renderCatalogPagination(
+          0
+        );
+
+
         return;
       }
 
 
+      const start =
+        (
+          catalogPage -
+          1
+        ) *
+        CATALOG_PAGE_SIZE;
+
+
+      const visibleMods =
+        filteredCatalogMods.slice(
+          start,
+          start +
+          CATALOG_PAGE_SIZE
+        );
+
+
       for (
-        const mod of mods
+        const mod of visibleMods
       ) {
 
         allModsGrid.appendChild(
@@ -3113,6 +3573,263 @@
           )
         );
       }
+
+
+      renderCatalogPagination(
+        totalPages
+      );
+    }
+
+
+    function renderCatalogPagination(
+      totalPages
+    ) {
+
+      catalogPagination.innerHTML =
+        "";
+
+
+      if (
+        totalPages <= 1
+      ) {
+
+        return;
+      }
+
+
+      const previous =
+        createPageButton(
+          "‹",
+          catalogPage - 1,
+          "catalog-page-arrow",
+          "Previous page"
+        );
+
+
+      previous.disabled =
+        catalogPage <= 1;
+
+
+      catalogPagination.appendChild(
+        previous
+      );
+
+
+      const pageItems =
+        getPageItems(
+          totalPages,
+          catalogPage
+        );
+
+
+      for (
+        const item of pageItems
+      ) {
+
+        if (
+          item === "..."
+        ) {
+
+          const ellipsis =
+            document.createElement(
+              "span"
+            );
+
+
+          ellipsis.className =
+            "catalog-page-ellipsis";
+
+
+          ellipsis.textContent =
+            "…";
+
+
+          catalogPagination.appendChild(
+            ellipsis
+          );
+
+
+          continue;
+        }
+
+
+        const button =
+          createPageButton(
+            String(
+              item
+            ),
+            item,
+            "catalog-page-button",
+            "Go to page " +
+            item
+          );
+
+
+        if (
+          item ===
+          catalogPage
+        ) {
+
+          button.classList.add(
+            "active"
+          );
+
+
+          button.disabled =
+            true;
+        }
+
+
+        catalogPagination.appendChild(
+          button
+        );
+      }
+
+
+      const next =
+        createPageButton(
+          "›",
+          catalogPage + 1,
+          "catalog-page-arrow",
+          "Next page"
+        );
+
+
+      next.disabled =
+        catalogPage >=
+        totalPages;
+
+
+      catalogPagination.appendChild(
+        next
+      );
+    }
+
+
+    function createPageButton(
+      label,
+      page,
+      className,
+      ariaLabel
+    ) {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        className;
+
+
+      button.textContent =
+        label;
+
+
+      button.setAttribute(
+        "aria-label",
+        ariaLabel
+      );
+
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          catalogPage =
+            page;
+
+
+          renderCatalogPage();
+
+
+          document
+            .getElementById(
+              "mods"
+            )
+            .scrollIntoView({
+              behavior:
+                "smooth",
+
+              block:
+                "start"
+            });
+        }
+      );
+
+
+      return button;
+    }
+
+
+    function getPageItems(
+      totalPages,
+      currentPage
+    ) {
+
+      if (
+        totalPages <= 7
+      ) {
+
+        return Array.from(
+          {
+            length:
+              totalPages
+          },
+
+          (_, index) =>
+            index + 1
+        );
+      }
+
+
+      if (
+        currentPage <= 4
+      ) {
+
+        return [
+          1,
+          2,
+          3,
+          4,
+          5,
+          "...",
+          totalPages
+        ];
+      }
+
+
+      if (
+        currentPage >=
+        totalPages - 3
+      ) {
+
+        return [
+          1,
+          "...",
+          totalPages - 4,
+          totalPages - 3,
+          totalPages - 2,
+          totalPages - 1,
+          totalPages
+        ];
+      }
+
+
+      return [
+        1,
+        "...",
+        currentPage - 1,
+        currentPage,
+        currentPage + 1,
+        "...",
+        totalPages
+      ];
     }
 
 
@@ -3521,9 +4238,15 @@
           !query
         ) {
 
-          renderCatalog(
-            allPublishedMods
-          );
+          filteredCatalogMods =
+            allPublishedMods;
+
+
+          catalogPage =
+            1;
+
+
+          renderCatalogPage();
 
 
           return;
@@ -3559,9 +4282,15 @@
           );
 
 
-        renderCatalog(
-          filtered
-        );
+        filteredCatalogMods =
+          filtered;
+
+
+        catalogPage =
+          1;
+
+
+        renderCatalogPage();
       }
     );
 
@@ -3716,6 +4445,7 @@
 
 
       /* Slow natural night-sky drift from right to left */
+
       const horizontalDrift =
         -(
           Math.random() *
