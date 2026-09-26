@@ -146,6 +146,32 @@ export default {
 
 
     /* =====================================================
+       PUBLIC CREATOR API
+
+       Example:
+       /api/creator/Yggdrah
+       ===================================================== */
+
+    if (
+      url.pathname.startsWith("/api/creator/") &&
+      request.method === "GET"
+    ) {
+      const username =
+        decodeURIComponent(
+          url.pathname.slice(
+            "/api/creator/".length
+          )
+        ).trim();
+
+
+      return handlePublicCreator(
+        env,
+        username
+      );
+    }
+
+
+    /* =====================================================
        UPLOAD MOD
        ===================================================== */
 
@@ -165,9 +191,6 @@ export default {
 
        Example:
        /mod/toolofthetrade
-
-       Keep the clean browser URL while internally
-       serving the static mod.html page through /mod.
        ===================================================== */
 
     if (
@@ -191,6 +214,55 @@ export default {
         const pageUrl =
           new URL(
             "/mod",
+            request.url
+          );
+
+
+        const pageRequest =
+          new Request(
+            pageUrl.toString(),
+            {
+              method: "GET",
+              headers: request.headers
+            }
+          );
+
+
+        return env.ASSETS.fetch(
+          pageRequest
+        );
+      }
+    }
+
+
+    /* =====================================================
+       CLEAN CREATOR PAGE URL
+
+       Example:
+       /creator/Yggdrah
+       ===================================================== */
+
+    if (
+      url.pathname.startsWith("/creator/") &&
+      request.method === "GET"
+    ) {
+      const username =
+        decodeURIComponent(
+          url.pathname.slice(
+            "/creator/".length
+          )
+        ).trim();
+
+
+      if (
+        username &&
+        /^[A-Za-z0-9_-]+$/.test(
+          username
+        )
+      ) {
+        const pageUrl =
+          new URL(
+            "/creator",
             request.url
           );
 
@@ -239,7 +311,8 @@ export default {
       url.pathname === "/api/mods" ||
       url.pathname === "/api/my-mods" ||
       url.pathname === "/api/mods/upload" ||
-      url.pathname.startsWith("/api/mod/")
+      url.pathname.startsWith("/api/mod/") ||
+      url.pathname.startsWith("/api/creator/")
     ) {
       return jsonResponse(
         {
@@ -533,6 +606,157 @@ async function handlePublicMod(
 
 
 /* =========================================================
+   PUBLIC CREATOR
+   ========================================================= */
+
+async function handlePublicCreator(
+  env,
+  username
+) {
+  try {
+
+    if (
+      !username ||
+      username.length > 24 ||
+      !/^[A-Za-z0-9_-]+$/.test(
+        username
+      )
+    ) {
+
+      return jsonResponse(
+        {
+          success: false,
+
+          message:
+            "Invalid creator."
+        },
+        400
+      );
+    }
+
+
+    const creator =
+      await env.DB
+        .prepare(`
+          SELECT
+            id,
+            username,
+            role,
+            created_at
+
+          FROM users
+
+          WHERE LOWER(username) =
+                LOWER(?)
+
+          LIMIT 1
+        `)
+        .bind(
+          username
+        )
+        .first();
+
+
+    if (!creator) {
+
+      return jsonResponse(
+        {
+          success: false,
+
+          message:
+            "Creator not found."
+        },
+        404
+      );
+    }
+
+
+    const modsResult =
+      await env.DB
+        .prepare(`
+          SELECT
+            mods.id,
+            mods.name,
+            mods.slug,
+            mods.version,
+            mods.category,
+            mods.short_description,
+            mods.full_description,
+            mods.icon_url,
+            mods.download_url,
+            mods.changelog,
+            mods.created_at,
+            mods.updated_at
+
+          FROM mods
+
+          WHERE mods.owner_user_id = ?
+            AND mods.is_published = 1
+
+          ORDER BY
+            datetime(mods.updated_at) DESC,
+            mods.id DESC
+        `)
+        .bind(
+          creator.id
+        )
+        .all();
+
+
+    const mods =
+      modsResult.results ||
+      [];
+
+
+    return jsonResponse({
+      success: true,
+
+      creator: {
+        id:
+          creator.id,
+
+        username:
+          creator.username,
+
+        role:
+          creator.role,
+
+        created_at:
+          creator.created_at,
+
+        mod_count:
+          mods.length
+      },
+
+      mods:
+        mods
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Creator page error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success: false,
+
+        message:
+          "Unable to load creator.",
+
+        error:
+          error.message
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
    CURRENT USER'S MODS
    ========================================================= */
 
@@ -618,7 +842,8 @@ async function handleMyMods(
       },
 
       mods:
-        result.results || []
+        result.results ||
+        []
     });
 
   } catch (error) {
@@ -1336,19 +1561,25 @@ async function handleModUpload(
 
     const name =
       String(
-        form.get("name") ?? ""
+        form.get(
+          "name"
+        ) ?? ""
       ).trim();
 
 
     const version =
       String(
-        form.get("version") ?? ""
+        form.get(
+          "version"
+        ) ?? ""
       ).trim();
 
 
     const category =
       String(
-        form.get("category") ?? ""
+        form.get(
+          "category"
+        ) ?? ""
       ).trim();
 
 
@@ -2512,7 +2743,9 @@ function createSlug(
   value
 ) {
 
-  return String(value)
+  return String(
+    value
+  )
     .toLowerCase()
     .trim()
     .replace(
@@ -2534,7 +2767,9 @@ function sanitizeFilename(
   filename
 ) {
 
-  return String(filename)
+  return String(
+    filename
+  )
     .replace(
       /[^A-Za-z0-9._-]/g,
       "_"
