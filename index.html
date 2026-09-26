@@ -3,7 +3,10 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
   <title>YMIR Mods</title>
 
@@ -30,7 +33,8 @@
       --line: rgba(255, 192, 76, 0.15);
 
       --shadow:
-        0 20px 60px rgba(0, 0, 0, 0.45);
+        0 20px 60px
+        rgba(0, 0, 0, 0.45);
 
       --max: 1220px;
     }
@@ -64,19 +68,19 @@
       background:
         radial-gradient(
           circle at 15% 20%,
-          rgba(255,180,60,0.10),
+          rgba(255, 180, 60, 0.10),
           transparent 23%
         ),
 
         radial-gradient(
           circle at 82% 18%,
-          rgba(255,120,0,0.09),
+          rgba(255, 120, 0, 0.09),
           transparent 20%
         ),
 
         radial-gradient(
           circle at 78% 72%,
-          rgba(255,196,80,0.07),
+          rgba(255, 196, 80, 0.07),
           transparent 19%
         ),
 
@@ -103,13 +107,13 @@
       background:
         radial-gradient(
           circle at 50% 0%,
-          rgba(255,189,74,0.08),
+          rgba(255, 189, 74, 0.08),
           transparent 45%
         ),
 
         radial-gradient(
           circle at 10% 60%,
-          rgba(255,110,0,0.05),
+          rgba(255, 110, 0, 0.05),
           transparent 35%
         );
     }
@@ -121,7 +125,8 @@
     }
 
 
-    button {
+    button,
+    input {
       font-family: inherit;
     }
 
@@ -173,7 +178,9 @@
       opacity: var(--min-opacity);
 
       box-shadow:
-        0 0 var(--star-glow) currentColor;
+        0 0
+        var(--star-glow)
+        currentColor;
 
       animation:
         starTwinkle
@@ -197,17 +204,20 @@
       box-shadow:
         0 0 6px currentColor,
         0 0 14px currentColor,
-        0 0 30px rgba(255,166,40,0.35);
+        0 0 30px
+        rgba(255, 166, 40, 0.35);
     }
 
 
     @keyframes starTwinkle {
       from {
-        opacity: var(--min-opacity);
+        opacity:
+          var(--min-opacity);
       }
 
       to {
-        opacity: var(--max-opacity);
+        opacity:
+          var(--max-opacity);
       }
     }
 
@@ -215,7 +225,11 @@
     @keyframes starDrift {
       from {
         transform:
-          translate3d(0,0,0);
+          translate3d(
+            0,
+            0,
+            0
+          );
       }
 
       to {
@@ -243,15 +257,15 @@
         blur(14px);
 
       background:
-        rgba(5,7,10,0.89);
+        rgba(5, 7, 10, 0.89);
 
       border-bottom:
         1px solid
-        rgba(255,195,84,0.13);
+        rgba(255, 195, 84, 0.13);
 
       box-shadow:
         0 8px 30px
-        rgba(0,0,0,0.28);
+        rgba(0, 0, 0, 0.28);
     }
 
 
@@ -288,12 +302,12 @@
       filter:
         drop-shadow(
           0 0 8px
-          rgba(255,174,35,0.45)
+          rgba(255, 174, 35, 0.45)
         )
 
         drop-shadow(
           0 0 18px
-          rgba(255,110,0,0.18)
+          rgba(255, 110, 0, 0.18)
         );
     }
 
@@ -332,7 +346,8 @@
 
       align-items: center;
 
-      justify-content: flex-end;
+      justify-content:
+        flex-end;
 
       gap: 22px;
 
@@ -367,7 +382,7 @@
 
       text-shadow:
         0 0 10px
-        rgba(255,175,45,0.35);
+        rgba(255, 175, 45, 0.35);
     }
 
 
@@ -390,7 +405,7 @@
 
       border:
         1px solid
-        rgba(255,190,80,0.18);
+        rgba(255, 190, 80, 0.18);
 
       font-weight: bold;
 
@@ -415,16 +430,19 @@
       background:
         linear-gradient(
           135deg,
-          rgba(217,119,6,0.95),
-          rgba(242,193,91,0.95)
+          rgba(217, 119, 6, 0.95),
+          rgba(242, 193, 91, 0.95)
         );
     }
 
 
     .btn.primary:hover {
       box-shadow:
-        0 0 18px rgba(255,190,60,0.28),
-        0 0 34px rgba(255,110,0,0.14);
+        0 0 18px
+        rgba(255, 190, 60, 0.28),
+
+        0 0 34px
+        rgba(255, 110, 0, 0.14);
     }
 
 
@@ -432,17 +450,17 @@
       color: var(--gold2);
 
       background:
-        rgba(255,183,77,0.06);
+        rgba(255, 183, 77, 0.06);
     }
 
 
     .btn.secondary:hover {
       border-color:
-        rgba(255,190,65,0.42);
+        rgba(255, 190, 65, 0.42);
 
       box-shadow:
         0 0 16px
-        rgba(255,145,20,0.14);
+        rgba(255, 145, 20, 0.14);
     }
 
 
@@ -457,7 +475,8 @@
 
       align-items: center;
 
-      justify-content: flex-end;
+      justify-content:
+        flex-end;
 
       gap: 8px;
 
@@ -465,7 +484,7 @@
 
       border-left:
         1px solid
-        rgba(255,194,82,0.12);
+        rgba(255, 194, 82, 0.12);
     }
 
 
@@ -522,10 +541,10 @@
 
       border:
         1px solid
-        rgba(255,194,82,0.17);
+        rgba(255, 194, 82, 0.17);
 
       background:
-        rgba(255,183,77,0.055);
+        rgba(255, 183, 77, 0.055);
 
       color: var(--gold2);
 
@@ -539,8 +558,8 @@
       background:
         linear-gradient(
           135deg,
-          rgba(217,119,6,0.95),
-          rgba(242,193,91,0.95)
+          rgba(217, 119, 6, 0.95),
+          rgba(242, 193, 91, 0.95)
         );
 
       color: #15100a;
@@ -553,10 +572,10 @@
       color: #ffc5b6;
 
       border-color:
-        rgba(255,100,75,0.17);
+        rgba(255, 100, 75, 0.17);
 
       background:
-        rgba(170,50,35,0.08);
+        rgba(170, 50, 35, 0.08);
     }
 
 
@@ -600,12 +619,12 @@
 
       border:
         1px solid
-        rgba(255,195,84,0.18);
+        rgba(255, 195, 84, 0.18);
 
       border-radius: 999px;
 
       background:
-        rgba(255,179,71,0.07);
+        rgba(255, 179, 71, 0.07);
 
       color: var(--gold2);
 
@@ -613,7 +632,7 @@
 
       box-shadow:
         0 0 18px
-        rgba(255,145,20,0.08);
+        rgba(255, 145, 20, 0.08);
     }
 
 
@@ -633,10 +652,10 @@
 
       text-shadow:
         0 0 18px
-        rgba(255,205,110,0.18),
+        rgba(255, 205, 110, 0.18),
 
         0 0 38px
-        rgba(255,125,10,0.10);
+        rgba(255, 125, 10, 0.10);
     }
 
 
@@ -667,7 +686,7 @@
 
       text-shadow:
         0 0 12px
-        rgba(255,190,70,0.12);
+        rgba(255, 190, 70, 0.12);
     }
 
 
@@ -675,7 +694,10 @@
       display: grid;
 
       grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+        repeat(
+          3,
+          minmax(0, 1fr)
+        );
 
       gap: 14px;
     }
@@ -703,17 +725,17 @@
       background:
         linear-gradient(
           180deg,
-          rgba(22,27,34,0.96),
-          rgba(12,16,21,0.96)
+          rgba(22, 27, 34, 0.96),
+          rgba(12, 16, 21, 0.96)
         );
 
       border:
         1px solid
-        rgba(255,194,82,0.10);
+        rgba(255, 194, 82, 0.10);
 
       box-shadow:
         0 15px 38px
-        rgba(0,0,0,0.34);
+        rgba(0, 0, 0, 0.34);
 
       transition:
         transform 0.28s ease,
@@ -726,7 +748,7 @@
     .last-mod-card:focus-visible {
       outline:
         2px solid
-        rgba(255,205,100,0.82);
+        rgba(255, 205, 100, 0.82);
 
       outline-offset: 4px;
     }
@@ -752,14 +774,10 @@
       background:
         radial-gradient(
           circle,
-          rgba(255,180,50,0.16),
-          rgba(255,120,0,0.05) 45%,
+          rgba(255, 180, 50, 0.16),
+          rgba(255, 120, 0, 0.05) 45%,
           transparent 70%
         );
-
-      transition:
-        opacity 0.28s ease,
-        transform 0.28s ease;
     }
 
 
@@ -781,22 +799,16 @@
       background:
         radial-gradient(
           circle at 17% 18%,
-          rgba(255,220,130,0.22),
-          rgba(255,165,45,0.12) 24%,
-          rgba(255,115,0,0.06) 44%,
+          rgba(255, 220, 130, 0.22),
+          rgba(255, 165, 45, 0.12) 24%,
+          rgba(255, 115, 0, 0.06) 44%,
           transparent 64%
         ),
 
         radial-gradient(
           circle at 95% 5%,
-          rgba(255,125,0,0.16),
+          rgba(255, 125, 0, 0.16),
           transparent 48%
-        ),
-
-        linear-gradient(
-          135deg,
-          rgba(255,150,25,0.065),
-          transparent 60%
         );
 
       transition:
@@ -810,50 +822,33 @@
         scale(1.018);
 
       border-color:
-        rgba(255,192,60,0.72);
+        rgba(255, 192, 60, 0.72);
 
       background:
         radial-gradient(
           circle at 15% 15%,
-          rgba(255,160,25,0.14),
+          rgba(255, 160, 25, 0.14),
           transparent 46%
         ),
 
         linear-gradient(
           180deg,
-          rgba(37,28,20,0.98),
-          rgba(16,18,20,0.98)
+          rgba(37, 28, 20, 0.98),
+          rgba(16, 18, 20, 0.98)
         );
 
       box-shadow:
         0 30px 72px
-        rgba(0,0,0,0.56),
-
-        0 0 8px
-        rgba(255,232,150,0.25),
+        rgba(0, 0, 0, 0.56),
 
         0 0 18px
-        rgba(255,198,75,0.30),
+        rgba(255, 198, 75, 0.30),
 
         0 0 36px
-        rgba(255,145,25,0.24),
+        rgba(255, 145, 25, 0.24),
 
         0 0 58px
-        rgba(255,95,0,0.14),
-
-        inset 0 0 22px
-        rgba(255,210,110,0.08),
-
-        inset 0 0 44px
-        rgba(255,135,15,0.055);
-    }
-
-
-    .last-mod-card:hover::before {
-      transform:
-        scale(1.15);
-
-      opacity: 1;
+        rgba(255, 95, 0, 0.14);
     }
 
 
@@ -861,10 +856,6 @@
       opacity: 1;
     }
 
-
-    /* =====================================================
-       MOD NAME NOW AT TOP
-       ===================================================== */
 
     .last-mod-title {
       color: #f2d797;
@@ -879,10 +870,6 @@
       min-height: 30px;
 
       font-weight: bold;
-
-      transition:
-        color 0.25s ease,
-        text-shadow 0.25s ease;
     }
 
 
@@ -891,17 +878,8 @@
       color: #ffe4a1;
 
       text-shadow:
-        0 0 6px
-        rgba(255,235,175,0.75),
-
         0 0 14px
-        rgba(255,195,75,0.55),
-
-        0 0 28px
-        rgba(255,135,15,0.30),
-
-        0 0 42px
-        rgba(255,90,0,0.15);
+        rgba(255, 195, 75, 0.55);
     }
 
 
@@ -910,7 +888,8 @@
 
       align-items: flex-start;
 
-      justify-content: space-between;
+      justify-content:
+        space-between;
 
       gap: 14px;
 
@@ -954,41 +933,11 @@
 
       border:
         1px solid
-        rgba(255,194,82,0.20);
+        rgba(255, 194, 82, 0.20);
 
       box-shadow:
         0 0 16px
-        rgba(255,150,25,0.14);
-
-      transition:
-        transform 0.28s ease,
-        border-color 0.28s ease,
-        box-shadow 0.28s ease,
-        filter 0.28s ease;
-    }
-
-
-    .last-mod-card:hover
-    .last-mod-icon {
-      transform:
-        scale(1.045);
-
-      border-color:
-        rgba(255,210,100,0.66);
-
-      box-shadow:
-        0 0 8px
-        rgba(255,225,145,0.30),
-
-        0 0 20px
-        rgba(255,180,55,0.30),
-
-        0 0 38px
-        rgba(255,110,0,0.18);
-
-      filter:
-        brightness(1.08)
-        saturate(1.08);
+        rgba(255, 150, 25, 0.14);
     }
 
 
@@ -1000,20 +949,6 @@
       line-height: 1;
 
       white-space: nowrap;
-
-      transition:
-        color 0.25s ease,
-        text-shadow 0.25s ease;
-    }
-
-
-    .last-mod-card:hover
-    .mod-version {
-      color: #f4c86e;
-
-      text-shadow:
-        0 0 8px
-        rgba(255,160,30,0.22);
     }
 
 
@@ -1036,10 +971,6 @@
       font-weight: bold;
 
       cursor: pointer;
-
-      transition:
-        color 0.25s ease,
-        text-shadow 0.25s ease;
     }
 
 
@@ -1048,33 +979,7 @@
 
       text-shadow:
         0 0 7px
-        rgba(255,220,120,0.50),
-
-        0 0 17px
-        rgba(255,125,10,0.30);
-    }
-
-
-    .last-mod-card:hover
-    .mod-author-link {
-      color: #ffc04e;
-
-      text-shadow:
-        0 0 8px
-        rgba(255,140,15,0.25);
-    }
-
-
-    .last-mod-card:hover
-    .mod-author-link:hover {
-      color: #ffe093;
-
-      text-shadow:
-        0 0 8px
-        rgba(255,225,145,0.62),
-
-        0 0 20px
-        rgba(255,130,10,0.38);
+        rgba(255, 220, 120, 0.50);
     }
 
 
@@ -1094,26 +999,11 @@
       -webkit-box-orient: vertical;
 
       overflow: hidden;
-
-      transition:
-        color 0.25s ease;
-    }
-
-
-    .last-mod-card:hover
-    .last-mod-description {
-      color: #dbc38c;
     }
 
 
     .last-mod-links {
       margin-top: auto;
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 14px;
     }
 
 
@@ -1127,22 +1017,456 @@
       font-size: 0.86rem;
 
       font-weight: 700;
-
-      transition:
-        color 0.2s ease,
-        text-shadow 0.2s ease;
     }
 
 
-    .last-mod-links a:hover {
-      color: #ffd57b;
+    /* =====================================================
+       MOD CATALOG HEADER
+       ===================================================== */
 
-      text-shadow:
-        0 0 7px
-        rgba(255,220,120,0.45),
+    .catalog-toolbar {
+      display: flex;
 
+      align-items: center;
+
+      justify-content:
+        space-between;
+
+      gap: 24px;
+
+      margin-bottom: 28px;
+
+      padding-bottom: 20px;
+
+      border-bottom:
+        1px solid
+        rgba(255, 194, 82, 0.12);
+    }
+
+
+    .catalog-stats {
+      display: flex;
+
+      align-items: center;
+
+      gap: 28px;
+
+      flex-wrap: wrap;
+    }
+
+
+    .catalog-stat {
+      display: flex;
+
+      align-items: baseline;
+
+      gap: 9px;
+    }
+
+
+    .catalog-stat-name {
+      color: var(--gold2);
+
+      font-size: 1.85rem;
+
+      font-weight: bold;
+    }
+
+
+    .catalog-stat-number {
+      min-width: 36px;
+
+      padding:
+        3px 9px;
+
+      border-radius: 999px;
+
+      color: #17100a;
+
+      text-align: center;
+
+      font-weight: bold;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--orange),
+          var(--gold)
+        );
+
+      box-shadow:
         0 0 16px
-        rgba(255,125,10,0.28);
+        rgba(255, 150, 20, 0.18);
+    }
+
+
+    .catalog-search {
+      position: relative;
+
+      width:
+        min(
+          420px,
+          100%
+        );
+
+      flex-shrink: 0;
+    }
+
+
+    .catalog-search input {
+      width: 100%;
+
+      height: 48px;
+
+      padding:
+        0 48px 0 16px;
+
+      outline: none;
+
+      border-radius: 13px;
+
+      color: var(--text);
+
+      font-size: 0.96rem;
+
+      background:
+        rgba(11, 15, 20, 0.92);
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.15);
+
+      box-shadow:
+        inset 0 0 20px
+        rgba(0, 0, 0, 0.25);
+
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+
+    .catalog-search input::placeholder {
+      color: #7f745b;
+    }
+
+
+    .catalog-search input:focus {
+      border-color:
+        rgba(255, 190, 65, 0.52);
+
+      box-shadow:
+        0 0 18px
+        rgba(255, 135, 10, 0.12),
+
+        inset 0 0 20px
+        rgba(0, 0, 0, 0.22);
+    }
+
+
+    .search-icon {
+      position: absolute;
+
+      top: 50%;
+      right: 16px;
+
+      transform:
+        translateY(-50%);
+
+      color: var(--orange2);
+
+      pointer-events: none;
+
+      font-size: 1.1rem;
+    }
+
+
+    /* =====================================================
+       MOD CATALOG GRID
+       ===================================================== */
+
+    .catalog-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          4,
+          minmax(0, 1fr)
+        );
+
+      gap: 18px;
+    }
+
+
+    .catalog-card {
+      position: relative;
+
+      min-width: 0;
+      min-height: 335px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      overflow: hidden;
+
+      cursor: pointer;
+
+      border-radius: 17px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(22, 27, 34, 0.96),
+          rgba(11, 15, 20, 0.97)
+        );
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.11);
+
+      box-shadow:
+        0 16px 42px
+        rgba(0, 0, 0, 0.36);
+
+      transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+
+    .catalog-card:hover {
+      transform:
+        translateY(-6px);
+
+      border-color:
+        rgba(255, 190, 60, 0.58);
+
+      box-shadow:
+        0 26px 58px
+        rgba(0, 0, 0, 0.52),
+
+        0 0 24px
+        rgba(255, 145, 20, 0.16);
+    }
+
+
+    .catalog-card:focus-visible {
+      outline:
+        2px solid
+        rgba(255, 205, 100, 0.82);
+
+      outline-offset: 4px;
+    }
+
+
+    .catalog-card-image-wrap {
+      height: 155px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      position: relative;
+
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 50% 35%,
+          rgba(255, 164, 35, 0.14),
+          transparent 55%
+        ),
+
+        linear-gradient(
+          180deg,
+          #11161d,
+          #0c1015
+        );
+
+      border-bottom:
+        1px solid
+        rgba(255, 194, 82, 0.10);
+    }
+
+
+    .catalog-card-image-wrap::after {
+      content: "";
+
+      position: absolute;
+
+      inset: 0;
+
+      pointer-events: none;
+
+      box-shadow:
+        inset 0 -24px 35px
+        rgba(0, 0, 0, 0.30);
+    }
+
+
+    .catalog-card-icon {
+      width: 118px;
+      height: 118px;
+
+      object-fit: cover;
+
+      border-radius: 13px;
+
+      background: #080b0f;
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.20);
+
+      box-shadow:
+        0 8px 30px
+        rgba(0, 0, 0, 0.36),
+
+        0 0 18px
+        rgba(255, 150, 20, 0.15);
+
+      transition:
+        transform 0.25s ease;
+    }
+
+
+    .catalog-card:hover
+    .catalog-card-icon {
+      transform:
+        scale(1.045);
+    }
+
+
+    .catalog-card-body {
+      flex: 1;
+
+      display: flex;
+
+      flex-direction: column;
+
+      padding: 17px;
+    }
+
+
+    .catalog-card-title {
+      color: #f2d797;
+
+      font-size: 1.18rem;
+
+      line-height: 1.25;
+
+      margin-bottom: 4px;
+
+      white-space: nowrap;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+    }
+
+
+    .catalog-card-author {
+      color: #8f8264;
+
+      font-size: 0.78rem;
+
+      margin-bottom: 10px;
+    }
+
+
+    .catalog-card-author a {
+      position: relative;
+
+      z-index: 5;
+
+      color: var(--orange2);
+
+      font-weight: bold;
+    }
+
+
+    .catalog-card-author a:hover {
+      color: #ffd579;
+    }
+
+
+    .catalog-card-description {
+      color: #c4ae7d;
+
+      font-size: 0.83rem;
+
+      line-height: 1.48;
+
+      display: -webkit-box;
+
+      -webkit-line-clamp: 3;
+
+      -webkit-box-orient: vertical;
+
+      overflow: hidden;
+
+      margin-bottom: 14px;
+    }
+
+
+    .catalog-card-footer {
+      margin-top: auto;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content:
+        space-between;
+
+      gap: 10px;
+
+      padding-top: 10px;
+
+      border-top:
+        1px solid
+        rgba(255, 194, 82, 0.07);
+    }
+
+
+    .catalog-version {
+      color: #a89974;
+
+      font-size: 0.76rem;
+    }
+
+
+    .catalog-view {
+      color: var(--orange2);
+
+      font-size: 0.82rem;
+
+      font-weight: bold;
+    }
+
+
+    .catalog-empty {
+      grid-column:
+        1 / -1;
+
+      padding: 45px 20px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      border-radius: 17px;
+
+      background:
+        rgba(15, 19, 25, 0.75);
+
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.10);
     }
 
 
@@ -1160,7 +1484,7 @@
       color: var(--muted);
 
       background:
-        rgba(16,20,27,0.82);
+        rgba(16, 20, 27, 0.82);
 
       border:
         1px solid
@@ -1245,16 +1569,16 @@
         linear-gradient(
           90deg,
           transparent,
-          rgba(255,120,10,0.35),
-          rgba(255,205,95,0.95)
+          rgba(255, 120, 10, 0.35),
+          rgba(255, 205, 95, 0.95)
         );
 
       box-shadow:
         0 0 7px
-        rgba(255,157,30,0.45),
+        rgba(255, 157, 30, 0.45),
 
         0 0 18px
-        rgba(255,105,0,0.18);
+        rgba(255, 105, 0, 0.18);
     }
 
 
@@ -1275,163 +1599,31 @@
 
       text-shadow:
         0 0 6px
-        rgba(255,220,135,0.80),
+        rgba(255, 220, 135, 0.80),
 
         0 0 14px
-        rgba(255,164,35,0.55),
+        rgba(255, 164, 35, 0.55),
 
         0 0 28px
-        rgba(255,105,0,0.22);
-
-      animation:
-        runePulse
-        4.5s
-        ease-in-out
-        infinite;
-    }
-
-
-    @keyframes runePulse {
-      0%,
-      100% {
-        opacity: 0.72;
-      }
-
-      50% {
-        opacity: 1;
-      }
+        rgba(255, 105, 0, 0.22);
     }
 
 
     /* =====================================================
-       STANDARD CARDS
-       ===================================================== */
-
-    .cards {
-      display: grid;
-
-      grid-template-columns:
-        repeat(3,1fr);
-
-      gap: 22px;
-    }
-
-
-    .card {
-      padding: 24px;
-
-      border-radius: 18px;
-
-      position: relative;
-
-      overflow: hidden;
-
-      background:
-        linear-gradient(
-          180deg,
-          rgba(22,27,34,0.96),
-          rgba(12,16,21,0.96)
-        );
-
-      border:
-        1px solid
-        rgba(255,194,82,0.10);
-
-      box-shadow:
-        var(--shadow);
-
-      transition:
-        transform 0.28s ease,
-        border-color 0.28s ease,
-        box-shadow 0.28s ease;
-    }
-
-
-    .card:hover {
-      transform:
-        translateY(-8px)
-        scale(1.018);
-
-      border-color:
-        rgba(255,190,55,0.70);
-
-      box-shadow:
-        0 30px 72px
-        rgba(0,0,0,0.55),
-
-        0 0 9px
-        rgba(255,226,140,0.24),
-
-        0 0 20px
-        rgba(255,192,65,0.28),
-
-        0 0 38px
-        rgba(255,140,20,0.22);
-    }
-
-
-    .card .type {
-      display: inline-block;
-
-      margin-bottom: 12px;
-
-      padding: 6px 12px;
-
-      border-radius: 999px;
-
-      color: var(--gold2);
-
-      background:
-        rgba(255,193,74,0.07);
-
-      border:
-        1px solid
-        rgba(255,196,86,0.14);
-
-      font-size: 0.82rem;
-
-      font-weight: bold;
-    }
-
-
-    .card h4 {
-      color: #f2d797;
-
-      font-size: 1.7rem;
-
-      margin-bottom: 10px;
-    }
-
-
-    .card p {
-      color: #cdb786;
-
-      margin-bottom: 20px;
-    }
-
-
-    .card a {
-      color: var(--orange2);
-
-      font-weight: bold;
-    }
-
-
-    /* =====================================================
-       PANELS
+       LOWER PANELS
        ===================================================== */
 
     .panel {
       background:
         linear-gradient(
           180deg,
-          rgba(22,26,32,0.92),
-          rgba(12,15,20,0.92)
+          rgba(22, 26, 32, 0.92),
+          rgba(12, 15, 20, 0.92)
         );
 
       border:
         1px solid
-        rgba(255,192,80,0.12);
+        rgba(255, 192, 80, 0.12);
 
       border-radius: 20px;
 
@@ -1529,14 +1721,15 @@
 
       border-top:
         1px solid
-        rgba(255,194,82,0.10);
+        rgba(255, 194, 82, 0.10);
     }
 
 
     .footer-grid {
       display: flex;
 
-      justify-content: space-between;
+      justify-content:
+        space-between;
 
       gap: 20px;
 
@@ -1562,7 +1755,7 @@
        RESPONSIVE
        ===================================================== */
 
-    @media (max-width: 1040px) {
+    @media (max-width: 1080px) {
 
       .hero-grid {
         grid-template-columns:
@@ -1570,24 +1763,24 @@
       }
 
 
-      .last-updated-grid {
+      .catalog-grid {
         grid-template-columns:
-          repeat(3, minmax(0,1fr));
+          repeat(
+            3,
+            minmax(0, 1fr)
+          );
       }
 
 
       .nav {
-        flex-wrap:
-          wrap;
+        flex-wrap: wrap;
       }
 
 
       .header-right {
-        width:
-          100%;
+        width: 100%;
 
-        margin-left:
-          0;
+        margin-left: 0;
 
         justify-content:
           space-between;
@@ -1599,13 +1792,31 @@
 
       .last-updated-grid {
         grid-template-columns:
-          repeat(2, minmax(0,1fr));
+          repeat(
+            2,
+            minmax(0, 1fr)
+          );
       }
 
 
-      .cards {
+      .catalog-grid {
         grid-template-columns:
-          1fr;
+          repeat(
+            2,
+            minmax(0, 1fr)
+          );
+      }
+
+
+      .catalog-toolbar {
+        align-items: stretch;
+
+        flex-direction: column;
+      }
+
+
+      .catalog-search {
+        width: 100%;
       }
 
 
@@ -1616,20 +1827,12 @@
 
 
       .nav-links {
-        display:
-          none;
-      }
-
-
-      .header-actions {
-        order:
-          3;
+        display: none;
       }
 
 
       .footer-grid {
-        flex-direction:
-          column;
+        flex-direction: column;
       }
     }
 
@@ -1646,41 +1849,34 @@
 
 
       .hero {
-        padding-top:
-          50px;
+        padding-top: 50px;
       }
 
 
       .hero h2 {
-        font-size:
-          3rem;
+        font-size: 3rem;
       }
 
 
       .header-brand {
-        width:
-          100%;
+        width: 100%;
       }
 
 
       .header-actions {
-        width:
-          100%;
+        width: 100%;
       }
 
 
       .header-actions .btn {
-        flex:
-          1;
+        flex: 1;
       }
 
 
       .account-area {
-        border-left:
-          0;
+        border-left: 0;
 
-        padding-left:
-          0;
+        padding-left: 0;
       }
 
 
@@ -1690,12 +1886,20 @@
       }
 
 
-      .last-mod-icon {
-        width:
-          92px;
+      .catalog-grid {
+        grid-template-columns:
+          1fr;
+      }
 
-        height:
-          92px;
+
+      .catalog-stat-name {
+        font-size: 1.45rem;
+      }
+
+
+      .last-mod-icon {
+        width: 92px;
+        height: 92px;
       }
 
 
@@ -1732,7 +1936,7 @@
 
         <img
           class="header-logo"
-          src="ymirmodwebsiteicon.png"
+          src="/ymirmodwebsiteicon.png"
           alt="YMIR Mods"
         />
 
@@ -1782,10 +1986,6 @@
 
           <a href="#features">
             Features
-          </a>
-
-          <a href="#updates">
-            Updates
           </a>
 
           <a href="#community">
@@ -1937,172 +2137,82 @@
     </div>
 
 
-    <!-- FEATURED MODS -->
+    <!-- ALL MODS -->
 
     <section id="mods">
 
       <div class="container">
 
 
-        <div class="section-heading">
+        <div class="catalog-toolbar">
 
-          <h3>
-            Featured Mods
-          </h3>
 
-          <p>
-            A few of the core YMIR projects.
-            Discover mods, updates,
-            downloads and more.
-          </p>
+          <div class="catalog-stats">
+
+
+            <div class="catalog-stat">
+
+              <span class="catalog-stat-name">
+                Mods
+              </span>
+
+              <span
+                id="modCount"
+                class="catalog-stat-number"
+              >
+                0
+              </span>
+
+            </div>
+
+
+            <div class="catalog-stat">
+
+              <span class="catalog-stat-name">
+                Mod Packs
+              </span>
+
+              <span
+                id="modPackCount"
+                class="catalog-stat-number"
+              >
+                0
+              </span>
+
+            </div>
+
+
+          </div>
+
+
+          <div class="catalog-search">
+
+            <input
+              id="modSearch"
+              type="search"
+              placeholder="Search mods..."
+              autocomplete="off"
+              aria-label="Search mods"
+            />
+
+            <span class="search-icon">
+              ⌕
+            </span>
+
+          </div>
+
 
         </div>
 
 
-        <div class="cards">
+        <div
+          id="allModsGrid"
+          class="catalog-grid"
+        >
 
-
-          <article class="card">
-
-            <span class="type">
-              Hub / Quests
-            </span>
-
-            <h4>
-              BeastMarketOutpost
-            </h4>
-
-            <p>
-              A living outpost with Toski,
-              Squee, a quest board,
-              companion systems, and a growing
-              community-driven world.
-            </p>
-
-            <a href="#">
-              View Mod →
-            </a>
-
-          </article>
-
-
-          <article class="card">
-
-            <span class="type">
-              Mount System
-            </span>
-
-            <h4>
-              MountRidingSystem
-            </h4>
-
-            <p>
-              Refined riding controls,
-              better mount handling,
-              quality-of-life behavior,
-              and smoother adventure across Valheim.
-            </p>
-
-            <a href="#">
-              View Mod →
-            </a>
-
-          </article>
-
-
-          <article class="card">
-
-            <span class="type">
-              Dragons / Combat
-            </span>
-
-            <h4>
-              DragonWars
-            </h4>
-
-            <p>
-              Take to the skies with powerful dragons,
-              abilities, flight mechanics,
-              and cinematic Norse combat energy.
-            </p>
-
-            <a href="#">
-              View Mod →
-            </a>
-
-          </article>
-
-
-          <article class="card">
-
-            <span class="type">
-              Trading
-            </span>
-
-            <h4>
-              World Market
-            </h4>
-
-            <p>
-              A player-driven economy with listings,
-              NPC interaction, and a marketplace
-              built for server communities.
-            </p>
-
-            <a href="#">
-              View Mod →
-            </a>
-
-          </article>
-
-
-          <article class="card">
-
-            <span class="type">
-              Travel / Utility
-            </span>
-
-            <h4>
-              Valheim Gliders
-            </h4>
-
-            <p>
-              Glide across the world with
-              progression-based wings and equipment
-              designed for freedom,
-              danger, and style.
-            </p>
-
-            <a href="#">
-              View Mod →
-            </a>
-
-          </article>
-
-
-          <article class="card">
-
-            <span class="type">
-              Horror / Atmosphere
-            </span>
-
-            <h4>
-              The Mist
-            </h4>
-
-            <p>
-              Bring a haunting edge to Valheim
-              with fog, nightfeeders,
-              mystical oak progression,
-              and survival tension.
-            </p>
-
-            <a href="#">
-              View Mod →
-            </a>
-
-          </article>
-
+          <div class="catalog-empty">
+            Loading YMIR Mods...
+          </div>
 
         </div>
 
@@ -2218,107 +2328,6 @@
     </section>
 
 
-    <!-- UPDATES -->
-
-    <section id="updates">
-
-      <div class="container">
-
-
-        <div class="section-heading">
-
-          <h3>
-            Latest Updates
-          </h3>
-
-          <p>
-            YMIR development news,
-            patch notes, and announcements.
-          </p>
-
-        </div>
-
-
-        <div class="cards">
-
-
-          <article class="card">
-
-            <span class="type">
-              Patch Notes
-            </span>
-
-            <h4>
-              DragonWars Update
-            </h4>
-
-            <p>
-              New combat tuning,
-              improved dragon handling,
-              and better flight behaviour.
-            </p>
-
-            <a href="#">
-              Read Update →
-            </a>
-
-          </article>
-
-
-          <article class="card">
-
-            <span class="type">
-              Community
-            </span>
-
-            <h4>
-              Server Event News
-            </h4>
-
-            <p>
-              Event schedules,
-              server happenings,
-              and community announcements.
-            </p>
-
-            <a href="#">
-              Read Update →
-            </a>
-
-          </article>
-
-
-          <article class="card">
-
-            <span class="type">
-              Development
-            </span>
-
-            <h4>
-              Mod Progress Log
-            </h4>
-
-            <p>
-              New features,
-              fixes, roadmap ideas,
-              and upcoming releases.
-            </p>
-
-            <a href="#">
-              Read Update →
-            </a>
-
-          </article>
-
-
-        </div>
-
-
-      </div>
-
-    </section>
-
-
     <div
       class="runic-divider"
       aria-hidden="true"
@@ -2402,10 +2411,6 @@
 
         <a href="#features">
           Features
-        </a>
-
-        <a href="#updates">
-          Updates
         </a>
 
         <a href="#community">
@@ -2582,7 +2587,7 @@
 
 
     /* =====================================================
-       LAST UPDATED MODS
+       MOD DATA
        ===================================================== */
 
     const lastUpdatedMods =
@@ -2591,7 +2596,72 @@
       );
 
 
-    async function loadLatestMods() {
+    const allModsGrid =
+      document.getElementById(
+        "allModsGrid"
+      );
+
+
+    const modCount =
+      document.getElementById(
+        "modCount"
+      );
+
+
+    const modPackCount =
+      document.getElementById(
+        "modPackCount"
+      );
+
+
+    const modSearch =
+      document.getElementById(
+        "modSearch"
+      );
+
+
+    let allPublishedMods =
+      [];
+
+
+    /* =====================================================
+       IS MOD PACK
+       ===================================================== */
+
+    function isModPack(
+      mod
+    ) {
+
+      const category =
+        String(
+          mod.category ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      return (
+        category ===
+          "mod pack" ||
+
+        category ===
+          "mod packs" ||
+
+        category ===
+          "modpack" ||
+
+        category ===
+          "modpacks"
+      );
+    }
+
+
+    /* =====================================================
+       LOAD MODS
+       ===================================================== */
+
+    async function loadMods() {
 
       try {
 
@@ -2624,7 +2694,7 @@
         }
 
 
-        const mods =
+        allPublishedMods =
           Array.isArray(
             result.mods
           )
@@ -2632,49 +2702,21 @@
             : [];
 
 
-        if (
-          mods.length === 0
-        ) {
-
-          lastUpdatedMods.innerHTML =
-            `
-              <div class="mods-empty">
-                No published mods yet.
-              </div>
-            `;
+        renderLatestMods();
 
 
-          return;
-        }
+        updateCatalogCounts();
 
 
-        lastUpdatedMods.innerHTML =
-          "";
-
-
-        const latest =
-          mods.slice(
-            0,
-            6
-          );
-
-
-        for (
-          const mod of latest
-        ) {
-
-          lastUpdatedMods.appendChild(
-            buildModCard(
-              mod
-            )
-          );
-        }
+        renderCatalog(
+          allPublishedMods
+        );
 
 
       } catch (error) {
 
         console.error(
-          "Latest mods error:",
+          "Mods error:",
           error
         );
 
@@ -2685,15 +2727,99 @@
               YMIR could not load the latest mods.
             </div>
           `;
+
+
+        allModsGrid.innerHTML =
+          `
+            <div class="catalog-empty">
+              YMIR could not load the mod database.
+            </div>
+          `;
       }
     }
 
 
     /* =====================================================
-       BUILD MOD CARD
+       COUNTS
        ===================================================== */
 
-    function buildModCard(
+    function updateCatalogCounts() {
+
+      const packs =
+        allPublishedMods.filter(
+          isModPack
+        );
+
+
+      const normalMods =
+        allPublishedMods.filter(
+          mod =>
+            !isModPack(
+              mod
+            )
+        );
+
+
+      modCount.textContent =
+        normalMods.length;
+
+
+      modPackCount.textContent =
+        packs.length;
+    }
+
+
+    /* =====================================================
+       LATEST MODS
+       ===================================================== */
+
+    function renderLatestMods() {
+
+      if (
+        allPublishedMods.length === 0
+      ) {
+
+        lastUpdatedMods.innerHTML =
+          `
+            <div class="mods-empty">
+              No published mods yet.
+            </div>
+          `;
+
+
+        return;
+      }
+
+
+      lastUpdatedMods.innerHTML =
+        "";
+
+
+      const latest =
+        allPublishedMods.slice(
+          0,
+          6
+        );
+
+
+      for (
+        const mod of latest
+      ) {
+
+        lastUpdatedMods.appendChild(
+          buildLatestModCard(
+            mod
+          )
+        );
+      }
+    }
+
+
+    /* =====================================================
+       BUILD LATEST MOD CARD
+       ===================================================== */
+
+    function buildLatestModCard(
       mod
     ) {
 
@@ -2707,8 +2833,6 @@
         "last-mod-card";
 
 
-      /* MOD URL */
-
       const modUrl =
         mod.slug
           ? "/mod/" +
@@ -2718,92 +2842,17 @@
           : null;
 
 
-      /* =====================================================
-         WHOLE CARD CLICK
-         ===================================================== */
-
       if (
         modUrl
       ) {
 
-        card.setAttribute(
-          "role",
-          "link"
-        );
-
-
-        card.setAttribute(
-          "tabindex",
-          "0"
-        );
-
-
-        card.setAttribute(
-          "aria-label",
-          "View " +
-          (
-            mod.name ||
-            "mod"
-          )
-        );
-
-
-        card.addEventListener(
-          "click",
-          event => {
-
-            if (
-              event.target.closest(
-                "a, button"
-              )
-            ) {
-
-              return;
-            }
-
-
-            window.location.href =
-              modUrl;
-          }
-        );
-
-
-        card.addEventListener(
-          "keydown",
-          event => {
-
-            if (
-              event.key !== "Enter" &&
-              event.key !== " "
-            ) {
-
-              return;
-            }
-
-
-            if (
-              event.target.closest(
-                "a, button"
-              )
-            ) {
-
-              return;
-            }
-
-
-            event.preventDefault();
-
-
-            window.location.href =
-              modUrl;
-          }
+        makeCardClickable(
+          card,
+          modUrl,
+          mod.name
         );
       }
 
-
-      /* =====================================================
-         MOD NAME AT TOP
-         ===================================================== */
 
       const title =
         document.createElement(
@@ -2819,10 +2868,6 @@
         mod.name ||
         "Unnamed Mod";
 
-
-      /* =====================================================
-         HEADING AREA
-         ===================================================== */
 
       const heading =
         document.createElement(
@@ -2844,10 +2889,6 @@
         "last-mod-name-area";
 
 
-      /* =====================================================
-         AUTHOR
-         ===================================================== */
-
       const author =
         document.createElement(
           "div"
@@ -2864,53 +2905,9 @@
 
 
       const authorName =
-        document.createElement(
-          "a"
+        createCreatorLink(
+          mod
         );
-
-
-      authorName.className =
-        "mod-author-link";
-
-
-      authorName.textContent =
-        mod.author ||
-        "Unknown Creator";
-
-
-      if (
-        mod.author
-      ) {
-
-        authorName.href =
-          "/creator/" +
-          encodeURIComponent(
-            mod.author
-          );
-
-      } else {
-
-        authorName.href =
-          "#";
-      }
-
-
-      authorName.addEventListener(
-        "click",
-        event => {
-
-          event.stopPropagation();
-        }
-      );
-
-
-      authorName.addEventListener(
-        "keydown",
-        event => {
-
-          event.stopPropagation();
-        }
-      );
 
 
       author.appendChild(
@@ -2922,10 +2919,6 @@
         author
       );
 
-
-      /* =====================================================
-         ICON
-         ===================================================== */
 
       const iconArea =
         document.createElement(
@@ -2948,10 +2941,11 @@
 
 
       icon.alt =
-        mod.name
-          ? mod.name +
-            " icon"
-          : "YMIR Mod icon";
+        (
+          mod.name ||
+          "YMIR Mod"
+        ) +
+        " icon";
 
 
       icon.loading =
@@ -2960,7 +2954,7 @@
 
       icon.src =
         mod.icon_url ||
-        "ymirmodwebsiteicon.png";
+        "/ymirmodwebsiteicon.png";
 
 
       icon.onerror =
@@ -2971,11 +2965,9 @@
 
 
           icon.src =
-            "ymirmodwebsiteicon.png";
+            "/ymirmodwebsiteicon.png";
         };
 
-
-      /* VERSION */
 
       const version =
         document.createElement(
@@ -3014,10 +3006,6 @@
       );
 
 
-      /* =====================================================
-         DESCRIPTION
-         ===================================================== */
-
       const description =
         document.createElement(
           "p"
@@ -3032,10 +3020,6 @@
         mod.short_description ||
         "No description available.";
 
-
-      /* =====================================================
-         VIEW MOD
-         ===================================================== */
 
       const links =
         document.createElement(
@@ -3067,12 +3051,6 @@
       );
 
 
-      /* =====================================================
-         BUILD CARD
-
-         Notice there is NO category anymore.
-         ===================================================== */
-
       card.appendChild(
         title
       );
@@ -3097,7 +3075,498 @@
     }
 
 
-    loadLatestMods();
+    /* =====================================================
+       CATALOG
+       ===================================================== */
+
+    function renderCatalog(
+      mods
+    ) {
+
+      allModsGrid.innerHTML =
+        "";
+
+
+      if (
+        mods.length === 0
+      ) {
+
+        allModsGrid.innerHTML =
+          `
+            <div class="catalog-empty">
+              No mods matched your search.
+            </div>
+          `;
+
+
+        return;
+      }
+
+
+      for (
+        const mod of mods
+      ) {
+
+        allModsGrid.appendChild(
+          buildCatalogCard(
+            mod
+          )
+        );
+      }
+    }
+
+
+    /* =====================================================
+       BUILD CATALOG CARD
+       ===================================================== */
+
+    function buildCatalogCard(
+      mod
+    ) {
+
+      const card =
+        document.createElement(
+          "article"
+        );
+
+
+      card.className =
+        "catalog-card";
+
+
+      const modUrl =
+        mod.slug
+          ? "/mod/" +
+            encodeURIComponent(
+              mod.slug
+            )
+          : null;
+
+
+      if (
+        modUrl
+      ) {
+
+        makeCardClickable(
+          card,
+          modUrl,
+          mod.name
+        );
+      }
+
+
+      const imageWrap =
+        document.createElement(
+          "div"
+        );
+
+
+      imageWrap.className =
+        "catalog-card-image-wrap";
+
+
+      const icon =
+        document.createElement(
+          "img"
+        );
+
+
+      icon.className =
+        "catalog-card-icon";
+
+
+      icon.loading =
+        "lazy";
+
+
+      icon.alt =
+        (
+          mod.name ||
+          "YMIR Mod"
+        ) +
+        " icon";
+
+
+      icon.src =
+        mod.icon_url ||
+        "/ymirmodwebsiteicon.png";
+
+
+      icon.onerror =
+        () => {
+
+          icon.onerror =
+            null;
+
+
+          icon.src =
+            "/ymirmodwebsiteicon.png";
+        };
+
+
+      imageWrap.appendChild(
+        icon
+      );
+
+
+      const body =
+        document.createElement(
+          "div"
+        );
+
+
+      body.className =
+        "catalog-card-body";
+
+
+      const title =
+        document.createElement(
+          "h4"
+        );
+
+
+      title.className =
+        "catalog-card-title";
+
+
+      title.textContent =
+        mod.name ||
+        "Unnamed Mod";
+
+
+      const author =
+        document.createElement(
+          "div"
+        );
+
+
+      author.className =
+        "catalog-card-author";
+
+
+      author.append(
+        "by "
+      );
+
+
+      author.appendChild(
+        createCreatorLink(
+          mod
+        )
+      );
+
+
+      const description =
+        document.createElement(
+          "p"
+        );
+
+
+      description.className =
+        "catalog-card-description";
+
+
+      description.textContent =
+        mod.short_description ||
+        "No description available.";
+
+
+      const footer =
+        document.createElement(
+          "div"
+        );
+
+
+      footer.className =
+        "catalog-card-footer";
+
+
+      const version =
+        document.createElement(
+          "span"
+        );
+
+
+      version.className =
+        "catalog-version";
+
+
+      version.textContent =
+        mod.version
+          ? "v" +
+            mod.version
+          : "";
+
+
+      const view =
+        document.createElement(
+          "span"
+        );
+
+
+      view.className =
+        "catalog-view";
+
+
+      view.textContent =
+        "View Mod →";
+
+
+      footer.appendChild(
+        version
+      );
+
+
+      footer.appendChild(
+        view
+      );
+
+
+      body.appendChild(
+        title
+      );
+
+
+      body.appendChild(
+        author
+      );
+
+
+      body.appendChild(
+        description
+      );
+
+
+      body.appendChild(
+        footer
+      );
+
+
+      card.appendChild(
+        imageWrap
+      );
+
+
+      card.appendChild(
+        body
+      );
+
+
+      return card;
+    }
+
+
+    /* =====================================================
+       CREATOR LINK
+       ===================================================== */
+
+    function createCreatorLink(
+      mod
+    ) {
+
+      const link =
+        document.createElement(
+          "a"
+        );
+
+
+      link.className =
+        "mod-author-link";
+
+
+      link.textContent =
+        mod.author ||
+        "Unknown Creator";
+
+
+      if (
+        mod.author
+      ) {
+
+        link.href =
+          "/creator/" +
+          encodeURIComponent(
+            mod.author
+          );
+
+      } else {
+
+        link.href =
+          "#";
+      }
+
+
+      link.addEventListener(
+        "click",
+        event => {
+
+          event.stopPropagation();
+        }
+      );
+
+
+      link.addEventListener(
+        "keydown",
+        event => {
+
+          event.stopPropagation();
+        }
+      );
+
+
+      return link;
+    }
+
+
+    /* =====================================================
+       CARD CLICK
+       ===================================================== */
+
+    function makeCardClickable(
+      card,
+      url,
+      name
+    ) {
+
+      card.setAttribute(
+        "role",
+        "link"
+      );
+
+
+      card.setAttribute(
+        "tabindex",
+        "0"
+      );
+
+
+      card.setAttribute(
+        "aria-label",
+        "View " +
+        (
+          name ||
+          "mod"
+        )
+      );
+
+
+      card.addEventListener(
+        "click",
+        event => {
+
+          if (
+            event.target.closest(
+              "a, button, input"
+            )
+          ) {
+
+            return;
+          }
+
+
+          window.location.href =
+            url;
+        }
+      );
+
+
+      card.addEventListener(
+        "keydown",
+        event => {
+
+          if (
+            event.key !== "Enter" &&
+            event.key !== " "
+          ) {
+
+            return;
+          }
+
+
+          if (
+            event.target.closest(
+              "a, button, input"
+            )
+          ) {
+
+            return;
+          }
+
+
+          event.preventDefault();
+
+
+          window.location.href =
+            url;
+        }
+      );
+    }
+
+
+    /* =====================================================
+       SEARCH
+       ===================================================== */
+
+    modSearch.addEventListener(
+      "input",
+      () => {
+
+        const query =
+          modSearch.value
+            .trim()
+            .toLowerCase();
+
+
+        if (
+          !query
+        ) {
+
+          renderCatalog(
+            allPublishedMods
+          );
+
+
+          return;
+        }
+
+
+        const filtered =
+          allPublishedMods.filter(
+            mod => {
+
+              const searchable =
+                [
+                  mod.name,
+                  mod.author,
+                  mod.category,
+                  mod.short_description,
+                  mod.full_description,
+                  mod.version
+                ]
+                  .filter(
+                    Boolean
+                  )
+                  .join(
+                    " "
+                  )
+                  .toLowerCase();
+
+
+              return searchable.includes(
+                query
+              );
+            }
+          );
+
+
+        renderCatalog(
+          filtered
+        );
+      }
+    );
+
+
+    loadMods();
 
 
     /* =====================================================
