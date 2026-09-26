@@ -1045,7 +1045,7 @@ async function handleRegister(
             ?,
             ?,
             'member',
-            0
+            1
           )
         `)
         .bind(
@@ -1076,7 +1076,7 @@ async function handleRegister(
             "member",
 
           can_upload:
-            false
+            true
         }
       },
       201
