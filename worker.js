@@ -121,7 +121,7 @@ export default {
        SINGLE PUBLIC MOD API
 
        Example:
-       /api/mod/themist
+       /api/mod/toolofthetrade
        ===================================================== */
 
     if (
@@ -164,9 +164,10 @@ export default {
        CLEAN MOD PAGE URL
 
        Example:
-       /mod/themist
+       /mod/toolofthetrade
 
-       This will serve mod.html later.
+       Keep the clean browser URL while internally
+       serving the static mod.html page through /mod.
        ===================================================== */
 
     if (
@@ -178,16 +179,18 @@ export default {
           url.pathname.slice(
             "/mod/".length
           )
-        ).trim();
+        )
+          .trim()
+          .toLowerCase();
 
 
       if (
         slug &&
-        !slug.includes("/")
+        /^[a-z0-9-]+$/.test(slug)
       ) {
         const pageUrl =
           new URL(
-            "/mod.html",
+            "/mod",
             request.url
           );
 
@@ -195,7 +198,10 @@ export default {
         const pageRequest =
           new Request(
             pageUrl.toString(),
-            request
+            {
+              method: "GET",
+              headers: request.headers
+            }
           );
 
 
@@ -262,6 +268,7 @@ export default {
 
 async function handleTest(env) {
   try {
+
     const userResult =
       await env.DB
         .prepare(
@@ -450,6 +457,7 @@ async function handlePublicMod(
 
 
     if (!mod) {
+
       return jsonResponse(
         {
           success: false,
@@ -542,6 +550,7 @@ async function handleMyMods(
 
 
     if (!user) {
+
       return jsonResponse(
         {
           success: false,
@@ -650,6 +659,7 @@ async function handleRegister(
 
 
     try {
+
       body =
         await request.json();
 
@@ -691,6 +701,7 @@ async function handleRegister(
       username.length < 3 ||
       username.length > 24
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -708,6 +719,7 @@ async function handleRegister(
         username
       )
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -723,6 +735,7 @@ async function handleRegister(
     if (
       !isValidEmail(email)
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -739,6 +752,7 @@ async function handleRegister(
       password.length < 10 ||
       password.length > 128
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -771,6 +785,7 @@ async function handleRegister(
 
 
     if (existingUser) {
+
       return jsonResponse(
         {
           success: false,
@@ -877,6 +892,7 @@ async function handleLogin(
 
 
     try {
+
       body =
         await request.json();
 
@@ -910,6 +926,7 @@ async function handleLogin(
       !identifier ||
       !password
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -948,6 +965,7 @@ async function handleLogin(
 
 
     if (!user) {
+
       return jsonResponse(
         {
           success: false,
@@ -968,6 +986,7 @@ async function handleLogin(
 
 
     if (!validPassword) {
+
       return jsonResponse(
         {
           success: false,
@@ -1105,6 +1124,7 @@ async function handleCurrentUser(
 
 
     if (!user) {
+
       return jsonResponse({
         success: true,
 
@@ -1265,6 +1285,7 @@ async function handleModUpload(
 
 
     if (!user) {
+
       return jsonResponse(
         {
           success: false,
@@ -1282,6 +1303,7 @@ async function handleModUpload(
         user.can_upload
       )
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1295,6 +1317,7 @@ async function handleModUpload(
 
 
     if (!env.MOD_FILES) {
+
       return jsonResponse(
         {
           success: false,
@@ -1373,6 +1396,7 @@ async function handleModUpload(
       name.length < 2 ||
       name.length > 80
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1389,6 +1413,7 @@ async function handleModUpload(
       version.length < 1 ||
       version.length > 32
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1405,6 +1430,7 @@ async function handleModUpload(
       category.length < 2 ||
       category.length > 60
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1421,6 +1447,7 @@ async function handleModUpload(
       shortDescription.length < 10 ||
       shortDescription.length > 250
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1437,6 +1464,7 @@ async function handleModUpload(
       fullDescription.length >
       10000
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1453,6 +1481,7 @@ async function handleModUpload(
       changelog.length >
       10000
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1473,6 +1502,7 @@ async function handleModUpload(
       !(modFile instanceof File) ||
       modFile.size === 0
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1489,6 +1519,7 @@ async function handleModUpload(
       modFile.size >
       MAX_MOD_FILE_SIZE
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1506,6 +1537,7 @@ async function handleModUpload(
         .toLowerCase()
         .endsWith(".zip")
     ) {
+
       return jsonResponse(
         {
           success: false,
@@ -1531,6 +1563,7 @@ async function handleModUpload(
         iconFile.size >
         MAX_ICON_FILE_SIZE
       ) {
+
         return jsonResponse(
           {
             success: false,
@@ -1556,6 +1589,7 @@ async function handleModUpload(
           iconFile.type
         )
       ) {
+
         return jsonResponse(
           {
             success: false,
@@ -1580,6 +1614,7 @@ async function handleModUpload(
 
 
     if (!slug) {
+
       return jsonResponse(
         {
           success: false,
@@ -1787,6 +1822,7 @@ async function handleModUpload(
 
 
     if (!modId) {
+
       throw new Error(
         "Unable to determine new mod ID."
       );
@@ -1900,6 +1936,7 @@ async function handleModUpload(
         packageKey &&
         env.MOD_FILES
       ) {
+
         await env.MOD_FILES
           .delete(
             packageKey
@@ -1911,6 +1948,7 @@ async function handleModUpload(
         iconKey &&
         env.MOD_FILES
       ) {
+
         await env.MOD_FILES
           .delete(
             iconKey
@@ -1953,6 +1991,7 @@ async function handleStoredFile(
   try {
 
     if (!env.MOD_FILES) {
+
       return new Response(
         "Storage unavailable.",
         {
@@ -1978,6 +2017,7 @@ async function handleStoredFile(
       !key ||
       key.includes("..")
     ) {
+
       return new Response(
         "Invalid file.",
         {
@@ -1994,6 +2034,7 @@ async function handleStoredFile(
 
 
     if (!object) {
+
       return new Response(
         "File not found.",
         {
@@ -2066,6 +2107,7 @@ async function getAuthenticatedUser(
 
 
   if (!sessionToken) {
+
     return null;
   }
 
@@ -2213,6 +2255,7 @@ async function verifyPassword(
     if (
       parts.length !== 4
     ) {
+
       return false;
     }
 
@@ -2248,6 +2291,7 @@ async function verifyPassword(
       iterations < 1 ||
       iterations > 100000
     ) {
+
       return false;
     }
 
@@ -2404,6 +2448,7 @@ function getCookie(
 
 
   if (!cookieHeader) {
+
     return null;
   }
 
@@ -2423,6 +2468,7 @@ function getCookie(
     if (
       separatorIndex === -1
     ) {
+
       continue;
     }
 
@@ -2448,6 +2494,7 @@ function getCookie(
       cookieName ===
       name
     ) {
+
       return cookieValue;
     }
   }
@@ -2510,6 +2557,7 @@ function getImageExtension(
     mime ===
     "image/jpeg"
   ) {
+
     return "jpg";
   }
 
@@ -2518,6 +2566,7 @@ function getImageExtension(
     mime ===
     "image/webp"
   ) {
+
     return "webp";
   }
 
@@ -2646,6 +2695,7 @@ function constantTimeEqual(
     first.length !==
     second.length
   ) {
+
     return false;
   }
 
