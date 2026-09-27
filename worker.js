@@ -3,6 +3,9 @@ const PBKDF2_ITERATIONS = 100000;
 const SESSION_COOKIE_NAME = "ymir_session";
 const SESSION_LENGTH_SECONDS = 60 * 60 * 24 * 7;
 
+const DISCORD_STATE_COOKIE_NAME = "ymir_discord_state";
+const DISCORD_STATE_LENGTH_SECONDS = 60 * 10;
+
 const MAX_MOD_FILE_SIZE = 100 * 1024 * 1024;
 const MAX_ICON_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -29,7 +32,40 @@ export default {
 
 
     /* =====================================================
-       REGISTER
+       DISCORD LOGIN
+       ===================================================== */
+
+    if (
+      url.pathname === "/api/auth/discord" &&
+      request.method === "GET"
+    ) {
+      return handleDiscordLogin(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       DISCORD CALLBACK
+       ===================================================== */
+
+    if (
+      url.pathname === "/api/auth/discord/callback" &&
+      request.method === "GET"
+    ) {
+      return handleDiscordCallback(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       LEGACY REGISTER
+
+       Kept temporarily as a fallback while Discord login
+       is being tested. We will remove/hide this later.
        ===================================================== */
 
     if (
@@ -44,7 +80,10 @@ export default {
 
 
     /* =====================================================
-       LOGIN
+       LEGACY LOGIN
+
+       Kept temporarily as a fallback while Discord login
+       is being tested.
        ===================================================== */
 
     if (
@@ -118,10 +157,7 @@ export default {
 
 
     /* =====================================================
-       SINGLE PUBLIC MOD API
-
-       Example:
-       /api/mod/toolofthetrade
+       SINGLE PUBLIC MOD
        ===================================================== */
 
     if (
@@ -146,10 +182,7 @@ export default {
 
 
     /* =====================================================
-       PUBLIC CREATOR API
-
-       Example:
-       /api/creator/Yggdrah
+       PUBLIC CREATOR
        ===================================================== */
 
     if (
@@ -187,10 +220,7 @@ export default {
 
 
     /* =====================================================
-       CLEAN MOD PAGE URL
-
-       Example:
-       /mod/toolofthetrade
+       CLEAN MOD PAGE
        ===================================================== */
 
     if (
@@ -236,10 +266,7 @@ export default {
 
 
     /* =====================================================
-       CLEAN CREATOR PAGE URL
-
-       Example:
-       /creator/Yggdrah
+       CLEAN CREATOR PAGE
        ===================================================== */
 
     if (
@@ -285,7 +312,7 @@ export default {
 
 
     /* =====================================================
-       SERVE R2 FILES
+       R2 FILES
        ===================================================== */
 
     if (
@@ -311,6 +338,8 @@ export default {
       url.pathname === "/api/mods" ||
       url.pathname === "/api/my-mods" ||
       url.pathname === "/api/mods/upload" ||
+      url.pathname === "/api/auth/discord" ||
+      url.pathname === "/api/auth/discord/callback" ||
       url.pathname.startsWith("/api/mod/") ||
       url.pathname.startsWith("/api/creator/")
     ) {
@@ -325,7 +354,7 @@ export default {
 
 
     /* =====================================================
-       NORMAL WEBSITE FILES
+       STATIC WEBSITE
        ===================================================== */
 
     return env.ASSETS.fetch(
@@ -341,8 +370,7 @@ export default {
 
 async function handleTest(env) {
   try {
-
-    const userResult =
+    const result =
       await env.DB
         .prepare(
           "SELECT COUNT(*) AS count FROM users"
@@ -352,24 +380,25 @@ async function handleTest(env) {
 
     return jsonResponse({
       success: true,
-
       message:
         "YMIR Mods backend is running",
-
       database:
         "connected",
-
       r2:
         env.MOD_FILES
           ? "connected"
           : "missing",
-
+      discord:
+        env.DISCORD_CLIENT_ID &&
+        env.DISCORD_CLIENT_SECRET &&
+        env.DISCORD_REDIRECT_URI
+          ? "configured"
+          : "missing",
       users:
-        userResult?.count ?? 0
+        result?.count ?? 0
     });
 
   } catch (error) {
-
     console.error(
       "Backend test error:",
       error
@@ -379,7 +408,6 @@ async function handleTest(env) {
     return jsonResponse(
       {
         success: false,
-
         message:
           "Backend or database connection failed."
       },
@@ -390,12 +418,748 @@ async function handleTest(env) {
 
 
 /* =========================================================
+   DISCORD LOGIN
+   ========================================================= */
+
+async function handleDiscordLogin(
+  request,
+  env
+) {
+  try {
+    if (
+      !env.DISCORD_CLIENT_ID ||
+      !env.DISCORD_CLIENT_SECRET ||
+      !env.DISCORD_REDIRECT_URI
+    ) {
+      return new Response(
+        "Discord login is not configured.",
+        {
+          status: 500
+        }
+      );
+    }
+
+
+    const state =
+      generateSessionToken();
+
+
+    const authorizeUrl =
+      new URL(
+        "https://discord.com/oauth2/authorize"
+      );
+
+
+    authorizeUrl.searchParams.set(
+      "client_id",
+      env.DISCORD_CLIENT_ID
+    );
+
+
+    authorizeUrl.searchParams.set(
+      "response_type",
+      "code"
+    );
+
+
+    authorizeUrl.searchParams.set(
+      "redirect_uri",
+      env.DISCORD_REDIRECT_URI
+    );
+
+
+    authorizeUrl.searchParams.set(
+      "scope",
+      "identify email"
+    );
+
+
+    authorizeUrl.searchParams.set(
+      "state",
+      state
+    );
+
+
+    authorizeUrl.searchParams.set(
+      "prompt",
+      "consent"
+    );
+
+
+    const headers =
+      new Headers();
+
+
+    headers.set(
+      "Location",
+      authorizeUrl.toString()
+    );
+
+
+    headers.set(
+      "Cache-Control",
+      "no-store"
+    );
+
+
+    headers.append(
+      "Set-Cookie",
+      createDiscordStateCookie(
+        state
+      )
+    );
+
+
+    return new Response(
+      null,
+      {
+        status: 302,
+        headers
+      }
+    );
+
+  } catch (error) {
+    console.error(
+      "Discord login error:",
+      error
+    );
+
+
+    return new Response(
+      "Unable to start Discord login.",
+      {
+        status: 500
+      }
+    );
+  }
+}
+
+
+/* =========================================================
+   DISCORD CALLBACK
+   ========================================================= */
+
+async function handleDiscordCallback(
+  request,
+  env
+) {
+  try {
+    const url =
+      new URL(
+        request.url
+      );
+
+
+    const discordError =
+      url.searchParams.get(
+        "error"
+      );
+
+
+    if (discordError) {
+      return redirectResponse(
+        "/login?error=discord_cancelled",
+        {
+          "Set-Cookie":
+            clearDiscordStateCookie()
+        }
+      );
+    }
+
+
+    const code =
+      url.searchParams.get(
+        "code"
+      );
+
+
+    const returnedState =
+      url.searchParams.get(
+        "state"
+      );
+
+
+    const storedState =
+      getCookie(
+        request,
+        DISCORD_STATE_COOKIE_NAME
+      );
+
+
+    if (
+      !code ||
+      !returnedState ||
+      !storedState ||
+      returnedState !== storedState
+    ) {
+      return redirectResponse(
+        "/login?error=discord_state",
+        {
+          "Set-Cookie":
+            clearDiscordStateCookie()
+        }
+      );
+    }
+
+
+    /* -----------------------------------------------------
+       EXCHANGE DISCORD CODE
+       ----------------------------------------------------- */
+
+    const tokenBody =
+      new URLSearchParams();
+
+
+    tokenBody.set(
+      "client_id",
+      env.DISCORD_CLIENT_ID
+    );
+
+
+    tokenBody.set(
+      "client_secret",
+      env.DISCORD_CLIENT_SECRET
+    );
+
+
+    tokenBody.set(
+      "grant_type",
+      "authorization_code"
+    );
+
+
+    tokenBody.set(
+      "code",
+      code
+    );
+
+
+    tokenBody.set(
+      "redirect_uri",
+      env.DISCORD_REDIRECT_URI
+    );
+
+
+    const tokenResponse =
+      await fetch(
+        "https://discord.com/api/v10/oauth2/token",
+        {
+          method:
+            "POST",
+
+          headers: {
+            "Content-Type":
+              "application/x-www-form-urlencoded"
+          },
+
+          body:
+            tokenBody
+        }
+      );
+
+
+    if (
+      !tokenResponse.ok
+    ) {
+      console.error(
+        "Discord token exchange failed:",
+        tokenResponse.status,
+        await tokenResponse.text()
+      );
+
+
+      return redirectResponse(
+        "/login?error=discord_token",
+        {
+          "Set-Cookie":
+            clearDiscordStateCookie()
+        }
+      );
+    }
+
+
+    const tokenData =
+      await tokenResponse.json();
+
+
+    const accessToken =
+      tokenData.access_token;
+
+
+    if (!accessToken) {
+      return redirectResponse(
+        "/login?error=discord_token",
+        {
+          "Set-Cookie":
+            clearDiscordStateCookie()
+        }
+      );
+    }
+
+
+    /* -----------------------------------------------------
+       GET DISCORD ACCOUNT
+       ----------------------------------------------------- */
+
+    const discordResponse =
+      await fetch(
+        "https://discord.com/api/v10/users/@me",
+        {
+          headers: {
+            Authorization:
+              `Bearer ${accessToken}`
+          }
+        }
+      );
+
+
+    if (
+      !discordResponse.ok
+    ) {
+      console.error(
+        "Discord user request failed:",
+        discordResponse.status
+      );
+
+
+      return redirectResponse(
+        "/login?error=discord_user",
+        {
+          "Set-Cookie":
+            clearDiscordStateCookie()
+        }
+      );
+    }
+
+
+    const discordUser =
+      await discordResponse.json();
+
+
+    const discordId =
+      String(
+        discordUser.id ?? ""
+      ).trim();
+
+
+    const discordUsername =
+      String(
+        discordUser.username ?? ""
+      ).trim();
+
+
+    const discordEmail =
+      String(
+        discordUser.email ?? ""
+      )
+        .trim()
+        .toLowerCase();
+
+
+    const emailVerified =
+      Boolean(
+        discordUser.verified
+      );
+
+
+    if (!discordId) {
+      return redirectResponse(
+        "/login?error=discord_user",
+        {
+          "Set-Cookie":
+            clearDiscordStateCookie()
+        }
+      );
+    }
+
+
+    /* -----------------------------------------------------
+       FIND ALREADY-LINKED ACCOUNT
+       ----------------------------------------------------- */
+
+    let user =
+      await env.DB
+        .prepare(`
+          SELECT
+            id,
+            username,
+            email,
+            role,
+            can_upload,
+            discord_id
+
+          FROM users
+
+          WHERE discord_id = ?
+
+          LIMIT 1
+        `)
+        .bind(
+          discordId
+        )
+        .first();
+
+
+    /* -----------------------------------------------------
+       LINK EXISTING ACCOUNT BY VERIFIED EMAIL
+
+       This allows an existing YMIR account such as
+       Yggdrah to keep its mods, admin role and profile.
+       ----------------------------------------------------- */
+
+    if (
+      !user &&
+      discordEmail &&
+      emailVerified
+    ) {
+      const emailUser =
+        await env.DB
+          .prepare(`
+            SELECT
+              id,
+              username,
+              email,
+              role,
+              can_upload,
+              discord_id
+
+            FROM users
+
+            WHERE LOWER(email) =
+                  LOWER(?)
+
+            LIMIT 1
+          `)
+          .bind(
+            discordEmail
+          )
+          .first();
+
+
+      if (emailUser) {
+        if (
+          emailUser.discord_id &&
+          String(
+            emailUser.discord_id
+          ) !== discordId
+        ) {
+          console.error(
+            "YMIR email is already linked to another Discord account."
+          );
+
+
+          return redirectResponse(
+            "/login?error=discord_conflict",
+            {
+              "Set-Cookie":
+                clearDiscordStateCookie()
+            }
+          );
+        }
+
+
+        if (
+          !emailUser.discord_id
+        ) {
+          await env.DB
+            .prepare(`
+              UPDATE users
+
+              SET discord_id = ?
+
+              WHERE id = ?
+            `)
+            .bind(
+              discordId,
+              emailUser.id
+            )
+            .run();
+        }
+
+
+        user = {
+          ...emailUser,
+          discord_id:
+            discordId
+        };
+      }
+    }
+
+
+    /* -----------------------------------------------------
+       CREATE BRAND-NEW YMIR ACCOUNT
+       ----------------------------------------------------- */
+
+    if (!user) {
+      const username =
+        await createUniqueDiscordUsername(
+          env,
+          discordUsername,
+          discordId
+        );
+
+
+      /*
+       * Only use the actual Discord email when Discord
+       * says that email is verified.
+       *
+       * Otherwise create a private internal placeholder.
+       */
+      const email =
+        discordEmail &&
+        emailVerified
+          ? discordEmail
+          : `discord_${discordId}@users.ymirmods.invalid`;
+
+
+      const randomPassword =
+        generateSessionToken() +
+        generateSessionToken();
+
+
+      const passwordHash =
+        await hashPassword(
+          randomPassword
+        );
+
+
+      const insert =
+        await env.DB
+          .prepare(`
+            INSERT INTO users (
+              username,
+              email,
+              password_hash,
+              role,
+              can_upload,
+              discord_id
+            )
+
+            VALUES (
+              ?,
+              ?,
+              ?,
+              'member',
+              1,
+              ?
+            )
+          `)
+          .bind(
+            username,
+            email,
+            passwordHash,
+            discordId
+          )
+          .run();
+
+
+      const userId =
+        insert?.meta
+          ?.last_row_id;
+
+
+      if (!userId) {
+        throw new Error(
+          "Unable to create Discord user."
+        );
+      }
+
+
+      user = {
+        id:
+          userId,
+
+        username:
+          username,
+
+        email:
+          email,
+
+        role:
+          "member",
+
+        can_upload:
+          1,
+
+        discord_id:
+          discordId
+      };
+    }
+
+
+    /* -----------------------------------------------------
+       CREATE YMIR SESSION
+       ----------------------------------------------------- */
+
+    const sessionToken =
+      await createUserSession(
+        env,
+        user.id
+      );
+
+
+    const headers =
+      new Headers();
+
+
+    headers.set(
+      "Location",
+      "/dashboard"
+    );
+
+
+    headers.set(
+      "Cache-Control",
+      "no-store"
+    );
+
+
+    headers.append(
+      "Set-Cookie",
+      createSessionCookie(
+        sessionToken
+      )
+    );
+
+
+    headers.append(
+      "Set-Cookie",
+      clearDiscordStateCookie()
+    );
+
+
+    return new Response(
+      null,
+      {
+        status:
+          302,
+
+        headers
+      }
+    );
+
+  } catch (error) {
+    console.error(
+      "Discord callback error:",
+      error
+    );
+
+
+    return redirectResponse(
+      "/login?error=discord_failed",
+      {
+        "Set-Cookie":
+          clearDiscordStateCookie()
+      }
+    );
+  }
+}
+
+
+/* =========================================================
+   CREATE UNIQUE DISCORD USERNAME
+   ========================================================= */
+
+async function createUniqueDiscordUsername(
+  env,
+  discordUsername,
+  discordId
+) {
+  let base =
+    String(
+      discordUsername ||
+      "DiscordUser"
+    )
+      .trim()
+      .replace(
+        /[^A-Za-z0-9_-]/g,
+        "_"
+      )
+      .replace(
+        /_+/g,
+        "_"
+      );
+
+
+  if (
+    base.length < 3
+  ) {
+    base =
+      "DiscordUser";
+  }
+
+
+  base =
+    base.slice(
+      0,
+      24
+    );
+
+
+  let candidate =
+    base;
+
+
+  let attempt =
+    0;
+
+
+  while (true) {
+    const existing =
+      await env.DB
+        .prepare(`
+          SELECT id
+
+          FROM users
+
+          WHERE LOWER(username) =
+                LOWER(?)
+
+          LIMIT 1
+        `)
+        .bind(
+          candidate
+        )
+        .first();
+
+
+    if (!existing) {
+      return candidate;
+    }
+
+
+    attempt++;
+
+
+    const suffix =
+      attempt === 1
+        ? "_" +
+          discordId.slice(-4)
+        : "_" +
+          attempt;
+
+
+    candidate =
+      base
+        .slice(
+          0,
+          Math.max(
+            3,
+            24 -
+            suffix.length
+          )
+        ) +
+      suffix;
+  }
+}
+
+
+/* =========================================================
    PUBLIC MOD LIST
    ========================================================= */
 
 async function handlePublicMods(env) {
   try {
-
     const result =
       await env.DB
         .prepare(`
@@ -428,7 +1192,7 @@ async function handlePublicMods(env) {
             datetime(mods.updated_at) DESC,
             mods.id DESC
 
-          LIMIT 50
+          LIMIT 500
         `)
         .all();
 
@@ -437,11 +1201,11 @@ async function handlePublicMods(env) {
       success: true,
 
       mods:
-        result.results || []
+        result.results ||
+        []
     });
 
   } catch (error) {
-
     console.error(
       "Public mods error:",
       error
@@ -451,10 +1215,8 @@ async function handlePublicMods(env) {
     return jsonResponse(
       {
         success: false,
-
         message:
           "Unable to load mods.",
-
         error:
           error.message
       },
@@ -473,16 +1235,16 @@ async function handlePublicMod(
   slug
 ) {
   try {
-
     if (
       !slug ||
       slug.length > 100 ||
-      !/^[a-z0-9-]+$/.test(slug)
+      !/^[a-z0-9-]+$/.test(
+        slug
+      )
     ) {
       return jsonResponse(
         {
           success: false,
-
           message:
             "Invalid mod."
         },
@@ -530,11 +1292,9 @@ async function handlePublicMod(
 
 
     if (!mod) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Mod not found."
         },
@@ -543,7 +1303,7 @@ async function handlePublicMod(
     }
 
 
-    const versionsResult =
+    const versions =
       await env.DB
         .prepare(`
           SELECT
@@ -576,13 +1336,12 @@ async function handlePublicMod(
         ...mod,
 
         versions:
-          versionsResult.results ||
+          versions.results ||
           []
       }
     });
 
   } catch (error) {
-
     console.error(
       "Single mod error:",
       error
@@ -592,10 +1351,8 @@ async function handlePublicMod(
     return jsonResponse(
       {
         success: false,
-
         message:
           "Unable to load mod.",
-
         error:
           error.message
       },
@@ -614,7 +1371,6 @@ async function handlePublicCreator(
   username
 ) {
   try {
-
     if (
       !username ||
       username.length > 24 ||
@@ -622,11 +1378,9 @@ async function handlePublicCreator(
         username
       )
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Invalid creator."
         },
@@ -658,11 +1412,9 @@ async function handlePublicCreator(
 
 
     if (!creator) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Creator not found."
         },
@@ -671,31 +1423,31 @@ async function handlePublicCreator(
     }
 
 
-    const modsResult =
+    const result =
       await env.DB
         .prepare(`
           SELECT
-            mods.id,
-            mods.name,
-            mods.slug,
-            mods.version,
-            mods.category,
-            mods.short_description,
-            mods.full_description,
-            mods.icon_url,
-            mods.download_url,
-            mods.changelog,
-            mods.created_at,
-            mods.updated_at
+            id,
+            name,
+            slug,
+            version,
+            category,
+            short_description,
+            full_description,
+            icon_url,
+            download_url,
+            changelog,
+            created_at,
+            updated_at
 
           FROM mods
 
-          WHERE mods.owner_user_id = ?
-            AND mods.is_published = 1
+          WHERE owner_user_id = ?
+            AND is_published = 1
 
           ORDER BY
-            datetime(mods.updated_at) DESC,
-            mods.id DESC
+            datetime(updated_at) DESC,
+            id DESC
         `)
         .bind(
           creator.id
@@ -704,7 +1456,7 @@ async function handlePublicCreator(
 
 
     const mods =
-      modsResult.results ||
+      result.results ||
       [];
 
 
@@ -728,12 +1480,10 @@ async function handlePublicCreator(
           mods.length
       },
 
-      mods:
-        mods
+      mods
     });
 
   } catch (error) {
-
     console.error(
       "Creator page error:",
       error
@@ -743,10 +1493,8 @@ async function handlePublicCreator(
     return jsonResponse(
       {
         success: false,
-
         message:
           "Unable to load creator.",
-
         error:
           error.message
       },
@@ -765,7 +1513,6 @@ async function handleMyMods(
   env
 ) {
   try {
-
     const user =
       await getAuthenticatedUser(
         request,
@@ -774,11 +1521,9 @@ async function handleMyMods(
 
 
     if (!user) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "You must be logged in."
         },
@@ -822,24 +1567,10 @@ async function handleMyMods(
     return jsonResponse({
       success: true,
 
-      user: {
-        id:
-          user.id,
-
-        username:
-          user.username,
-
-        email:
-          user.email,
-
-        role:
-          user.role,
-
-        can_upload:
-          Boolean(
-            user.can_upload
-          )
-      },
+      user:
+        publicUser(
+          user
+        ),
 
       mods:
         result.results ||
@@ -847,7 +1578,6 @@ async function handleMyMods(
     });
 
   } catch (error) {
-
     console.error(
       "My mods error:",
       error
@@ -857,10 +1587,8 @@ async function handleMyMods(
     return jsonResponse(
       {
         success: false,
-
         message:
           "Unable to load your mods.",
-
         error:
           error.message
       },
@@ -871,7 +1599,7 @@ async function handleMyMods(
 
 
 /* =========================================================
-   REGISTER
+   LEGACY REGISTER
    ========================================================= */
 
 async function handleRegister(
@@ -879,21 +1607,17 @@ async function handleRegister(
   env
 ) {
   try {
-
     let body;
 
 
     try {
-
       body =
         await request.json();
 
     } catch {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Invalid request body."
         },
@@ -926,11 +1650,9 @@ async function handleRegister(
       username.length < 3 ||
       username.length > 24
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Username must be between 3 and 24 characters."
         },
@@ -944,11 +1666,9 @@ async function handleRegister(
         username
       )
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Username can only contain letters, numbers, underscores and hyphens."
         },
@@ -958,13 +1678,13 @@ async function handleRegister(
 
 
     if (
-      !isValidEmail(email)
+      !isValidEmail(
+        email
+      )
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Please enter a valid email address."
         },
@@ -977,11 +1697,9 @@ async function handleRegister(
       password.length < 10 ||
       password.length > 128
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Password must be between 10 and 128 characters."
         },
@@ -990,15 +1708,17 @@ async function handleRegister(
     }
 
 
-    const existingUser =
+    const existing =
       await env.DB
         .prepare(`
           SELECT id
 
           FROM users
 
-          WHERE LOWER(username) = LOWER(?)
-             OR LOWER(email) = LOWER(?)
+          WHERE LOWER(username) =
+                LOWER(?)
+             OR LOWER(email) =
+                LOWER(?)
 
           LIMIT 1
         `)
@@ -1009,12 +1729,10 @@ async function handleRegister(
         .first();
 
 
-    if (existingUser) {
-
+    if (existing) {
       return jsonResponse(
         {
           success: false,
-
           message:
             "That username or email is already registered."
         },
@@ -1069,8 +1787,7 @@ async function handleRegister(
               ?.last_row_id ??
             null,
 
-          username:
-            username,
+          username,
 
           role:
             "member",
@@ -1083,7 +1800,6 @@ async function handleRegister(
     );
 
   } catch (error) {
-
     console.error(
       "Registration error:",
       error
@@ -1093,7 +1809,6 @@ async function handleRegister(
     return jsonResponse(
       {
         success: false,
-
         message:
           "Unable to create account."
       },
@@ -1104,7 +1819,7 @@ async function handleRegister(
 
 
 /* =========================================================
-   LOGIN
+   LEGACY LOGIN
    ========================================================= */
 
 async function handleLogin(
@@ -1112,21 +1827,17 @@ async function handleLogin(
   env
 ) {
   try {
-
     let body;
 
 
     try {
-
       body =
         await request.json();
 
     } catch {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Invalid request body."
         },
@@ -1151,11 +1862,9 @@ async function handleLogin(
       !identifier ||
       !password
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Username/email and password are required."
         },
@@ -1173,12 +1882,15 @@ async function handleLogin(
             email,
             password_hash,
             role,
-            can_upload
+            can_upload,
+            discord_id
 
           FROM users
 
-          WHERE LOWER(username) = LOWER(?)
-             OR LOWER(email) = LOWER(?)
+          WHERE LOWER(username) =
+                LOWER(?)
+             OR LOWER(email) =
+                LOWER(?)
 
           LIMIT 1
         `)
@@ -1190,11 +1902,9 @@ async function handleLogin(
 
 
     if (!user) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Invalid username/email or password."
         },
@@ -1203,19 +1913,17 @@ async function handleLogin(
     }
 
 
-    const validPassword =
+    const valid =
       await verifyPassword(
         password,
         user.password_hash
       );
 
 
-    if (!validPassword) {
-
+    if (!valid) {
       return jsonResponse(
         {
           success: false,
-
           message:
             "Invalid username/email or password."
         },
@@ -1224,82 +1932,22 @@ async function handleLogin(
     }
 
 
-    const now =
-      Math.floor(
-        Date.now() / 1000
-      );
-
-
-    await env.DB
-      .prepare(`
-        DELETE FROM sessions
-
-        WHERE expires_at <= ?
-      `)
-      .bind(
-        now
-      )
-      .run();
-
-
     const sessionToken =
-      generateSessionToken();
-
-
-    const tokenHash =
-      await hashSessionToken(
-        sessionToken
+      await createUserSession(
+        env,
+        user.id
       );
-
-
-    const expiresAt =
-      now +
-      SESSION_LENGTH_SECONDS;
-
-
-    await env.DB
-      .prepare(`
-        INSERT INTO sessions (
-          user_id,
-          token_hash,
-          expires_at
-        )
-
-        VALUES (?, ?, ?)
-      `)
-      .bind(
-        user.id,
-        tokenHash,
-        expiresAt
-      )
-      .run();
 
 
     return jsonResponse(
       {
         success: true,
-
         message:
           "Login successful.",
-
-        user: {
-          id:
-            user.id,
-
-          username:
-            user.username,
-
-          email:
-            user.email,
-
-          role:
-            user.role,
-
-          can_upload:
-            Boolean(
-              user.can_upload
-            )
-        }
+        user:
+          publicUser(
+            user
+          )
       },
       200,
       {
@@ -1311,7 +1959,6 @@ async function handleLogin(
     );
 
   } catch (error) {
-
     console.error(
       "Login error:",
       error
@@ -1321,7 +1968,6 @@ async function handleLogin(
     return jsonResponse(
       {
         success: false,
-
         message:
           "Unable to log in."
       },
@@ -1340,7 +1986,6 @@ async function handleCurrentUser(
   env
 ) {
   try {
-
     const user =
       await getAuthenticatedUser(
         request,
@@ -1349,13 +1994,10 @@ async function handleCurrentUser(
 
 
     if (!user) {
-
       return jsonResponse({
         success: true,
-
         authenticated:
           false,
-
         user:
           null
       });
@@ -1364,32 +2006,15 @@ async function handleCurrentUser(
 
     return jsonResponse({
       success: true,
-
       authenticated:
         true,
-
-      user: {
-        id:
-          user.id,
-
-        username:
-          user.username,
-
-        email:
-          user.email,
-
-        role:
-          user.role,
-
-        can_upload:
-          Boolean(
-            user.can_upload
-          )
-      }
+      user:
+        publicUser(
+          user
+        )
     });
 
   } catch (error) {
-
     console.error(
       "Current user error:",
       error
@@ -1399,7 +2024,6 @@ async function handleCurrentUser(
     return jsonResponse(
       {
         success: false,
-
         message:
           "Unable to check login."
       },
@@ -1418,7 +2042,6 @@ async function handleLogout(
   env
 ) {
   try {
-
     const sessionToken =
       getCookie(
         request,
@@ -1427,7 +2050,6 @@ async function handleLogout(
 
 
     if (sessionToken) {
-
       const tokenHash =
         await hashSessionToken(
           sessionToken
@@ -1450,7 +2072,6 @@ async function handleLogout(
     return jsonResponse(
       {
         success: true,
-
         message:
           "Logged out successfully."
       },
@@ -1462,7 +2083,6 @@ async function handleLogout(
     );
 
   } catch (error) {
-
     console.error(
       "Logout error:",
       error
@@ -1472,7 +2092,6 @@ async function handleLogout(
     return jsonResponse(
       {
         success: false,
-
         message:
           "Unable to log out."
       },
@@ -1483,7 +2102,7 @@ async function handleLogout(
 
 
 /* =========================================================
-   UPLOAD MOD
+   MOD UPLOAD
    ========================================================= */
 
 async function handleModUpload(
@@ -1501,7 +2120,6 @@ async function handleModUpload(
 
 
   try {
-
     const user =
       await getAuthenticatedUser(
         request,
@@ -1510,11 +2128,9 @@ async function handleModUpload(
 
 
     if (!user) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "You must be logged in."
         },
@@ -1528,11 +2144,9 @@ async function handleModUpload(
         user.can_upload
       )
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Your account does not have upload permission."
         },
@@ -1542,11 +2156,9 @@ async function handleModUpload(
 
 
     if (!env.MOD_FILES) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "YMIR file storage is not connected."
         },
@@ -1561,25 +2173,22 @@ async function handleModUpload(
 
     const name =
       String(
-        form.get(
-          "name"
-        ) ?? ""
+        form.get("name") ??
+        ""
       ).trim();
 
 
     const version =
       String(
-        form.get(
-          "version"
-        ) ?? ""
+        form.get("version") ??
+        ""
       ).trim();
 
 
     const category =
       String(
-        form.get(
-          "category"
-        ) ?? ""
+        form.get("category") ??
+        ""
       ).trim();
 
 
@@ -1587,7 +2196,8 @@ async function handleModUpload(
       String(
         form.get(
           "short_description"
-        ) ?? ""
+        ) ??
+        ""
       ).trim();
 
 
@@ -1595,15 +2205,15 @@ async function handleModUpload(
       String(
         form.get(
           "full_description"
-        ) ?? ""
+        ) ??
+        ""
       ).trim();
 
 
     const changelog =
       String(
-        form.get(
-          "changelog"
-        ) ?? ""
+        form.get("changelog") ??
+        ""
       ).trim();
 
 
@@ -1627,11 +2237,9 @@ async function handleModUpload(
       name.length < 2 ||
       name.length > 80
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Mod name must be between 2 and 80 characters."
         },
@@ -1644,11 +2252,9 @@ async function handleModUpload(
       version.length < 1 ||
       version.length > 32
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Please enter a valid mod version."
         },
@@ -1661,11 +2267,9 @@ async function handleModUpload(
       category.length < 2 ||
       category.length > 60
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Please select a mod category."
         },
@@ -1678,11 +2282,9 @@ async function handleModUpload(
       shortDescription.length < 10 ||
       shortDescription.length > 250
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Short description must be between 10 and 250 characters."
         },
@@ -1695,11 +2297,9 @@ async function handleModUpload(
       fullDescription.length >
       10000
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Full description is too long."
         },
@@ -1712,11 +2312,9 @@ async function handleModUpload(
       changelog.length >
       10000
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Changelog is too long."
         },
@@ -1726,18 +2324,16 @@ async function handleModUpload(
 
 
     /* -----------------------------------------------------
-       VALIDATE MOD FILE
+       VALIDATE ZIP
        ----------------------------------------------------- */
 
     if (
       !(modFile instanceof File) ||
       modFile.size === 0
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Please choose a mod ZIP file."
         },
@@ -1750,11 +2346,9 @@ async function handleModUpload(
       modFile.size >
       MAX_MOD_FILE_SIZE
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Mod package is too large."
         },
@@ -1768,11 +2362,9 @@ async function handleModUpload(
         .toLowerCase()
         .endsWith(".zip")
     ) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Mod package must be a ZIP file."
         },
@@ -1789,16 +2381,13 @@ async function handleModUpload(
       iconFile instanceof File &&
       iconFile.size > 0
     ) {
-
       if (
         iconFile.size >
         MAX_ICON_FILE_SIZE
       ) {
-
         return jsonResponse(
           {
             success: false,
-
             message:
               "Mod icon is too large."
           },
@@ -1807,7 +2396,7 @@ async function handleModUpload(
       }
 
 
-      const allowedIconTypes =
+      const allowedTypes =
         [
           "image/png",
           "image/jpeg",
@@ -1816,15 +2405,13 @@ async function handleModUpload(
 
 
       if (
-        !allowedIconTypes.includes(
+        !allowedTypes.includes(
           iconFile.type
         )
       ) {
-
         return jsonResponse(
           {
             success: false,
-
             message:
               "Mod icon must be PNG, JPG or WebP."
           },
@@ -1845,11 +2432,9 @@ async function handleModUpload(
 
 
     if (!slug) {
-
       return jsonResponse(
         {
           success: false,
-
           message:
             "Unable to create a valid mod URL."
         },
@@ -1876,7 +2461,6 @@ async function handleModUpload(
 
 
     if (existingSlug) {
-
       slug =
         slug +
         "-" +
@@ -1885,10 +2469,6 @@ async function handleModUpload(
           .slice(-6);
     }
 
-
-    /* -----------------------------------------------------
-       R2 KEYS
-       ----------------------------------------------------- */
 
     const timestamp =
       Date.now();
@@ -1905,7 +2485,7 @@ async function handleModUpload(
 
 
     /* -----------------------------------------------------
-       UPLOAD MOD ZIP
+       UPLOAD ZIP
        ----------------------------------------------------- */
 
     await env.MOD_FILES.put(
@@ -1913,7 +2493,6 @@ async function handleModUpload(
       modFile.stream(),
       {
         httpMetadata: {
-
           contentType:
             modFile.type ||
             "application/zip",
@@ -1923,7 +2502,6 @@ async function handleModUpload(
         },
 
         customMetadata: {
-
           uploader:
             user.username,
 
@@ -1945,15 +2523,14 @@ async function handleModUpload(
       iconFile instanceof File &&
       iconFile.size > 0
     ) {
-
-      const iconExtension =
+      const extension =
         getImageExtension(
           iconFile.type
         );
 
 
       iconKey =
-        `mods/${user.id}/${slug}/icon-${timestamp}.${iconExtension}`;
+        `mods/${user.id}/${slug}/icon-${timestamp}.${extension}`;
 
 
       await env.MOD_FILES.put(
@@ -1961,7 +2538,6 @@ async function handleModUpload(
         iconFile.stream(),
         {
           httpMetadata: {
-
             contentType:
               iconFile.type,
 
@@ -1972,10 +2548,6 @@ async function handleModUpload(
       );
     }
 
-
-    /* -----------------------------------------------------
-       FILE URLS
-       ----------------------------------------------------- */
 
     const packageUrl =
       "/files/" +
@@ -1997,7 +2569,7 @@ async function handleModUpload(
        INSERT MOD
        ----------------------------------------------------- */
 
-    const modInsert =
+    const insert =
       await env.DB
         .prepare(`
           INSERT INTO mods (
@@ -2048,12 +2620,11 @@ async function handleModUpload(
 
 
     modId =
-      modInsert?.meta
+      insert?.meta
         ?.last_row_id;
 
 
     if (!modId) {
-
       throw new Error(
         "Unable to determine new mod ID."
       );
@@ -2061,7 +2632,7 @@ async function handleModUpload(
 
 
     /* -----------------------------------------------------
-       INSERT VERSION
+       VERSION HISTORY
        ----------------------------------------------------- */
 
     await env.DB
@@ -2096,10 +2667,6 @@ async function handleModUpload(
       .run();
 
 
-    /* -----------------------------------------------------
-       SUCCESS
-       ----------------------------------------------------- */
-
     return jsonResponse(
       {
         success: true,
@@ -2111,17 +2678,10 @@ async function handleModUpload(
           id:
             modId,
 
-          name:
-            name,
-
-          slug:
-            slug,
-
-          version:
-            version,
-
-          category:
-            category,
+          name,
+          slug,
+          version,
+          category,
 
           icon_url:
             iconUrl,
@@ -2133,22 +2693,26 @@ async function handleModUpload(
       201
     );
 
-
   } catch (error) {
-
     console.error(
       "Mod upload error:",
       error
     );
 
 
-    /* -----------------------------------------------------
-       BEST-EFFORT CLEANUP
-       ----------------------------------------------------- */
-
     try {
-
       if (modId) {
+        await env.DB
+          .prepare(`
+            DELETE FROM mod_versions
+
+            WHERE mod_id = ?
+          `)
+          .bind(
+            modId
+          )
+          .run();
+
 
         await env.DB
           .prepare(`
@@ -2167,11 +2731,9 @@ async function handleModUpload(
         packageKey &&
         env.MOD_FILES
       ) {
-
-        await env.MOD_FILES
-          .delete(
-            packageKey
-          );
+        await env.MOD_FILES.delete(
+          packageKey
+        );
       }
 
 
@@ -2179,17 +2741,12 @@ async function handleModUpload(
         iconKey &&
         env.MOD_FILES
       ) {
-
-        await env.MOD_FILES
-          .delete(
-            iconKey
-          );
+        await env.MOD_FILES.delete(
+          iconKey
+        );
       }
 
-    } catch (
-      cleanupError
-    ) {
-
+    } catch (cleanupError) {
       console.error(
         "Upload cleanup error:",
         cleanupError
@@ -2200,7 +2757,6 @@ async function handleModUpload(
     return jsonResponse(
       {
         success: false,
-
         message:
           "Unable to upload mod."
       },
@@ -2211,7 +2767,7 @@ async function handleModUpload(
 
 
 /* =========================================================
-   SERVE R2 FILE
+   R2 FILE
    ========================================================= */
 
 async function handleStoredFile(
@@ -2220,9 +2776,7 @@ async function handleStoredFile(
   url
 ) {
   try {
-
     if (!env.MOD_FILES) {
-
       return new Response(
         "Storage unavailable.",
         {
@@ -2248,7 +2802,6 @@ async function handleStoredFile(
       !key ||
       key.includes("..")
     ) {
-
       return new Response(
         "Invalid file.",
         {
@@ -2265,7 +2818,6 @@ async function handleStoredFile(
 
 
     if (!object) {
-
       return new Response(
         "File not found.",
         {
@@ -2304,7 +2856,6 @@ async function handleStoredFile(
     );
 
   } catch (error) {
-
     console.error(
       "R2 file error:",
       error
@@ -2329,7 +2880,6 @@ async function getAuthenticatedUser(
   request,
   env
 ) {
-
   const sessionToken =
     getCookie(
       request,
@@ -2338,7 +2888,6 @@ async function getAuthenticatedUser(
 
 
   if (!sessionToken) {
-
     return null;
   }
 
@@ -2351,7 +2900,8 @@ async function getAuthenticatedUser(
 
   const now =
     Math.floor(
-      Date.now() / 1000
+      Date.now() /
+      1000
     );
 
 
@@ -2363,7 +2913,8 @@ async function getAuthenticatedUser(
           users.username,
           users.email,
           users.role,
-          users.can_upload
+          users.can_upload,
+          users.discord_id
 
         FROM sessions
 
@@ -2383,7 +2934,109 @@ async function getAuthenticatedUser(
       .first();
 
 
-  return user || null;
+  return user ||
+    null;
+}
+
+
+/* =========================================================
+   PUBLIC USER OBJECT
+   ========================================================= */
+
+function publicUser(
+  user
+) {
+  return {
+    id:
+      user.id,
+
+    username:
+      user.username,
+
+    email:
+      user.email,
+
+    role:
+      user.role,
+
+    can_upload:
+      Boolean(
+        user.can_upload
+      ),
+
+    discord_linked:
+      Boolean(
+        user.discord_id
+      )
+  };
+}
+
+
+/* =========================================================
+   CREATE LOGIN SESSION
+   ========================================================= */
+
+async function createUserSession(
+  env,
+  userId
+) {
+  const now =
+    Math.floor(
+      Date.now() /
+      1000
+    );
+
+
+  await env.DB
+    .prepare(`
+      DELETE FROM sessions
+
+      WHERE expires_at <= ?
+    `)
+    .bind(
+      now
+    )
+    .run();
+
+
+  const sessionToken =
+    generateSessionToken();
+
+
+  const tokenHash =
+    await hashSessionToken(
+      sessionToken
+    );
+
+
+  const expiresAt =
+    now +
+    SESSION_LENGTH_SECONDS;
+
+
+  await env.DB
+    .prepare(`
+      INSERT INTO sessions (
+        user_id,
+        token_hash,
+        expires_at
+      )
+
+      VALUES (
+        ?,
+        ?,
+        ?
+      )
+    `)
+    .bind(
+      userId,
+      tokenHash,
+      expiresAt
+    )
+    .run();
+
+
+  return sessionToken;
 }
 
 
@@ -2394,14 +3047,15 @@ async function getAuthenticatedUser(
 async function hashPassword(
   password
 ) {
-
   const encoder =
     new TextEncoder();
 
 
   const salt =
     crypto.getRandomValues(
-      new Uint8Array(16)
+      new Uint8Array(
+        16
+      )
     );
 
 
@@ -2432,8 +3086,7 @@ async function hashPassword(
         name:
           "PBKDF2",
 
-        salt:
-          salt,
+        salt,
 
         iterations:
           PBKDF2_ITERATIONS,
@@ -2474,9 +3127,7 @@ async function verifyPassword(
   password,
   storedHash
 ) {
-
   try {
-
     const parts =
       String(
         storedHash
@@ -2486,7 +3137,6 @@ async function verifyPassword(
     if (
       parts.length !== 4
     ) {
-
       return false;
     }
 
@@ -2507,7 +3157,7 @@ async function verifyPassword(
       );
 
 
-    const expectedHash =
+    const expected =
       base64ToBytes(
         parts[3]
       );
@@ -2520,9 +3170,9 @@ async function verifyPassword(
         iterations
       ) ||
       iterations < 1 ||
-      iterations > 100000
+      iterations >
+        PBKDF2_ITERATIONS
     ) {
-
       return false;
     }
 
@@ -2552,17 +3202,15 @@ async function verifyPassword(
       );
 
 
-    const derivedBits =
+    const derived =
       await crypto.subtle.deriveBits(
         {
           name:
             "PBKDF2",
 
-          salt:
-            salt,
+          salt,
 
-          iterations:
-            iterations,
+          iterations,
 
           hash:
             "SHA-256"
@@ -2570,26 +3218,20 @@ async function verifyPassword(
 
         keyMaterial,
 
-        expectedHash.length * 8
+        expected.length *
+        8
       );
 
 
     return constantTimeEqual(
       new Uint8Array(
-        derivedBits
+        derived
       ),
 
-      expectedHash
+      expected
     );
 
   } catch (error) {
-
-    console.error(
-      "Password verification error:",
-      error
-    );
-
-
     return false;
   }
 }
@@ -2600,10 +3242,11 @@ async function verifyPassword(
    ========================================================= */
 
 function generateSessionToken() {
-
   return bytesToBase64Url(
     crypto.getRandomValues(
-      new Uint8Array(32)
+      new Uint8Array(
+        32
+      )
     )
   );
 }
@@ -2612,18 +3255,14 @@ function generateSessionToken() {
 async function hashSessionToken(
   token
 ) {
-
-  const encoder =
-    new TextEncoder();
-
-
   const digest =
     await crypto.subtle.digest(
       "SHA-256",
 
-      encoder.encode(
-        token
-      )
+      new TextEncoder()
+        .encode(
+          token
+        )
     );
 
 
@@ -2636,13 +3275,12 @@ async function hashSessionToken(
 
 
 /* =========================================================
-   COOKIE HELPERS
+   SESSION COOKIE
    ========================================================= */
 
 function createSessionCookie(
   token
 ) {
-
   return [
     `${SESSION_COOKIE_NAME}=${token}`,
     "Path=/",
@@ -2655,7 +3293,6 @@ function createSessionCookie(
 
 
 function clearSessionCookie() {
-
   return [
     `${SESSION_COOKIE_NAME}=`,
     "Path=/",
@@ -2667,39 +3304,69 @@ function clearSessionCookie() {
 }
 
 
+/* =========================================================
+   DISCORD STATE COOKIE
+   ========================================================= */
+
+function createDiscordStateCookie(
+  state
+) {
+  return [
+    `${DISCORD_STATE_COOKIE_NAME}=${state}`,
+    "Path=/",
+    "HttpOnly",
+    "Secure",
+    "SameSite=Lax",
+    `Max-Age=${DISCORD_STATE_LENGTH_SECONDS}`
+  ].join("; ");
+}
+
+
+function clearDiscordStateCookie() {
+  return [
+    `${DISCORD_STATE_COOKIE_NAME}=`,
+    "Path=/",
+    "HttpOnly",
+    "Secure",
+    "SameSite=Lax",
+    "Max-Age=0"
+  ].join("; ");
+}
+
+
+/* =========================================================
+   COOKIE LOOKUP
+   ========================================================= */
+
 function getCookie(
   request,
   name
 ) {
-
-  const cookieHeader =
+  const header =
     request.headers.get(
       "Cookie"
     );
 
 
-  if (!cookieHeader) {
-
+  if (!header) {
     return null;
   }
 
 
   const cookies =
-    cookieHeader.split(";");
+    header.split(";");
 
 
   for (
     const cookie of cookies
   ) {
-
-    const separatorIndex =
+    const separator =
       cookie.indexOf("=");
 
 
     if (
-      separatorIndex === -1
+      separator === -1
     ) {
-
       continue;
     }
 
@@ -2708,7 +3375,7 @@ function getCookie(
       cookie
         .slice(
           0,
-          separatorIndex
+          separator
         )
         .trim();
 
@@ -2716,16 +3383,15 @@ function getCookie(
     const cookieValue =
       cookie
         .slice(
-          separatorIndex + 1
+          separator +
+          1
         )
         .trim();
 
 
     if (
-      cookieName ===
-      name
+      cookieName === name
     ) {
-
       return cookieValue;
     }
   }
@@ -2736,13 +3402,57 @@ function getCookie(
 
 
 /* =========================================================
+   REDIRECT
+   ========================================================= */
+
+function redirectResponse(
+  location,
+  extraHeaders = {}
+) {
+  const headers =
+    new Headers({
+      Location:
+        location,
+
+      "Cache-Control":
+        "no-store"
+    });
+
+
+  for (
+    const [
+      key,
+      value
+    ] of Object.entries(
+      extraHeaders
+    )
+  ) {
+    headers.append(
+      key,
+      value
+    );
+  }
+
+
+  return new Response(
+    null,
+    {
+      status:
+        302,
+
+      headers
+    }
+  );
+}
+
+
+/* =========================================================
    MOD HELPERS
    ========================================================= */
 
 function createSlug(
   value
 ) {
-
   return String(
     value
   )
@@ -2766,7 +3476,6 @@ function createSlug(
 function sanitizeFilename(
   filename
 ) {
-
   return String(
     filename
   )
@@ -2787,12 +3496,10 @@ function sanitizeFilename(
 function getImageExtension(
   mime
 ) {
-
   if (
     mime ===
     "image/jpeg"
   ) {
-
     return "jpg";
   }
 
@@ -2801,7 +3508,6 @@ function getImageExtension(
     mime ===
     "image/webp"
   ) {
-
     return "webp";
   }
 
@@ -2817,7 +3523,6 @@ function getImageExtension(
 function bytesToBase64(
   bytes
 ) {
-
   let binary =
     "";
 
@@ -2827,7 +3532,6 @@ function bytesToBase64(
     i < bytes.length;
     i++
   ) {
-
     binary +=
       String.fromCharCode(
         bytes[i]
@@ -2844,7 +3548,6 @@ function bytesToBase64(
 function base64ToBytes(
   value
 ) {
-
   const binary =
     atob(
       value
@@ -2862,7 +3565,6 @@ function base64ToBytes(
     i < binary.length;
     i++
   ) {
-
     bytes[i] =
       binary.charCodeAt(
         i
@@ -2877,7 +3579,6 @@ function base64ToBytes(
 function bytesToBase64Url(
   bytes
 ) {
-
   return bytesToBase64(
     bytes
   )
@@ -2899,7 +3600,6 @@ function bytesToBase64Url(
 function bytesToHex(
   bytes
 ) {
-
   return Array
     .from(
       bytes
@@ -2918,19 +3618,17 @@ function bytesToHex(
 
 
 /* =========================================================
-   CONSTANT-TIME COMPARISON
+   CONSTANT TIME COMPARISON
    ========================================================= */
 
 function constantTimeEqual(
   first,
   second
 ) {
-
   if (
     first.length !==
     second.length
   ) {
-
     return false;
   }
 
@@ -2944,7 +3642,6 @@ function constantTimeEqual(
     i < first.length;
     i++
   ) {
-
     difference |=
       first[i] ^
       second[i];
@@ -2963,7 +3660,6 @@ function constantTimeEqual(
 function isValidEmail(
   email
 ) {
-
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     .test(
       email
@@ -2980,7 +3676,6 @@ function jsonResponse(
   status = 200,
   extraHeaders = {}
 ) {
-
   const headers =
     new Headers({
       "Content-Type":
@@ -2999,7 +3694,6 @@ function jsonResponse(
       extraHeaders
     )
   ) {
-
     headers.set(
       key,
       value
@@ -3013,11 +3707,8 @@ function jsonResponse(
     ),
 
     {
-      status:
-        status,
-
-      headers:
-        headers
+      status,
+      headers
     }
   );
 }
