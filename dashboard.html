@@ -1703,6 +1703,355 @@
 
 
     /* =====================================================
+       API KEYS
+       ===================================================== */
+
+    .api-section {
+
+      margin-top:
+        38px;
+
+      padding-top:
+        10px;
+
+      scroll-margin-top:
+        110px;
+
+    }
+
+
+    .api-panel {
+
+      padding:
+        24px;
+
+      border-radius:
+        18px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(
+            23,
+            27,
+            34,
+            0.96
+          ),
+          rgba(
+            11,
+            14,
+            19,
+            0.96
+          )
+        );
+
+      border:
+        1px solid
+        var(
+          --line
+        );
+
+      box-shadow:
+        0 20px 50px
+        rgba(
+          0,
+          0,
+          0,
+          0.34
+        );
+
+    }
+
+
+    .api-form {
+
+      display:
+        flex;
+
+      gap:
+        10px;
+
+      margin-top:
+        18px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    .api-input {
+
+      flex:
+        1;
+
+      min-width:
+        220px;
+
+      min-height:
+        44px;
+
+      padding:
+        10px 13px;
+
+      border-radius:
+        11px;
+
+      border:
+        1px solid
+        rgba(
+          255,
+          194,
+          82,
+          0.17
+        );
+
+      outline:
+        none;
+
+      color:
+        var(
+          --text
+        );
+
+      background:
+        rgba(
+          5,
+          8,
+          12,
+          0.65
+        );
+
+      font-family:
+        inherit;
+
+    }
+
+
+    .api-input:focus {
+
+      border-color:
+        rgba(
+          255,
+          194,
+          82,
+          0.45
+        );
+
+    }
+
+
+    .api-new-key {
+
+      display:
+        none;
+
+      margin-top:
+        18px;
+
+      padding:
+        17px;
+
+      border-radius:
+        13px;
+
+      background:
+        rgba(
+          73,
+          125,
+          60,
+          0.10
+        );
+
+      border:
+        1px solid
+        rgba(
+          145,
+          216,
+          120,
+          0.22
+        );
+
+    }
+
+
+    .api-new-key strong {
+
+      display:
+        block;
+
+      color:
+        #dfffd2;
+
+      margin-bottom:
+        8px;
+
+    }
+
+
+    .api-key-value {
+
+      display:
+        block;
+
+      width:
+        100%;
+
+      padding:
+        12px;
+
+      border-radius:
+        9px;
+
+      word-break:
+        break-all;
+
+      color:
+        #fff0bd;
+
+      background:
+        rgba(
+          0,
+          0,
+          0,
+          0.32
+        );
+
+      border:
+        1px solid
+        rgba(
+          255,
+          194,
+          82,
+          0.12
+        );
+
+      font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+      font-size:
+        0.85rem;
+
+      user-select:
+        all;
+
+    }
+
+
+    .api-key-list {
+
+      display:
+        grid;
+
+      gap:
+        12px;
+
+      margin-top:
+        20px;
+
+    }
+
+
+    .api-key-row {
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        16px;
+
+      padding:
+        15px;
+
+      border-radius:
+        13px;
+
+      background:
+        rgba(
+          7,
+          10,
+          14,
+          0.46
+        );
+
+      border:
+        1px solid
+        rgba(
+          255,
+          194,
+          82,
+          0.09
+        );
+
+    }
+
+
+    .api-key-row.revoked {
+
+      opacity:
+        0.52;
+
+    }
+
+
+    .api-key-title {
+
+      color:
+        var(
+          --gold
+        );
+
+      font-weight:
+        bold;
+
+      margin-bottom:
+        4px;
+
+    }
+
+
+    .api-key-meta {
+
+      color:
+        var(
+          --muted
+        );
+
+      font-size:
+        0.78rem;
+
+      line-height:
+        1.5;
+
+    }
+
+
+    .api-copy-row {
+
+      display:
+        flex;
+
+      gap:
+        8px;
+
+      margin-top:
+        10px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    /* =====================================================
        ERROR
        ===================================================== */
 
@@ -2202,6 +2551,38 @@
         </article>
 
 
+        <!-- API KEYS -->
+
+        <article class="dashboard-card">
+
+          <div class="card-icon">
+            ⛨
+          </div>
+
+
+          <h3>
+            API Keys
+          </h3>
+
+
+          <p>
+            Generate secure creator keys
+            for GitHub Actions,
+            upload tools,
+            and automated releases.
+          </p>
+
+
+          <a
+            class="button secondary"
+            href="#apiKeysSection"
+          >
+            Manage API Keys
+          </a>
+
+        </article>
+
+
         <!-- MOD UPDATES -->
 
         <article class="dashboard-card">
@@ -2411,6 +2792,112 @@
       </section>
 
 
+      <!-- =================================================
+           API KEYS
+           ================================================= -->
+
+      <section
+        id="apiKeysSection"
+        class="api-section"
+      >
+
+        <div class="my-mods-heading">
+
+          <div>
+
+            <h2>
+              Creator API Keys
+            </h2>
+
+            <p>
+              Use API keys with GitHub Actions
+              or external upload tools.
+              Treat them like passwords.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="api-panel">
+
+          <h3>
+            Generate a new key
+          </h3>
+
+          <p style="color:var(--muted); margin-top:6px;">
+            The full key is shown only once.
+            Save it in GitHub as a repository secret.
+          </p>
+
+
+          <div class="api-form">
+
+            <input
+              id="apiKeyName"
+              class="api-input"
+              maxlength="80"
+              value="GitHub Releases"
+              placeholder="Key name"
+            />
+
+            <button
+              id="generateApiKeyButton"
+              class="button primary"
+              type="button"
+            >
+              Generate API Key
+            </button>
+
+          </div>
+
+
+          <div
+            id="newApiKeyBox"
+            class="api-new-key"
+          >
+
+            <strong>
+              Copy this key now — it will not be shown again.
+            </strong>
+
+            <code
+              id="newApiKeyValue"
+              class="api-key-value"
+            ></code>
+
+            <div class="api-copy-row">
+
+              <button
+                id="copyApiKeyButton"
+                class="button secondary"
+                type="button"
+              >
+                Copy API Key
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="apiKeyList"
+            class="api-key-list"
+          >
+
+            <div class="mods-loading">
+              Loading API keys...
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
     </div>
 
 
@@ -2547,6 +3034,42 @@
       );
 
 
+    const apiKeyName =
+      document.getElementById(
+        "apiKeyName"
+      );
+
+
+    const generateApiKeyButton =
+      document.getElementById(
+        "generateApiKeyButton"
+      );
+
+
+    const newApiKeyBox =
+      document.getElementById(
+        "newApiKeyBox"
+      );
+
+
+    const newApiKeyValue =
+      document.getElementById(
+        "newApiKeyValue"
+      );
+
+
+    const copyApiKeyButton =
+      document.getElementById(
+        "copyApiKeyButton"
+      );
+
+
+    const apiKeyList =
+      document.getElementById(
+        "apiKeyList"
+      );
+
+
     /* =====================================================
        LOAD USER
        ===================================================== */
@@ -2610,7 +3133,10 @@
         );
 
 
-        await loadMyMods();
+        await Promise.all([
+          loadMyMods(),
+          loadApiKeys()
+        ]);
 
       } catch (
         error
@@ -3272,6 +3798,484 @@
 
       return card;
 
+    }
+
+
+    /* =====================================================
+       API KEYS
+       ===================================================== */
+
+    async function loadApiKeys() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/api-keys",
+            {
+              credentials:
+                "same-origin",
+
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          throw new Error(
+            result.message ||
+            "Unable to load API keys."
+          );
+        }
+
+
+        renderApiKeys(
+          Array.isArray(
+            result.api_keys
+          )
+            ? result.api_keys
+            : []
+        );
+
+      } catch (error) {
+
+        console.error(
+          "API key load error:",
+          error
+        );
+
+
+        apiKeyList.innerHTML =
+          '<div class="mods-error">Unable to load API keys.</div>';
+      }
+    }
+
+
+    function renderApiKeys(
+      keys
+    ) {
+
+      apiKeyList.innerHTML =
+        "";
+
+
+      if (
+        keys.length ===
+        0
+      ) {
+
+        apiKeyList.innerHTML =
+          '<div class="mods-empty">No API keys yet.</div>';
+
+        return;
+      }
+
+
+      for (
+        const key of keys
+      ) {
+
+        const row =
+          document.createElement(
+            "div"
+          );
+
+
+        row.className =
+          "api-key-row" +
+          (
+            key.revoked_at
+              ? " revoked"
+              : ""
+          );
+
+
+        const info =
+          document.createElement(
+            "div"
+          );
+
+
+        const title =
+          document.createElement(
+            "div"
+          );
+
+
+        title.className =
+          "api-key-title";
+
+
+        title.textContent =
+          key.name ||
+          "API Key";
+
+
+        const meta =
+          document.createElement(
+            "div"
+          );
+
+
+        meta.className =
+          "api-key-meta";
+
+
+        meta.textContent =
+          (
+            key.key_prefix ||
+            "ymir_live_..."
+          ) +
+          "… • Created " +
+          formatApiDate(
+            key.created_at
+          ) +
+          (
+            key.last_used_at
+              ? " • Last used " +
+                formatApiDate(
+                  key.last_used_at
+                )
+              : " • Never used"
+          ) +
+          (
+            key.revoked_at
+              ? " • REVOKED"
+              : ""
+          );
+
+
+        info.appendChild(
+          title
+        );
+
+
+        info.appendChild(
+          meta
+        );
+
+
+        row.appendChild(
+          info
+        );
+
+
+        if (
+          !key.revoked_at
+        ) {
+
+          const revoke =
+            document.createElement(
+              "button"
+            );
+
+
+          revoke.className =
+            "button danger";
+
+
+          revoke.type =
+            "button";
+
+
+          revoke.textContent =
+            "Revoke";
+
+
+          revoke.addEventListener(
+            "click",
+            async () => {
+
+              const confirmed =
+                window.confirm(
+                  "Revoke this API key? Any GitHub Action using it will stop working."
+                );
+
+
+              if (
+                !confirmed
+              ) {
+
+                return;
+              }
+
+
+              revoke.disabled =
+                true;
+
+
+              try {
+
+                const response =
+                  await fetch(
+                    "/api/api-keys/" +
+                    encodeURIComponent(
+                      key.id
+                    ) +
+                    "/revoke",
+                    {
+                      method:
+                        "POST",
+
+                      credentials:
+                        "same-origin"
+                    }
+                  );
+
+
+                const result =
+                  await response.json();
+
+
+                if (
+                  !response.ok ||
+                  !result.success
+                ) {
+
+                  throw new Error(
+                    result.message ||
+                    "Unable to revoke key."
+                  );
+                }
+
+
+                await loadApiKeys();
+
+              } catch (error) {
+
+                alert(
+                  error.message ||
+                  "Unable to revoke API key."
+                );
+
+
+                revoke.disabled =
+                  false;
+              }
+
+            }
+          );
+
+
+          row.appendChild(
+            revoke
+          );
+        }
+
+
+        apiKeyList.appendChild(
+          row
+        );
+      }
+    }
+
+
+    generateApiKeyButton.addEventListener(
+      "click",
+      async () => {
+
+        const name =
+          apiKeyName.value
+            .trim();
+
+
+        if (
+          !name
+        ) {
+
+          alert(
+            "Enter a name for the API key."
+          );
+
+          return;
+        }
+
+
+        generateApiKeyButton.disabled =
+          true;
+
+
+        generateApiKeyButton.textContent =
+          "Generating...";
+
+
+        try {
+
+          const response =
+            await fetch(
+              "/api/api-keys",
+              {
+                method:
+                  "POST",
+
+                credentials:
+                  "same-origin",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    name:
+                      name
+                  })
+              }
+            );
+
+
+          const result =
+            await response.json();
+
+
+          if (
+            !response.ok ||
+            !result.success ||
+            !result.api_key?.key
+          ) {
+
+            throw new Error(
+              result.message ||
+              "Unable to generate API key."
+            );
+          }
+
+
+          newApiKeyValue.textContent =
+            result.api_key.key;
+
+
+          newApiKeyBox.style.display =
+            "block";
+
+
+          await loadApiKeys();
+
+        } catch (error) {
+
+          alert(
+            error.message ||
+            "Unable to generate API key."
+          );
+
+        } finally {
+
+          generateApiKeyButton.disabled =
+            false;
+
+
+          generateApiKeyButton.textContent =
+            "Generate API Key";
+        }
+
+      }
+    );
+
+
+    copyApiKeyButton.addEventListener(
+      "click",
+      async () => {
+
+        const value =
+          newApiKeyValue.textContent
+            .trim();
+
+
+        if (
+          !value
+        ) {
+
+          return;
+        }
+
+
+        try {
+
+          await navigator.clipboard
+            .writeText(
+              value
+            );
+
+
+          copyApiKeyButton.textContent =
+            "Copied!";
+
+
+          setTimeout(
+            () => {
+
+              copyApiKeyButton.textContent =
+                "Copy API Key";
+
+            },
+            1600
+          );
+
+        } catch {
+
+          alert(
+            "Copy failed. Select the key manually and copy it."
+          );
+        }
+
+      }
+    );
+
+
+    function formatApiDate(
+      value
+    ) {
+
+      if (
+        !value
+      ) {
+
+        return "-";
+      }
+
+
+      const normalised =
+        String(
+          value
+        )
+          .replace(
+            " ",
+            "T"
+          );
+
+
+      const date =
+        new Date(
+          normalised.endsWith(
+            "Z"
+          )
+            ? normalised
+            : normalised +
+              "Z"
+        );
+
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+
+        return value;
+      }
+
+
+      return date.toLocaleString();
     }
 
 
