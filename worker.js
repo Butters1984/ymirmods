@@ -1,13 +1,22 @@
 const PBKDF2_ITERATIONS = 100000;
 
-const SESSION_COOKIE_NAME = "ymir_session";
-const SESSION_LENGTH_SECONDS = 60 * 60 * 24 * 7;
+const SESSION_COOKIE_NAME =
+  "ymir_session";
 
-const DISCORD_STATE_COOKIE_NAME = "ymir_discord_state";
-const DISCORD_STATE_LENGTH_SECONDS = 60 * 10;
+const SESSION_LENGTH_SECONDS =
+  60 * 60 * 24 * 7;
 
-const MAX_MOD_FILE_SIZE = 100 * 1024 * 1024;
-const MAX_ICON_FILE_SIZE = 5 * 1024 * 1024;
+const DISCORD_STATE_COOKIE_NAME =
+  "ymir_discord_state";
+
+const DISCORD_STATE_LENGTH_SECONDS =
+  60 * 10;
+
+const MAX_MOD_FILE_SIZE =
+  100 * 1024 * 1024;
+
+const MAX_ICON_FILE_SIZE =
+  5 * 1024 * 1024;
 
 
 /* =========================================================
@@ -15,8 +24,16 @@ const MAX_ICON_FILE_SIZE = 5 * 1024 * 1024;
    ========================================================= */
 
 export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
+
+  async fetch(
+    request,
+    env
+  ) {
+
+    const url =
+      new URL(
+        request.url
+      );
 
 
     /* =====================================================
@@ -24,10 +41,15 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname === "/api/test" &&
-      request.method === "GET"
+      url.pathname ===
+        "/api/test" &&
+      request.method ===
+        "GET"
     ) {
-      return handleTest(env);
+
+      return handleTest(
+        env
+      );
     }
 
 
@@ -36,9 +58,12 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname === "/api/auth/discord" &&
-      request.method === "GET"
+      url.pathname ===
+        "/api/auth/discord" &&
+      request.method ===
+        "GET"
     ) {
+
       return handleDiscordLogin(
         request,
         env
@@ -51,9 +76,12 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname === "/api/auth/discord/callback" &&
-      request.method === "GET"
+      url.pathname ===
+        "/api/auth/discord/callback" &&
+      request.method ===
+        "GET"
     ) {
+
       return handleDiscordCallback(
         request,
         env
@@ -63,15 +91,15 @@ export default {
 
     /* =====================================================
        LEGACY REGISTER
-
-       Kept temporarily as a fallback while Discord login
-       is being tested. We will remove/hide this later.
        ===================================================== */
 
     if (
-      url.pathname === "/api/register" &&
-      request.method === "POST"
+      url.pathname ===
+        "/api/register" &&
+      request.method ===
+        "POST"
     ) {
+
       return handleRegister(
         request,
         env
@@ -81,15 +109,15 @@ export default {
 
     /* =====================================================
        LEGACY LOGIN
-
-       Kept temporarily as a fallback while Discord login
-       is being tested.
        ===================================================== */
 
     if (
-      url.pathname === "/api/login" &&
-      request.method === "POST"
+      url.pathname ===
+        "/api/login" &&
+      request.method ===
+        "POST"
     ) {
+
       return handleLogin(
         request,
         env
@@ -102,9 +130,12 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname === "/api/logout" &&
-      request.method === "POST"
+      url.pathname ===
+        "/api/logout" &&
+      request.method ===
+        "POST"
     ) {
+
       return handleLogout(
         request,
         env
@@ -117,9 +148,12 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname === "/api/me" &&
-      request.method === "GET"
+      url.pathname ===
+        "/api/me" &&
+      request.method ===
+        "GET"
     ) {
+
       return handleCurrentUser(
         request,
         env
@@ -132,9 +166,12 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname === "/api/mods" &&
-      request.method === "GET"
+      url.pathname ===
+        "/api/mods" &&
+      request.method ===
+        "GET"
     ) {
+
       return handlePublicMods(
         env
       );
@@ -146,9 +183,12 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname === "/api/my-mods" &&
-      request.method === "GET"
+      url.pathname ===
+        "/api/my-mods" &&
+      request.method ===
+        "GET"
     ) {
+
       return handleMyMods(
         request,
         env
@@ -161,9 +201,13 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname.startsWith("/api/mod/") &&
-      request.method === "GET"
+      url.pathname.startsWith(
+        "/api/mod/"
+      ) &&
+      request.method ===
+        "GET"
     ) {
+
       const slug =
         decodeURIComponent(
           url.pathname.slice(
@@ -186,15 +230,20 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname.startsWith("/api/creator/") &&
-      request.method === "GET"
+      url.pathname.startsWith(
+        "/api/creator/"
+      ) &&
+      request.method ===
+        "GET"
     ) {
+
       const username =
         decodeURIComponent(
           url.pathname.slice(
             "/api/creator/".length
           )
-        ).trim();
+        )
+          .trim();
 
 
       return handlePublicCreator(
@@ -209,9 +258,12 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname === "/api/mods/upload" &&
-      request.method === "POST"
+      url.pathname ===
+        "/api/mods/upload" &&
+      request.method ===
+        "POST"
     ) {
+
       return handleModUpload(
         request,
         env
@@ -224,9 +276,13 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname.startsWith("/mod/") &&
-      request.method === "GET"
+      url.pathname.startsWith(
+        "/mod/"
+      ) &&
+      request.method ===
+        "GET"
     ) {
+
       const slug =
         decodeURIComponent(
           url.pathname.slice(
@@ -239,8 +295,11 @@ export default {
 
       if (
         slug &&
-        /^[a-z0-9-]+$/.test(slug)
+        /^[a-z0-9-]+$/.test(
+          slug
+        )
       ) {
+
         const pageUrl =
           new URL(
             "/mod",
@@ -252,8 +311,11 @@ export default {
           new Request(
             pageUrl.toString(),
             {
-              method: "GET",
-              headers: request.headers
+              method:
+                "GET",
+
+              headers:
+                request.headers
             }
           );
 
@@ -270,15 +332,20 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname.startsWith("/creator/") &&
-      request.method === "GET"
+      url.pathname.startsWith(
+        "/creator/"
+      ) &&
+      request.method ===
+        "GET"
     ) {
+
       const username =
         decodeURIComponent(
           url.pathname.slice(
             "/creator/".length
           )
-        ).trim();
+        )
+          .trim();
 
 
       if (
@@ -287,6 +354,7 @@ export default {
           username
         )
       ) {
+
         const pageUrl =
           new URL(
             "/creator",
@@ -298,8 +366,11 @@ export default {
           new Request(
             pageUrl.toString(),
             {
-              method: "GET",
-              headers: request.headers
+              method:
+                "GET",
+
+              headers:
+                request.headers
             }
           );
 
@@ -316,9 +387,13 @@ export default {
        ===================================================== */
 
     if (
-      url.pathname.startsWith("/files/") &&
-      request.method === "GET"
+      url.pathname.startsWith(
+        "/files/"
+      ) &&
+      request.method ===
+        "GET"
     ) {
+
       return handleStoredFile(
         request,
         env,
@@ -328,25 +403,50 @@ export default {
 
 
     /* =====================================================
-       API METHOD ERRORS
+       METHOD ERRORS
        ===================================================== */
 
     if (
-      url.pathname === "/api/register" ||
-      url.pathname === "/api/login" ||
-      url.pathname === "/api/logout" ||
-      url.pathname === "/api/mods" ||
-      url.pathname === "/api/my-mods" ||
-      url.pathname === "/api/mods/upload" ||
-      url.pathname === "/api/auth/discord" ||
-      url.pathname === "/api/auth/discord/callback" ||
-      url.pathname.startsWith("/api/mod/") ||
-      url.pathname.startsWith("/api/creator/")
+      url.pathname ===
+        "/api/register" ||
+
+      url.pathname ===
+        "/api/login" ||
+
+      url.pathname ===
+        "/api/logout" ||
+
+      url.pathname ===
+        "/api/mods" ||
+
+      url.pathname ===
+        "/api/my-mods" ||
+
+      url.pathname ===
+        "/api/mods/upload" ||
+
+      url.pathname ===
+        "/api/auth/discord" ||
+
+      url.pathname ===
+        "/api/auth/discord/callback" ||
+
+      url.pathname.startsWith(
+        "/api/mod/"
+      ) ||
+
+      url.pathname.startsWith(
+        "/api/creator/"
+      )
     ) {
+
       return jsonResponse(
         {
-          success: false,
-          message: "Method not allowed."
+          success:
+            false,
+
+          message:
+            "Method not allowed."
         },
         405
       );
@@ -354,7 +454,7 @@ export default {
 
 
     /* =====================================================
-       STATIC WEBSITE
+       WEBSITE FILES
        ===================================================== */
 
     return env.ASSETS.fetch(
@@ -368,37 +468,56 @@ export default {
    BACKEND TEST
    ========================================================= */
 
-async function handleTest(env) {
+async function handleTest(
+  env
+) {
+
   try {
+
     const result =
       await env.DB
         .prepare(
-          "SELECT COUNT(*) AS count FROM users"
+          `
+          SELECT
+            COUNT(*) AS count
+
+          FROM users
+          `
         )
         .first();
 
 
     return jsonResponse({
-      success: true,
+      success:
+        true,
+
       message:
         "YMIR Mods backend is running",
+
       database:
         "connected",
+
       r2:
         env.MOD_FILES
           ? "connected"
           : "missing",
+
       discord:
-        env.DISCORD_CLIENT_ID &&
-        env.DISCORD_CLIENT_SECRET &&
-        env.DISCORD_REDIRECT_URI
+        (
+          env.DISCORD_CLIENT_ID &&
+          env.DISCORD_CLIENT_SECRET &&
+          env.DISCORD_REDIRECT_URI
+        )
           ? "configured"
           : "missing",
+
       users:
-        result?.count ?? 0
+        result?.count ??
+        0
     });
 
   } catch (error) {
+
     console.error(
       "Backend test error:",
       error
@@ -407,7 +526,9 @@ async function handleTest(env) {
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Backend or database connection failed."
       },
@@ -425,16 +546,20 @@ async function handleDiscordLogin(
   request,
   env
 ) {
+
   try {
+
     if (
       !env.DISCORD_CLIENT_ID ||
       !env.DISCORD_CLIENT_SECRET ||
       !env.DISCORD_REDIRECT_URI
     ) {
+
       return new Response(
         "Discord login is not configured.",
         {
-          status: 500
+          status:
+            500
         }
       );
     }
@@ -450,40 +575,44 @@ async function handleDiscordLogin(
       );
 
 
-    authorizeUrl.searchParams.set(
-      "client_id",
-      env.DISCORD_CLIENT_ID
-    );
+    authorizeUrl
+      .searchParams
+      .set(
+        "client_id",
+        env.DISCORD_CLIENT_ID
+      );
 
 
-    authorizeUrl.searchParams.set(
-      "response_type",
-      "code"
-    );
+    authorizeUrl
+      .searchParams
+      .set(
+        "response_type",
+        "code"
+      );
 
 
-    authorizeUrl.searchParams.set(
-      "redirect_uri",
-      env.DISCORD_REDIRECT_URI
-    );
+    authorizeUrl
+      .searchParams
+      .set(
+        "redirect_uri",
+        env.DISCORD_REDIRECT_URI
+      );
 
 
-    authorizeUrl.searchParams.set(
-      "scope",
-      "identify email"
-    );
+    authorizeUrl
+      .searchParams
+      .set(
+        "scope",
+        "identify email"
+      );
 
 
-    authorizeUrl.searchParams.set(
-      "state",
-      state
-    );
-
-
-    authorizeUrl.searchParams.set(
-      "prompt",
-      "consent"
-    );
+    authorizeUrl
+      .searchParams
+      .set(
+        "state",
+        state
+      );
 
 
     const headers =
@@ -513,12 +642,16 @@ async function handleDiscordLogin(
     return new Response(
       null,
       {
-        status: 302,
-        headers
+        status:
+          302,
+
+        headers:
+          headers
       }
     );
 
   } catch (error) {
+
     console.error(
       "Discord login error:",
       error
@@ -528,7 +661,8 @@ async function handleDiscordLogin(
     return new Response(
       "Unable to start Discord login.",
       {
-        status: 500
+        status:
+          500
       }
     );
   }
@@ -543,7 +677,9 @@ async function handleDiscordCallback(
   request,
   env
 ) {
+
   try {
+
     const url =
       new URL(
         request.url
@@ -556,7 +692,10 @@ async function handleDiscordCallback(
       );
 
 
-    if (discordError) {
+    if (
+      discordError
+    ) {
+
       return redirectResponse(
         "/login?error=discord_cancelled",
         {
@@ -590,8 +729,10 @@ async function handleDiscordCallback(
       !code ||
       !returnedState ||
       !storedState ||
-      returnedState !== storedState
+      returnedState !==
+        storedState
     ) {
+
       return redirectResponse(
         "/login?error=discord_state",
         {
@@ -603,7 +744,7 @@ async function handleDiscordCallback(
 
 
     /* -----------------------------------------------------
-       EXCHANGE DISCORD CODE
+       EXCHANGE CODE FOR TOKEN
        ----------------------------------------------------- */
 
     const tokenBody =
@@ -661,10 +802,10 @@ async function handleDiscordCallback(
     if (
       !tokenResponse.ok
     ) {
+
       console.error(
         "Discord token exchange failed:",
-        tokenResponse.status,
-        await tokenResponse.text()
+        tokenResponse.status
       );
 
 
@@ -686,7 +827,10 @@ async function handleDiscordCallback(
       tokenData.access_token;
 
 
-    if (!accessToken) {
+    if (
+      !accessToken
+    ) {
+
       return redirectResponse(
         "/login?error=discord_token",
         {
@@ -698,7 +842,7 @@ async function handleDiscordCallback(
 
 
     /* -----------------------------------------------------
-       GET DISCORD ACCOUNT
+       GET DISCORD USER
        ----------------------------------------------------- */
 
     const discordResponse =
@@ -706,7 +850,7 @@ async function handleDiscordCallback(
         "https://discord.com/api/v10/users/@me",
         {
           headers: {
-            Authorization:
+            "Authorization":
               `Bearer ${accessToken}`
           }
         }
@@ -716,6 +860,7 @@ async function handleDiscordCallback(
     if (
       !discordResponse.ok
     ) {
+
       console.error(
         "Discord user request failed:",
         discordResponse.status
@@ -738,19 +883,33 @@ async function handleDiscordCallback(
 
     const discordId =
       String(
-        discordUser.id ?? ""
-      ).trim();
+        discordUser.id ??
+        ""
+      )
+        .trim();
 
 
     const discordUsername =
       String(
-        discordUser.username ?? ""
-      ).trim();
+        discordUser.username ??
+        ""
+      )
+        .trim();
+
+
+    const displayName =
+      String(
+        discordUser.global_name ||
+        discordUser.username ||
+        ""
+      )
+        .trim();
 
 
     const discordEmail =
       String(
-        discordUser.email ?? ""
+        discordUser.email ??
+        ""
       )
         .trim()
         .toLowerCase();
@@ -762,7 +921,16 @@ async function handleDiscordCallback(
       );
 
 
-    if (!discordId) {
+    const avatarUrl =
+      buildDiscordAvatarUrl(
+        discordUser
+      );
+
+
+    if (
+      !discordId
+    ) {
+
       return redirectResponse(
         "/login?error=discord_user",
         {
@@ -774,26 +942,31 @@ async function handleDiscordCallback(
 
 
     /* -----------------------------------------------------
-       FIND ALREADY-LINKED ACCOUNT
+       FIND EXISTING DISCORD LINK
        ----------------------------------------------------- */
 
     let user =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT
             id,
             username,
             email,
             role,
             can_upload,
-            discord_id
+            discord_id,
+            discord_username,
+            display_name,
+            avatar_url
 
           FROM users
 
           WHERE discord_id = ?
 
           LIMIT 1
-        `)
+          `
+        )
         .bind(
           discordId
         )
@@ -801,10 +974,7 @@ async function handleDiscordCallback(
 
 
     /* -----------------------------------------------------
-       LINK EXISTING ACCOUNT BY VERIFIED EMAIL
-
-       This allows an existing YMIR account such as
-       Yggdrah to keep its mods, admin role and profile.
+       LINK EXISTING YMIR ACCOUNT BY VERIFIED EMAIL
        ----------------------------------------------------- */
 
     if (
@@ -812,16 +982,21 @@ async function handleDiscordCallback(
       discordEmail &&
       emailVerified
     ) {
+
       const emailUser =
         await env.DB
-          .prepare(`
+          .prepare(
+            `
             SELECT
               id,
               username,
               email,
               role,
               can_upload,
-              discord_id
+              discord_id,
+              discord_username,
+              display_name,
+              avatar_url
 
             FROM users
 
@@ -829,24 +1004,25 @@ async function handleDiscordCallback(
                   LOWER(?)
 
             LIMIT 1
-          `)
+            `
+          )
           .bind(
             discordEmail
           )
           .first();
 
 
-      if (emailUser) {
+      if (
+        emailUser
+      ) {
+
         if (
           emailUser.discord_id &&
           String(
             emailUser.discord_id
-          ) !== discordId
+          ) !==
+            discordId
         ) {
-          console.error(
-            "YMIR email is already linked to another Discord account."
-          );
-
 
           return redirectResponse(
             "/login?error=discord_conflict",
@@ -858,39 +1034,57 @@ async function handleDiscordCallback(
         }
 
 
-        if (
-          !emailUser.discord_id
-        ) {
-          await env.DB
-            .prepare(`
-              UPDATE users
+        await env.DB
+          .prepare(
+            `
+            UPDATE users
 
-              SET discord_id = ?
+            SET
+              discord_id = ?,
+              discord_username = ?,
+              display_name = ?,
+              avatar_url = ?
 
-              WHERE id = ?
-            `)
-            .bind(
-              discordId,
-              emailUser.id
-            )
-            .run();
-        }
+            WHERE id = ?
+            `
+          )
+          .bind(
+            discordId,
+            discordUsername,
+            displayName,
+            avatarUrl,
+            emailUser.id
+          )
+          .run();
 
 
         user = {
           ...emailUser,
+
           discord_id:
-            discordId
+            discordId,
+
+          discord_username:
+            discordUsername,
+
+          display_name:
+            displayName,
+
+          avatar_url:
+            avatarUrl
         };
       }
     }
 
 
     /* -----------------------------------------------------
-       CREATE BRAND-NEW YMIR ACCOUNT
+       CREATE NEW YMIR USER
        ----------------------------------------------------- */
 
-    if (!user) {
+    if (
+      !user
+    ) {
+
       const username =
         await createUniqueDiscordUsername(
           env,
@@ -899,15 +1093,11 @@ async function handleDiscordCallback(
         );
 
 
-      /*
-       * Only use the actual Discord email when Discord
-       * says that email is verified.
-       *
-       * Otherwise create a private internal placeholder.
-       */
       const email =
-        discordEmail &&
-        emailVerified
+        (
+          discordEmail &&
+          emailVerified
+        )
           ? discordEmail
           : `discord_${discordId}@users.ymirmods.invalid`;
 
@@ -925,14 +1115,18 @@ async function handleDiscordCallback(
 
       const insert =
         await env.DB
-          .prepare(`
+          .prepare(
+            `
             INSERT INTO users (
               username,
               email,
               password_hash,
               role,
               can_upload,
-              discord_id
+              discord_id,
+              discord_username,
+              display_name,
+              avatar_url
             )
 
             VALUES (
@@ -941,14 +1135,21 @@ async function handleDiscordCallback(
               ?,
               'member',
               1,
+              ?,
+              ?,
+              ?,
               ?
             )
-          `)
+            `
+          )
           .bind(
             username,
             email,
             passwordHash,
-            discordId
+            discordId,
+            discordUsername,
+            displayName,
+            avatarUrl
           )
           .run();
 
@@ -958,7 +1159,10 @@ async function handleDiscordCallback(
           ?.last_row_id;
 
 
-      if (!userId) {
+      if (
+        !userId
+      ) {
+
         throw new Error(
           "Unable to create Discord user."
         );
@@ -982,13 +1186,61 @@ async function handleDiscordCallback(
           1,
 
         discord_id:
-          discordId
+          discordId,
+
+        discord_username:
+          discordUsername,
+
+        display_name:
+          displayName,
+
+        avatar_url:
+          avatarUrl
       };
+
+    } else {
+
+      /* ---------------------------------------------------
+         REFRESH DISCORD PROFILE EACH LOGIN
+         --------------------------------------------------- */
+
+      await env.DB
+        .prepare(
+          `
+          UPDATE users
+
+          SET
+            discord_username = ?,
+            display_name = ?,
+            avatar_url = ?
+
+          WHERE id = ?
+          `
+        )
+        .bind(
+          discordUsername,
+          displayName,
+          avatarUrl,
+          user.id
+        )
+        .run();
+
+
+      user.discord_username =
+        discordUsername;
+
+
+      user.display_name =
+        displayName;
+
+
+      user.avatar_url =
+        avatarUrl;
     }
 
 
     /* -----------------------------------------------------
-       CREATE YMIR SESSION
+       CREATE SESSION
        ----------------------------------------------------- */
 
     const sessionToken =
@@ -1034,11 +1286,13 @@ async function handleDiscordCallback(
         status:
           302,
 
-        headers
+        headers:
+          headers
       }
     );
 
   } catch (error) {
+
     console.error(
       "Discord callback error:",
       error
@@ -1057,7 +1311,52 @@ async function handleDiscordCallback(
 
 
 /* =========================================================
-   CREATE UNIQUE DISCORD USERNAME
+   DISCORD AVATAR
+   ========================================================= */
+
+function buildDiscordAvatarUrl(
+  discordUser
+) {
+
+  const id =
+    String(
+      discordUser?.id ??
+      ""
+    );
+
+
+  const avatar =
+    String(
+      discordUser?.avatar ??
+      ""
+    );
+
+
+  if (
+    !id ||
+    !avatar
+  ) {
+
+    return null;
+  }
+
+
+  return (
+    "https://cdn.discordapp.com/avatars/" +
+    encodeURIComponent(
+      id
+    ) +
+    "/" +
+    encodeURIComponent(
+      avatar
+    ) +
+    ".png?size=256"
+  );
+}
+
+
+/* =========================================================
+   UNIQUE DISCORD USERNAME
    ========================================================= */
 
 async function createUniqueDiscordUsername(
@@ -1065,6 +1364,7 @@ async function createUniqueDiscordUsername(
   discordUsername,
   discordId
 ) {
+
   let base =
     String(
       discordUsername ||
@@ -1082,8 +1382,10 @@ async function createUniqueDiscordUsername(
 
 
   if (
-    base.length < 3
+    base.length <
+    3
   ) {
+
     base =
       "DiscordUser";
   }
@@ -1104,10 +1406,14 @@ async function createUniqueDiscordUsername(
     0;
 
 
-  while (true) {
+  while (
+    true
+  ) {
+
     const existing =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT id
 
           FROM users
@@ -1116,14 +1422,18 @@ async function createUniqueDiscordUsername(
                 LOWER(?)
 
           LIMIT 1
-        `)
+          `
+        )
         .bind(
           candidate
         )
         .first();
 
 
-    if (!existing) {
+    if (
+      !existing
+    ) {
+
       return candidate;
     }
 
@@ -1132,23 +1442,25 @@ async function createUniqueDiscordUsername(
 
 
     const suffix =
-      attempt === 1
+      attempt ===
+        1
         ? "_" +
-          discordId.slice(-4)
+          discordId.slice(
+            -4
+          )
         : "_" +
           attempt;
 
 
     candidate =
-      base
-        .slice(
-          0,
-          Math.max(
-            3,
-            24 -
-            suffix.length
-          )
-        ) +
+      base.slice(
+        0,
+        Math.max(
+          3,
+          24 -
+          suffix.length
+        )
+      ) +
       suffix;
   }
 }
@@ -1158,11 +1470,16 @@ async function createUniqueDiscordUsername(
    PUBLIC MOD LIST
    ========================================================= */
 
-async function handlePublicMods(env) {
+async function handlePublicMods(
+  env
+) {
+
   try {
+
     const result =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT
             mods.id,
             mods.name,
@@ -1179,26 +1496,34 @@ async function handlePublicMods(env) {
             mods.updated_at,
 
             users.id AS author_id,
-            users.username AS author
+            users.username AS author,
+            users.display_name AS author_display_name,
+            users.avatar_url AS author_avatar_url
 
           FROM mods
 
           LEFT JOIN users
-            ON users.id = mods.owner_user_id
+            ON users.id =
+               mods.owner_user_id
 
-          WHERE mods.is_published = 1
+          WHERE
+            mods.is_published = 1
 
           ORDER BY
-            datetime(mods.updated_at) DESC,
+            datetime(
+              mods.updated_at
+            ) DESC,
             mods.id DESC
 
           LIMIT 500
-        `)
+          `
+        )
         .all();
 
 
     return jsonResponse({
-      success: true,
+      success:
+        true,
 
       mods:
         result.results ||
@@ -1206,6 +1531,7 @@ async function handlePublicMods(env) {
     });
 
   } catch (error) {
+
     console.error(
       "Public mods error:",
       error
@@ -1214,9 +1540,12 @@ async function handlePublicMods(env) {
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Unable to load mods.",
+
         error:
           error.message
       },
@@ -1234,17 +1563,23 @@ async function handlePublicMod(
   env,
   slug
 ) {
+
   try {
+
     if (
       !slug ||
-      slug.length > 100 ||
+      slug.length >
+        100 ||
       !/^[a-z0-9-]+$/.test(
         slug
       )
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Invalid mod."
         },
@@ -1255,7 +1590,8 @@ async function handlePublicMod(
 
     const mod =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT
             mods.id,
             mods.owner_user_id,
@@ -1273,28 +1609,39 @@ async function handlePublicMod(
             mods.updated_at,
 
             users.id AS author_id,
-            users.username AS author
+            users.username AS author,
+            users.display_name AS author_display_name,
+            users.avatar_url AS author_avatar_url
 
           FROM mods
 
           LEFT JOIN users
-            ON users.id = mods.owner_user_id
+            ON users.id =
+               mods.owner_user_id
 
-          WHERE mods.slug = ?
-            AND mods.is_published = 1
+          WHERE
+            mods.slug = ?
+            AND
+            mods.is_published = 1
 
           LIMIT 1
-        `)
+          `
+        )
         .bind(
           slug
         )
         .first();
 
 
-    if (!mod) {
+    if (
+      !mod
+    ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Mod not found."
         },
@@ -1305,7 +1652,8 @@ async function handlePublicMod(
 
     const versions =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT
             id,
             version,
@@ -1317,12 +1665,16 @@ async function handlePublicMod(
 
           FROM mod_versions
 
-          WHERE mod_id = ?
+          WHERE
+            mod_id = ?
 
           ORDER BY
-            datetime(created_at) DESC,
+            datetime(
+              created_at
+            ) DESC,
             id DESC
-        `)
+          `
+        )
         .bind(
           mod.id
         )
@@ -1330,7 +1682,8 @@ async function handlePublicMod(
 
 
     return jsonResponse({
-      success: true,
+      success:
+        true,
 
       mod: {
         ...mod,
@@ -1342,6 +1695,7 @@ async function handlePublicMod(
     });
 
   } catch (error) {
+
     console.error(
       "Single mod error:",
       error
@@ -1350,9 +1704,12 @@ async function handlePublicMod(
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Unable to load mod.",
+
         error:
           error.message
       },
@@ -1370,17 +1727,23 @@ async function handlePublicCreator(
   env,
   username
 ) {
+
   try {
+
     if (
       !username ||
-      username.length > 24 ||
+      username.length >
+        24 ||
       !/^[A-Za-z0-9_-]+$/.test(
         username
       )
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Invalid creator."
         },
@@ -1391,30 +1754,41 @@ async function handlePublicCreator(
 
     const creator =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT
             id,
             username,
             role,
-            created_at
+            created_at,
+            display_name,
+            avatar_url,
+            discord_username
 
           FROM users
 
-          WHERE LOWER(username) =
-                LOWER(?)
+          WHERE
+            LOWER(username) =
+            LOWER(?)
 
           LIMIT 1
-        `)
+          `
+        )
         .bind(
           username
         )
         .first();
 
 
-    if (!creator) {
+    if (
+      !creator
+    ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Creator not found."
         },
@@ -1425,7 +1799,8 @@ async function handlePublicCreator(
 
     const result =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT
             id,
             name,
@@ -1442,13 +1817,18 @@ async function handlePublicCreator(
 
           FROM mods
 
-          WHERE owner_user_id = ?
-            AND is_published = 1
+          WHERE
+            owner_user_id = ?
+            AND
+            is_published = 1
 
           ORDER BY
-            datetime(updated_at) DESC,
+            datetime(
+              updated_at
+            ) DESC,
             id DESC
-        `)
+          `
+        )
         .bind(
           creator.id
         )
@@ -1461,7 +1841,8 @@ async function handlePublicCreator(
 
 
     return jsonResponse({
-      success: true,
+      success:
+        true,
 
       creator: {
         id:
@@ -1469,6 +1850,18 @@ async function handlePublicCreator(
 
         username:
           creator.username,
+
+        display_name:
+          creator.display_name ||
+          creator.username,
+
+        discord_username:
+          creator.discord_username ||
+          null,
+
+        avatar_url:
+          creator.avatar_url ||
+          null,
 
         role:
           creator.role,
@@ -1480,10 +1873,12 @@ async function handlePublicCreator(
           mods.length
       },
 
-      mods
+      mods:
+        mods
     });
 
   } catch (error) {
+
     console.error(
       "Creator page error:",
       error
@@ -1492,9 +1887,12 @@ async function handlePublicCreator(
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Unable to load creator.",
+
         error:
           error.message
       },
@@ -1512,7 +1910,9 @@ async function handleMyMods(
   request,
   env
 ) {
+
   try {
+
     const user =
       await getAuthenticatedUser(
         request,
@@ -1520,10 +1920,15 @@ async function handleMyMods(
       );
 
 
-    if (!user) {
+    if (
+      !user
+    ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "You must be logged in."
         },
@@ -1534,7 +1939,8 @@ async function handleMyMods(
 
     const result =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT
             id,
             name,
@@ -1552,12 +1958,16 @@ async function handleMyMods(
 
           FROM mods
 
-          WHERE owner_user_id = ?
+          WHERE
+            owner_user_id = ?
 
           ORDER BY
-            datetime(updated_at) DESC,
+            datetime(
+              updated_at
+            ) DESC,
             id DESC
-        `)
+          `
+        )
         .bind(
           user.id
         )
@@ -1565,12 +1975,18 @@ async function handleMyMods(
 
 
     return jsonResponse({
-      success: true,
+      success:
+        true,
 
       user:
         publicUser(
           user
         ),
+
+      mod_count:
+        result.results
+          ?.length ??
+        0,
 
       mods:
         result.results ||
@@ -1578,6 +1994,7 @@ async function handleMyMods(
     });
 
   } catch (error) {
+
     console.error(
       "My mods error:",
       error
@@ -1586,9 +2003,12 @@ async function handleMyMods(
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Unable to load your mods.",
+
         error:
           error.message
       },
@@ -1606,18 +2026,24 @@ async function handleRegister(
   request,
   env
 ) {
+
   try {
+
     let body;
 
 
     try {
+
       body =
         await request.json();
 
     } catch {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Invalid request body."
         },
@@ -1628,13 +2054,16 @@ async function handleRegister(
 
     const username =
       String(
-        body.username ?? ""
-      ).trim();
+        body.username ??
+        ""
+      )
+        .trim();
 
 
     const email =
       String(
-        body.email ?? ""
+        body.email ??
+        ""
       )
         .trim()
         .toLowerCase();
@@ -1642,17 +2071,23 @@ async function handleRegister(
 
     const password =
       String(
-        body.password ?? ""
+        body.password ??
+        ""
       );
 
 
     if (
-      username.length < 3 ||
-      username.length > 24
+      username.length <
+        3 ||
+      username.length >
+        24
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Username must be between 3 and 24 characters."
         },
@@ -1666,9 +2101,12 @@ async function handleRegister(
         username
       )
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Username can only contain letters, numbers, underscores and hyphens."
         },
@@ -1682,9 +2120,12 @@ async function handleRegister(
         email
       )
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Please enter a valid email address."
         },
@@ -1694,12 +2135,17 @@ async function handleRegister(
 
 
     if (
-      password.length < 10 ||
-      password.length > 128
+      password.length <
+        10 ||
+      password.length >
+        128
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Password must be between 10 and 128 characters."
         },
@@ -1710,18 +2156,22 @@ async function handleRegister(
 
     const existing =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT id
 
           FROM users
 
-          WHERE LOWER(username) =
-                LOWER(?)
-             OR LOWER(email) =
-                LOWER(?)
+          WHERE
+            LOWER(username) =
+              LOWER(?)
+            OR
+            LOWER(email) =
+              LOWER(?)
 
           LIMIT 1
-        `)
+          `
+        )
         .bind(
           username,
           email
@@ -1729,10 +2179,15 @@ async function handleRegister(
         .first();
 
 
-    if (existing) {
+    if (
+      existing
+    ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "That username or email is already registered."
         },
@@ -1749,7 +2204,8 @@ async function handleRegister(
 
     const result =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           INSERT INTO users (
             username,
             email,
@@ -1765,7 +2221,8 @@ async function handleRegister(
             'member',
             1
           )
-        `)
+          `
+        )
         .bind(
           username,
           email,
@@ -1776,7 +2233,8 @@ async function handleRegister(
 
     return jsonResponse(
       {
-        success: true,
+        success:
+          true,
 
         message:
           "YMIR Mods account created successfully.",
@@ -1787,7 +2245,8 @@ async function handleRegister(
               ?.last_row_id ??
             null,
 
-          username,
+          username:
+            username,
 
           role:
             "member",
@@ -1800,6 +2259,7 @@ async function handleRegister(
     );
 
   } catch (error) {
+
     console.error(
       "Registration error:",
       error
@@ -1808,7 +2268,9 @@ async function handleRegister(
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Unable to create account."
       },
@@ -1826,18 +2288,24 @@ async function handleLogin(
   request,
   env
 ) {
+
   try {
+
     let body;
 
 
     try {
+
       body =
         await request.json();
 
     } catch {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Invalid request body."
         },
@@ -1848,13 +2316,16 @@ async function handleLogin(
 
     const identifier =
       String(
-        body.identifier ?? ""
-      ).trim();
+        body.identifier ??
+        ""
+      )
+        .trim();
 
 
     const password =
       String(
-        body.password ?? ""
+        body.password ??
+        ""
       );
 
 
@@ -1862,9 +2333,12 @@ async function handleLogin(
       !identifier ||
       !password
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Username/email and password are required."
         },
@@ -1875,7 +2349,8 @@ async function handleLogin(
 
     const user =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT
             id,
             username,
@@ -1883,17 +2358,23 @@ async function handleLogin(
             password_hash,
             role,
             can_upload,
-            discord_id
+            discord_id,
+            discord_username,
+            display_name,
+            avatar_url
 
           FROM users
 
-          WHERE LOWER(username) =
-                LOWER(?)
-             OR LOWER(email) =
-                LOWER(?)
+          WHERE
+            LOWER(username) =
+              LOWER(?)
+            OR
+            LOWER(email) =
+              LOWER(?)
 
           LIMIT 1
-        `)
+          `
+        )
         .bind(
           identifier,
           identifier
@@ -1901,10 +2382,15 @@ async function handleLogin(
         .first();
 
 
-    if (!user) {
+    if (
+      !user
+    ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Invalid username/email or password."
         },
@@ -1913,17 +2399,22 @@ async function handleLogin(
     }
 
 
-    const valid =
+    const validPassword =
       await verifyPassword(
         password,
         user.password_hash
       );
 
 
-    if (!valid) {
+    if (
+      !validPassword
+    ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Invalid username/email or password."
         },
@@ -1941,9 +2432,12 @@ async function handleLogin(
 
     return jsonResponse(
       {
-        success: true,
+        success:
+          true,
+
         message:
           "Login successful.",
+
         user:
           publicUser(
             user
@@ -1959,6 +2453,7 @@ async function handleLogin(
     );
 
   } catch (error) {
+
     console.error(
       "Login error:",
       error
@@ -1967,7 +2462,9 @@ async function handleLogin(
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Unable to log in."
       },
@@ -1985,7 +2482,9 @@ async function handleCurrentUser(
   request,
   env
 ) {
+
   try {
+
     const user =
       await getAuthenticatedUser(
         request,
@@ -1993,11 +2492,17 @@ async function handleCurrentUser(
       );
 
 
-    if (!user) {
+    if (
+      !user
+    ) {
+
       return jsonResponse({
-        success: true,
+        success:
+          true,
+
         authenticated:
           false,
+
         user:
           null
       });
@@ -2005,9 +2510,12 @@ async function handleCurrentUser(
 
 
     return jsonResponse({
-      success: true,
+      success:
+        true,
+
       authenticated:
         true,
+
       user:
         publicUser(
           user
@@ -2015,6 +2523,7 @@ async function handleCurrentUser(
     });
 
   } catch (error) {
+
     console.error(
       "Current user error:",
       error
@@ -2023,7 +2532,9 @@ async function handleCurrentUser(
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Unable to check login."
       },
@@ -2041,7 +2552,9 @@ async function handleLogout(
   request,
   env
 ) {
+
   try {
+
     const sessionToken =
       getCookie(
         request,
@@ -2049,7 +2562,10 @@ async function handleLogout(
       );
 
 
-    if (sessionToken) {
+    if (
+      sessionToken
+    ) {
+
       const tokenHash =
         await hashSessionToken(
           sessionToken
@@ -2057,11 +2573,14 @@ async function handleLogout(
 
 
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           DELETE FROM sessions
 
-          WHERE token_hash = ?
-        `)
+          WHERE
+            token_hash = ?
+          `
+        )
         .bind(
           tokenHash
         )
@@ -2071,7 +2590,9 @@ async function handleLogout(
 
     return jsonResponse(
       {
-        success: true,
+        success:
+          true,
+
         message:
           "Logged out successfully."
       },
@@ -2083,6 +2604,7 @@ async function handleLogout(
     );
 
   } catch (error) {
+
     console.error(
       "Logout error:",
       error
@@ -2091,7 +2613,9 @@ async function handleLogout(
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Unable to log out."
       },
@@ -2109,6 +2633,7 @@ async function handleModUpload(
   request,
   env
 ) {
+
   let packageKey =
     null;
 
@@ -2120,6 +2645,7 @@ async function handleModUpload(
 
 
   try {
+
     const user =
       await getAuthenticatedUser(
         request,
@@ -2127,10 +2653,15 @@ async function handleModUpload(
       );
 
 
-    if (!user) {
+    if (
+      !user
+    ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "You must be logged in."
         },
@@ -2144,9 +2675,12 @@ async function handleModUpload(
         user.can_upload
       )
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Your account does not have upload permission."
         },
@@ -2155,10 +2689,15 @@ async function handleModUpload(
     }
 
 
-    if (!env.MOD_FILES) {
+    if (
+      !env.MOD_FILES
+    ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "YMIR file storage is not connected."
         },
@@ -2173,23 +2712,32 @@ async function handleModUpload(
 
     const name =
       String(
-        form.get("name") ??
+        form.get(
+          "name"
+        ) ??
         ""
-      ).trim();
+      )
+        .trim();
 
 
     const version =
       String(
-        form.get("version") ??
+        form.get(
+          "version"
+        ) ??
         ""
-      ).trim();
+      )
+        .trim();
 
 
     const category =
       String(
-        form.get("category") ??
+        form.get(
+          "category"
+        ) ??
         ""
-      ).trim();
+      )
+        .trim();
 
 
     const shortDescription =
@@ -2198,7 +2746,8 @@ async function handleModUpload(
           "short_description"
         ) ??
         ""
-      ).trim();
+      )
+        .trim();
 
 
     const fullDescription =
@@ -2207,14 +2756,18 @@ async function handleModUpload(
           "full_description"
         ) ??
         ""
-      ).trim();
+      )
+        .trim();
 
 
     const changelog =
       String(
-        form.get("changelog") ??
+        form.get(
+          "changelog"
+        ) ??
         ""
-      ).trim();
+      )
+        .trim();
 
 
     const modFile =
@@ -2234,12 +2787,17 @@ async function handleModUpload(
        ----------------------------------------------------- */
 
     if (
-      name.length < 2 ||
-      name.length > 80
+      name.length <
+        2 ||
+      name.length >
+        80
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Mod name must be between 2 and 80 characters."
         },
@@ -2249,12 +2807,17 @@ async function handleModUpload(
 
 
     if (
-      version.length < 1 ||
-      version.length > 32
+      version.length <
+        1 ||
+      version.length >
+        32
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Please enter a valid mod version."
         },
@@ -2264,12 +2827,17 @@ async function handleModUpload(
 
 
     if (
-      category.length < 2 ||
-      category.length > 60
+      category.length <
+        2 ||
+      category.length >
+        60
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Please select a mod category."
         },
@@ -2279,12 +2847,17 @@ async function handleModUpload(
 
 
     if (
-      shortDescription.length < 10 ||
-      shortDescription.length > 250
+      shortDescription.length <
+        10 ||
+      shortDescription.length >
+        250
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Short description must be between 10 and 250 characters."
         },
@@ -2295,11 +2868,14 @@ async function handleModUpload(
 
     if (
       fullDescription.length >
-      10000
+        10000
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Full description is too long."
         },
@@ -2310,11 +2886,14 @@ async function handleModUpload(
 
     if (
       changelog.length >
-      10000
+        10000
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Changelog is too long."
         },
@@ -2324,16 +2903,23 @@ async function handleModUpload(
 
 
     /* -----------------------------------------------------
-       VALIDATE ZIP
+       MOD FILE
        ----------------------------------------------------- */
 
     if (
-      !(modFile instanceof File) ||
-      modFile.size === 0
+      !(
+        modFile instanceof
+        File
+      ) ||
+      modFile.size ===
+        0
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Please choose a mod ZIP file."
         },
@@ -2346,9 +2932,12 @@ async function handleModUpload(
       modFile.size >
       MAX_MOD_FILE_SIZE
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Mod package is too large."
         },
@@ -2360,11 +2949,16 @@ async function handleModUpload(
     if (
       !modFile.name
         .toLowerCase()
-        .endsWith(".zip")
+        .endsWith(
+          ".zip"
+        )
     ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Mod package must be a ZIP file."
         },
@@ -2374,20 +2968,26 @@ async function handleModUpload(
 
 
     /* -----------------------------------------------------
-       VALIDATE ICON
+       ICON
        ----------------------------------------------------- */
 
     if (
-      iconFile instanceof File &&
-      iconFile.size > 0
+      iconFile instanceof
+        File &&
+      iconFile.size >
+        0
     ) {
+
       if (
         iconFile.size >
         MAX_ICON_FILE_SIZE
       ) {
+
         return jsonResponse(
           {
-            success: false,
+            success:
+              false,
+
             message:
               "Mod icon is too large."
           },
@@ -2409,9 +3009,12 @@ async function handleModUpload(
           iconFile.type
         )
       ) {
+
         return jsonResponse(
           {
-            success: false,
+            success:
+              false,
+
             message:
               "Mod icon must be PNG, JPG or WebP."
           },
@@ -2422,7 +3025,7 @@ async function handleModUpload(
 
 
     /* -----------------------------------------------------
-       CREATE SLUG
+       SLUG
        ----------------------------------------------------- */
 
     let slug =
@@ -2431,10 +3034,15 @@ async function handleModUpload(
       );
 
 
-    if (!slug) {
+    if (
+      !slug
+    ) {
+
       return jsonResponse(
         {
-          success: false,
+          success:
+            false,
+
           message:
             "Unable to create a valid mod URL."
         },
@@ -2445,7 +3053,8 @@ async function handleModUpload(
 
     const existingSlug =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           SELECT id
 
           FROM mods
@@ -2453,20 +3062,26 @@ async function handleModUpload(
           WHERE slug = ?
 
           LIMIT 1
-        `)
+          `
+        )
         .bind(
           slug
         )
         .first();
 
 
-    if (existingSlug) {
+    if (
+      existingSlug
+    ) {
+
       slug =
         slug +
         "-" +
         Date.now()
           .toString()
-          .slice(-6);
+          .slice(
+            -6
+          );
     }
 
 
@@ -2493,6 +3108,7 @@ async function handleModUpload(
       modFile.stream(),
       {
         httpMetadata: {
+
           contentType:
             modFile.type ||
             "application/zip",
@@ -2502,6 +3118,7 @@ async function handleModUpload(
         },
 
         customMetadata: {
+
           uploader:
             user.username,
 
@@ -2520,9 +3137,12 @@ async function handleModUpload(
        ----------------------------------------------------- */
 
     if (
-      iconFile instanceof File &&
-      iconFile.size > 0
+      iconFile instanceof
+        File &&
+      iconFile.size >
+        0
     ) {
+
       const extension =
         getImageExtension(
           iconFile.type
@@ -2538,6 +3158,7 @@ async function handleModUpload(
         iconFile.stream(),
         {
           httpMetadata: {
+
             contentType:
               iconFile.type,
 
@@ -2571,7 +3192,8 @@ async function handleModUpload(
 
     const insert =
       await env.DB
-        .prepare(`
+        .prepare(
+          `
           INSERT INTO mods (
             owner_user_id,
             name,
@@ -2603,7 +3225,8 @@ async function handleModUpload(
             CURRENT_TIMESTAMP,
             CURRENT_TIMESTAMP
           )
-        `)
+          `
+        )
         .bind(
           user.id,
           name,
@@ -2624,7 +3247,10 @@ async function handleModUpload(
         ?.last_row_id;
 
 
-    if (!modId) {
+    if (
+      !modId
+    ) {
+
       throw new Error(
         "Unable to determine new mod ID."
       );
@@ -2632,11 +3258,12 @@ async function handleModUpload(
 
 
     /* -----------------------------------------------------
-       VERSION HISTORY
+       VERSION
        ----------------------------------------------------- */
 
     await env.DB
-      .prepare(`
+      .prepare(
+        `
         INSERT INTO mod_versions (
           mod_id,
           version,
@@ -2656,7 +3283,8 @@ async function handleModUpload(
           0,
           CURRENT_TIMESTAMP
         )
-      `)
+        `
+      )
       .bind(
         modId,
         version,
@@ -2669,7 +3297,8 @@ async function handleModUpload(
 
     return jsonResponse(
       {
-        success: true,
+        success:
+          true,
 
         message:
           "Mod uploaded successfully.",
@@ -2678,10 +3307,17 @@ async function handleModUpload(
           id:
             modId,
 
-          name,
-          slug,
-          version,
-          category,
+          name:
+            name,
+
+          slug:
+            slug,
+
+          version:
+            version,
+
+          category:
+            category,
 
           icon_url:
             iconUrl,
@@ -2694,6 +3330,7 @@ async function handleModUpload(
     );
 
   } catch (error) {
+
     console.error(
       "Mod upload error:",
       error
@@ -2701,13 +3338,19 @@ async function handleModUpload(
 
 
     try {
-      if (modId) {
+
+      if (
+        modId
+      ) {
+
         await env.DB
-          .prepare(`
+          .prepare(
+            `
             DELETE FROM mod_versions
 
             WHERE mod_id = ?
-          `)
+            `
+          )
           .bind(
             modId
           )
@@ -2715,11 +3358,13 @@ async function handleModUpload(
 
 
         await env.DB
-          .prepare(`
+          .prepare(
+            `
             DELETE FROM mods
 
             WHERE id = ?
-          `)
+            `
+          )
           .bind(
             modId
           )
@@ -2731,9 +3376,11 @@ async function handleModUpload(
         packageKey &&
         env.MOD_FILES
       ) {
-        await env.MOD_FILES.delete(
-          packageKey
-        );
+
+        await env.MOD_FILES
+          .delete(
+            packageKey
+          );
       }
 
 
@@ -2741,12 +3388,17 @@ async function handleModUpload(
         iconKey &&
         env.MOD_FILES
       ) {
-        await env.MOD_FILES.delete(
-          iconKey
-        );
+
+        await env.MOD_FILES
+          .delete(
+            iconKey
+          );
       }
 
-    } catch (cleanupError) {
+    } catch (
+      cleanupError
+    ) {
+
       console.error(
         "Upload cleanup error:",
         cleanupError
@@ -2756,7 +3408,9 @@ async function handleModUpload(
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         message:
           "Unable to upload mod."
       },
@@ -2775,12 +3429,18 @@ async function handleStoredFile(
   env,
   url
 ) {
+
   try {
-    if (!env.MOD_FILES) {
+
+    if (
+      !env.MOD_FILES
+    ) {
+
       return new Response(
         "Storage unavailable.",
         {
-          status: 500
+          status:
+            500
         }
       );
     }
@@ -2800,12 +3460,16 @@ async function handleStoredFile(
 
     if (
       !key ||
-      key.includes("..")
+      key.includes(
+        ".."
+      )
     ) {
+
       return new Response(
         "Invalid file.",
         {
-          status: 400
+          status:
+            400
         }
       );
     }
@@ -2817,11 +3481,15 @@ async function handleStoredFile(
       );
 
 
-    if (!object) {
+    if (
+      !object
+    ) {
+
       return new Response(
         "File not found.",
         {
-          status: 404
+          status:
+            404
         }
       );
     }
@@ -2851,11 +3519,13 @@ async function handleStoredFile(
     return new Response(
       object.body,
       {
-        headers
+        headers:
+          headers
       }
     );
 
   } catch (error) {
+
     console.error(
       "R2 file error:",
       error
@@ -2865,7 +3535,8 @@ async function handleStoredFile(
     return new Response(
       "Unable to load file.",
       {
-        status: 500
+        status:
+          500
       }
     );
   }
@@ -2880,6 +3551,7 @@ async function getAuthenticatedUser(
   request,
   env
 ) {
+
   const sessionToken =
     getCookie(
       request,
@@ -2887,7 +3559,10 @@ async function getAuthenticatedUser(
     );
 
 
-  if (!sessionToken) {
+  if (
+    !sessionToken
+  ) {
+
     return null;
   }
 
@@ -2907,14 +3582,18 @@ async function getAuthenticatedUser(
 
   const user =
     await env.DB
-      .prepare(`
+      .prepare(
+        `
         SELECT
           users.id,
           users.username,
           users.email,
           users.role,
           users.can_upload,
-          users.discord_id
+          users.discord_id,
+          users.discord_username,
+          users.display_name,
+          users.avatar_url
 
         FROM sessions
 
@@ -2922,11 +3601,14 @@ async function getAuthenticatedUser(
           ON users.id =
              sessions.user_id
 
-        WHERE sessions.token_hash = ?
-          AND sessions.expires_at > ?
+        WHERE
+          sessions.token_hash = ?
+          AND
+          sessions.expires_at > ?
 
         LIMIT 1
-      `)
+        `
+      )
       .bind(
         tokenHash,
         now
@@ -2940,17 +3622,22 @@ async function getAuthenticatedUser(
 
 
 /* =========================================================
-   PUBLIC USER OBJECT
+   PUBLIC USER
    ========================================================= */
 
 function publicUser(
   user
 ) {
+
   return {
     id:
       user.id,
 
     username:
+      user.username,
+
+    display_name:
+      user.display_name ||
       user.username,
 
     email:
@@ -2967,19 +3654,28 @@ function publicUser(
     discord_linked:
       Boolean(
         user.discord_id
-      )
+      ),
+
+    discord_username:
+      user.discord_username ||
+      null,
+
+    avatar_url:
+      user.avatar_url ||
+      null
   };
 }
 
 
 /* =========================================================
-   CREATE LOGIN SESSION
+   CREATE SESSION
    ========================================================= */
 
 async function createUserSession(
   env,
   userId
 ) {
+
   const now =
     Math.floor(
       Date.now() /
@@ -2988,11 +3684,13 @@ async function createUserSession(
 
 
   await env.DB
-    .prepare(`
+    .prepare(
+      `
       DELETE FROM sessions
 
       WHERE expires_at <= ?
-    `)
+      `
+    )
     .bind(
       now
     )
@@ -3015,7 +3713,8 @@ async function createUserSession(
 
 
   await env.DB
-    .prepare(`
+    .prepare(
+      `
       INSERT INTO sessions (
         user_id,
         token_hash,
@@ -3027,7 +3726,8 @@ async function createUserSession(
         ?,
         ?
       )
-    `)
+      `
+    )
     .bind(
       userId,
       tokenHash,
@@ -3047,6 +3747,7 @@ async function createUserSession(
 async function hashPassword(
   password
 ) {
+
   const encoder =
     new TextEncoder();
 
@@ -3060,45 +3761,48 @@ async function hashPassword(
 
 
   const keyMaterial =
-    await crypto.subtle.importKey(
-      "raw",
+    await crypto.subtle
+      .importKey(
+        "raw",
 
-      encoder.encode(
-        password
-      ),
+        encoder.encode(
+          password
+        ),
 
-      {
-        name:
-          "PBKDF2"
-      },
+        {
+          name:
+            "PBKDF2"
+        },
 
-      false,
+        false,
 
-      [
-        "deriveBits"
-      ]
-    );
+        [
+          "deriveBits"
+        ]
+      );
 
 
-  const derivedBits =
-    await crypto.subtle.deriveBits(
-      {
-        name:
-          "PBKDF2",
+  const derived =
+    await crypto.subtle
+      .deriveBits(
+        {
+          name:
+            "PBKDF2",
 
-        salt,
+          salt:
+            salt,
 
-        iterations:
-          PBKDF2_ITERATIONS,
+          iterations:
+            PBKDF2_ITERATIONS,
 
-        hash:
-          "SHA-256"
-      },
+          hash:
+            "SHA-256"
+        },
 
-      keyMaterial,
+        keyMaterial,
 
-      256
-    );
+        256
+      );
 
 
   return [
@@ -3112,31 +3816,40 @@ async function hashPassword(
 
     bytesToBase64(
       new Uint8Array(
-        derivedBits
+        derived
       )
     )
-  ].join("$");
+  ].join(
+    "$"
+  );
 }
 
 
 /* =========================================================
-   PASSWORD VERIFICATION
+   PASSWORD VERIFY
    ========================================================= */
 
 async function verifyPassword(
   password,
   storedHash
 ) {
+
   try {
+
     const parts =
       String(
         storedHash
-      ).split("$");
+      )
+        .split(
+          "$"
+        );
 
 
     if (
-      parts.length !== 4
+      parts.length !==
+      4
     ) {
+
       return false;
     }
 
@@ -3169,10 +3882,12 @@ async function verifyPassword(
       !Number.isInteger(
         iterations
       ) ||
-      iterations < 1 ||
+      iterations <
+        1 ||
       iterations >
         PBKDF2_ITERATIONS
     ) {
+
       return false;
     }
 
@@ -3182,45 +3897,49 @@ async function verifyPassword(
 
 
     const keyMaterial =
-      await crypto.subtle.importKey(
-        "raw",
+      await crypto.subtle
+        .importKey(
+          "raw",
 
-        encoder.encode(
-          password
-        ),
+          encoder.encode(
+            password
+          ),
 
-        {
-          name:
-            "PBKDF2"
-        },
+          {
+            name:
+              "PBKDF2"
+          },
 
-        false,
+          false,
 
-        [
-          "deriveBits"
-        ]
-      );
+          [
+            "deriveBits"
+          ]
+        );
 
 
     const derived =
-      await crypto.subtle.deriveBits(
-        {
-          name:
-            "PBKDF2",
+      await crypto.subtle
+        .deriveBits(
+          {
+            name:
+              "PBKDF2",
 
-          salt,
+            salt:
+              salt,
 
-          iterations,
+            iterations:
+              iterations,
 
-          hash:
-            "SHA-256"
-        },
+            hash:
+              "SHA-256"
+          },
 
-        keyMaterial,
+          keyMaterial,
 
-        expected.length *
-        8
-      );
+          expected.length *
+          8
+        );
 
 
     return constantTimeEqual(
@@ -3231,7 +3950,8 @@ async function verifyPassword(
       expected
     );
 
-  } catch (error) {
+  } catch {
+
     return false;
   }
 }
@@ -3242,6 +3962,7 @@ async function verifyPassword(
    ========================================================= */
 
 function generateSessionToken() {
+
   return bytesToBase64Url(
     crypto.getRandomValues(
       new Uint8Array(
@@ -3255,15 +3976,17 @@ function generateSessionToken() {
 async function hashSessionToken(
   token
 ) {
-  const digest =
-    await crypto.subtle.digest(
-      "SHA-256",
 
-      new TextEncoder()
-        .encode(
-          token
-        )
-    );
+  const digest =
+    await crypto.subtle
+      .digest(
+        "SHA-256",
+
+        new TextEncoder()
+          .encode(
+            token
+          )
+      );
 
 
   return bytesToHex(
@@ -3281,6 +4004,7 @@ async function hashSessionToken(
 function createSessionCookie(
   token
 ) {
+
   return [
     `${SESSION_COOKIE_NAME}=${token}`,
     "Path=/",
@@ -3288,11 +4012,14 @@ function createSessionCookie(
     "Secure",
     "SameSite=Lax",
     `Max-Age=${SESSION_LENGTH_SECONDS}`
-  ].join("; ");
+  ].join(
+    "; "
+  );
 }
 
 
 function clearSessionCookie() {
+
   return [
     `${SESSION_COOKIE_NAME}=`,
     "Path=/",
@@ -3300,7 +4027,9 @@ function clearSessionCookie() {
     "Secure",
     "SameSite=Lax",
     "Max-Age=0"
-  ].join("; ");
+  ].join(
+    "; "
+  );
 }
 
 
@@ -3311,6 +4040,7 @@ function clearSessionCookie() {
 function createDiscordStateCookie(
   state
 ) {
+
   return [
     `${DISCORD_STATE_COOKIE_NAME}=${state}`,
     "Path=/",
@@ -3318,11 +4048,14 @@ function createDiscordStateCookie(
     "Secure",
     "SameSite=Lax",
     `Max-Age=${DISCORD_STATE_LENGTH_SECONDS}`
-  ].join("; ");
+  ].join(
+    "; "
+  );
 }
 
 
 function clearDiscordStateCookie() {
+
   return [
     `${DISCORD_STATE_COOKIE_NAME}=`,
     "Path=/",
@@ -3330,43 +4063,57 @@ function clearDiscordStateCookie() {
     "Secure",
     "SameSite=Lax",
     "Max-Age=0"
-  ].join("; ");
+  ].join(
+    "; "
+  );
 }
 
 
 /* =========================================================
-   COOKIE LOOKUP
+   GET COOKIE
    ========================================================= */
 
 function getCookie(
   request,
   name
 ) {
+
   const header =
     request.headers.get(
       "Cookie"
     );
 
 
-  if (!header) {
+  if (
+    !header
+  ) {
+
     return null;
   }
 
 
   const cookies =
-    header.split(";");
+    header.split(
+      ";"
+    );
 
 
   for (
-    const cookie of cookies
+    const cookie of
+      cookies
   ) {
+
     const separator =
-      cookie.indexOf("=");
+      cookie.indexOf(
+        "="
+      );
 
 
     if (
-      separator === -1
+      separator ===
+      -1
     ) {
+
       continue;
     }
 
@@ -3390,8 +4137,10 @@ function getCookie(
 
 
     if (
-      cookieName === name
+      cookieName ===
+      name
     ) {
+
       return cookieValue;
     }
   }
@@ -3409,9 +4158,10 @@ function redirectResponse(
   location,
   extraHeaders = {}
 ) {
+
   const headers =
     new Headers({
-      Location:
+      "Location":
         location,
 
       "Cache-Control":
@@ -3427,6 +4177,7 @@ function redirectResponse(
       extraHeaders
     )
   ) {
+
     headers.append(
       key,
       value
@@ -3440,7 +4191,8 @@ function redirectResponse(
       status:
         302,
 
-      headers
+      headers:
+        headers
     }
   );
 }
@@ -3453,6 +4205,7 @@ function redirectResponse(
 function createSlug(
   value
 ) {
+
   return String(
     value
   )
@@ -3476,6 +4229,7 @@ function createSlug(
 function sanitizeFilename(
   filename
 ) {
+
   return String(
     filename
   )
@@ -3496,10 +4250,12 @@ function sanitizeFilename(
 function getImageExtension(
   mime
 ) {
+
   if (
     mime ===
     "image/jpeg"
   ) {
+
     return "jpg";
   }
 
@@ -3508,6 +4264,7 @@ function getImageExtension(
     mime ===
     "image/webp"
   ) {
+
     return "webp";
   }
 
@@ -3517,21 +4274,24 @@ function getImageExtension(
 
 
 /* =========================================================
-   ENCODING HELPERS
+   ENCODING
    ========================================================= */
 
 function bytesToBase64(
   bytes
 ) {
+
   let binary =
     "";
 
 
   for (
     let i = 0;
-    i < bytes.length;
+    i <
+    bytes.length;
     i++
   ) {
+
     binary +=
       String.fromCharCode(
         bytes[i]
@@ -3548,6 +4308,7 @@ function bytesToBase64(
 function base64ToBytes(
   value
 ) {
+
   const binary =
     atob(
       value
@@ -3562,9 +4323,11 @@ function base64ToBytes(
 
   for (
     let i = 0;
-    i < binary.length;
+    i <
+    binary.length;
     i++
   ) {
+
     bytes[i] =
       binary.charCodeAt(
         i
@@ -3579,6 +4342,7 @@ function base64ToBytes(
 function bytesToBase64Url(
   bytes
 ) {
+
   return bytesToBase64(
     bytes
   )
@@ -3600,35 +4364,41 @@ function bytesToBase64Url(
 function bytesToHex(
   bytes
 ) {
-  return Array
-    .from(
-      bytes
-    )
+
+  return Array.from(
+    bytes
+  )
     .map(
       byte =>
         byte
-          .toString(16)
+          .toString(
+            16
+          )
           .padStart(
             2,
             "0"
           )
     )
-    .join("");
+    .join(
+      ""
+    );
 }
 
 
 /* =========================================================
-   CONSTANT TIME COMPARISON
+   CONSTANT TIME COMPARE
    ========================================================= */
 
 function constantTimeEqual(
   first,
   second
 ) {
+
   if (
     first.length !==
     second.length
   ) {
+
     return false;
   }
 
@@ -3639,9 +4409,11 @@ function constantTimeEqual(
 
   for (
     let i = 0;
-    i < first.length;
+    i <
+    first.length;
     i++
   ) {
+
     difference |=
       first[i] ^
       second[i];
@@ -3660,6 +4432,7 @@ function constantTimeEqual(
 function isValidEmail(
   email
 ) {
+
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     .test(
       email
@@ -3676,6 +4449,7 @@ function jsonResponse(
   status = 200,
   extraHeaders = {}
 ) {
+
   const headers =
     new Headers({
       "Content-Type":
@@ -3694,6 +4468,7 @@ function jsonResponse(
       extraHeaders
     )
   ) {
+
     headers.set(
       key,
       value
@@ -3705,10 +4480,12 @@ function jsonResponse(
     JSON.stringify(
       data
     ),
-
     {
-      status,
-      headers
+      status:
+        status,
+
+      headers:
+        headers
     }
   );
 }
