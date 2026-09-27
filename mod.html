@@ -902,6 +902,109 @@
     }
 
 
+    .star-button {
+      min-height:
+        44px;
+
+      padding:
+        10px 16px;
+
+      border-radius:
+        12px;
+
+      cursor:
+        pointer;
+
+      color:
+        #ffd978;
+
+      background:
+        rgba(255,170,30,0.07);
+
+      border:
+        1px solid
+        rgba(255,200,90,0.24);
+
+      font-family:
+        inherit;
+
+      font-weight:
+        800;
+
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+
+    .star-button:hover {
+      transform:
+        translateY(-2px);
+
+      border-color:
+        rgba(255,220,125,0.48);
+    }
+
+
+    .star-button.starred {
+      color:
+        #171006;
+
+      background:
+        linear-gradient(
+          135deg,
+          #d77808,
+          #ffb02d,
+          #f2cc6b
+        );
+
+      border-color:
+        rgba(255,225,150,0.62);
+    }
+
+
+    .deprecated-banner {
+      display:
+        none;
+
+      margin-bottom:
+        18px;
+
+      padding:
+        16px 18px;
+
+      border-radius:
+        14px;
+
+      color:
+        #ffd4ca;
+
+      background:
+        rgba(120,35,25,0.19);
+
+      border:
+        1px solid
+        rgba(255,110,85,0.32);
+
+      box-shadow:
+        0 12px 30px
+        rgba(0,0,0,0.22);
+    }
+
+
+    .deprecated-banner strong {
+      display:
+        inline-block;
+
+      margin-right:
+        8px;
+
+      color:
+        #ff9b86;
+    }
+
+
     .download-button {
       display:
         flex;
@@ -1946,6 +2049,17 @@
         <div id="modContent">
 
 
+          <div
+            id="deprecatedBanner"
+            class="deprecated-banner"
+          >
+            <strong>DEPRECATED</strong>
+            <span id="deprecatedMessage">
+              This mod is no longer actively supported.
+            </span>
+          </div>
+
+
           <!-- HERO -->
 
           <div class="mod-hero">
@@ -2023,6 +2137,16 @@
               >
                 Download Mod
               </a>
+
+
+              <button
+                id="starButton"
+                class="star-button"
+                type="button"
+              >
+                <span id="starLabel">☆ Star</span>
+                <span id="starCount">0</span>
+              </button>
 
 
             </div>
@@ -2580,6 +2704,54 @@
         mod.version
           ? "v" + mod.version
           : "-"
+      );
+
+
+      /* DEPRECATED */
+
+      const deprecatedBanner =
+        document.getElementById(
+          "deprecatedBanner"
+        );
+
+
+      const deprecatedMessage =
+        document.getElementById(
+          "deprecatedMessage"
+        );
+
+
+      if (
+        Boolean(
+          mod.is_deprecated
+        )
+      ) {
+
+        deprecatedBanner.style.display =
+          "block";
+
+
+        deprecatedMessage.textContent =
+          mod.deprecated_message ||
+          "This mod is no longer actively supported.";
+
+      } else {
+
+        deprecatedBanner.style.display =
+          "none";
+      }
+
+
+      /* STAR */
+
+      updateStarButton(
+        Boolean(
+          mod.starred_by_user
+        ),
+        Number(
+          mod.star_count ||
+          0
+        )
       );
 
 
@@ -3416,6 +3588,141 @@
         0
       ).toLocaleString();
     }
+
+
+    function updateStarButton(
+      starred,
+      count
+    ) {
+
+      const button =
+        document.getElementById(
+          "starButton"
+        );
+
+
+      document
+        .getElementById(
+          "starLabel"
+        )
+        .textContent =
+          starred
+            ? "★ Starred"
+            : "☆ Star";
+
+
+      document
+        .getElementById(
+          "starCount"
+        )
+        .textContent =
+          Number(
+            count ||
+            0
+          )
+            .toLocaleString();
+
+
+      button.classList.toggle(
+        "starred",
+        starred
+      );
+    }
+
+
+    document
+      .getElementById(
+        "starButton"
+      )
+      .addEventListener(
+        "click",
+        async () => {
+
+          const slug =
+            getModSlug();
+
+
+          const button =
+            document.getElementById(
+              "starButton"
+            );
+
+
+          button.disabled =
+            true;
+
+
+          try {
+
+            const response =
+              await fetch(
+                "/api/mod/" +
+                encodeURIComponent(
+                  slug
+                ) +
+                "/star",
+                {
+                  method:
+                    "POST",
+
+                  credentials:
+                    "same-origin"
+                }
+              );
+
+
+            const result =
+              await response.json();
+
+
+            if (
+              response.status ===
+              401
+            ) {
+
+              window.location.href =
+                "/login";
+
+              return;
+            }
+
+
+            if (
+              !response.ok ||
+              !result.success
+            ) {
+
+              throw new Error(
+                result.message ||
+                "Unable to update star."
+              );
+            }
+
+
+            updateStarButton(
+              Boolean(
+                result.starred
+              ),
+              Number(
+                result.star_count ||
+                0
+              )
+            );
+
+          } catch (error) {
+
+            alert(
+              error.message ||
+              "Unable to update star."
+            );
+
+          } finally {
+
+            button.disabled =
+              false;
+          }
+        }
+      );
 
 
     function showError(
