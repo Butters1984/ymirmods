@@ -1,26 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
   <title>Login - YMIR Mods</title>
+
+  <meta
+    name="description"
+    content="Sign in to YMIR Mods using Discord."
+  />
 
   <style>
     :root {
       --bg: #07090d;
-      --panel: rgba(18, 21, 27, 0.94);
+      --panel: rgba(18, 21, 27, 0.96);
+
       --gold: #ffdc8c;
+      --gold-dark: #d99a2b;
+
       --orange: #ff9f1c;
+
       --muted: #bca97a;
       --text: #f4e5b5;
+
+      --discord: #5865f2;
+      --discord-hover: #6875f5;
     }
+
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
 
     body {
       min-height: 100vh;
@@ -29,9 +54,16 @@
       align-items: center;
       justify-content: center;
 
+      position: relative;
+
+      overflow: hidden;
+
       padding: 30px;
 
-      font-family: Georgia, "Times New Roman", serif;
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
       color: var(--text);
 
@@ -41,11 +73,19 @@
           rgba(255, 155, 30, 0.10),
           transparent 25%
         ),
+
         radial-gradient(
           circle at 80% 75%,
           rgba(255, 190, 70, 0.08),
           transparent 25%
         ),
+
+        radial-gradient(
+          circle at 50% 50%,
+          rgba(38, 46, 65, 0.15),
+          transparent 45%
+        ),
+
         linear-gradient(
           180deg,
           #05070a,
@@ -53,180 +93,428 @@
         );
     }
 
+
+    /* =====================================================
+       GALAXY
+       ===================================================== */
+
+    #galaxy {
+      position: fixed;
+      inset: 0;
+
+      overflow: hidden;
+
+      pointer-events: none;
+
+      z-index: 0;
+    }
+
+
+    .star {
+      position: absolute;
+
+      display: block;
+
+      width: var(--size);
+      height: var(--size);
+
+      border-radius: 50%;
+
+      background: currentColor;
+
+      color: #ffffff;
+
+      opacity: var(--opacity);
+
+      box-shadow:
+        0 0
+        var(--glow)
+        currentColor;
+
+      animation:
+        starTwinkle
+        var(--twinkle)
+        ease-in-out
+        infinite
+        alternate,
+
+        starDrift
+        var(--drift-speed)
+        ease-in-out
+        infinite
+        alternate;
+    }
+
+
+    @keyframes starTwinkle {
+      from {
+        opacity:
+          calc(
+            var(--opacity) * 0.45
+          );
+      }
+
+      to {
+        opacity:
+          var(--opacity);
+      }
+    }
+
+
+    @keyframes starDrift {
+      from {
+        transform:
+          translate3d(
+            0,
+            0,
+            0
+          );
+      }
+
+      to {
+        transform:
+          translate3d(
+            var(--drift-x),
+            var(--drift-y),
+            0
+          );
+      }
+    }
+
+
+    /* =====================================================
+       LOGIN CARD
+       ===================================================== */
+
     .login-card {
-      width: min(460px, 100%);
+      width:
+        min(
+          460px,
+          100%
+        );
 
-      padding: 34px;
+      position: relative;
 
-      border-radius: 20px;
+      z-index: 2;
+
+      padding:
+        38px 34px 32px;
+
+      border-radius: 22px;
+
+      overflow: hidden;
 
       background:
         linear-gradient(
           180deg,
-          rgba(23, 27, 34, 0.97),
-          rgba(11, 14, 19, 0.97)
+          rgba(24, 28, 36, 0.98),
+          rgba(10, 13, 18, 0.98)
         );
 
       border:
         1px solid
-        rgba(255, 194, 82, 0.16);
+        rgba(255, 194, 82, 0.17);
 
       box-shadow:
-        0 30px 80px rgba(0, 0, 0, 0.55),
-        0 0 30px rgba(255, 150, 30, 0.07);
+        0 30px 90px
+        rgba(0, 0, 0, 0.58),
+
+        0 0 28px
+        rgba(255, 150, 30, 0.07);
     }
+
+
+    .login-card::before {
+      content: "";
+
+      position: absolute;
+
+      top: -120px;
+      left: 50%;
+
+      width: 300px;
+      height: 300px;
+
+      transform:
+        translateX(-50%);
+
+      border-radius: 50%;
+
+      pointer-events: none;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255, 186, 65, 0.13),
+          rgba(255, 120, 0, 0.04) 45%,
+          transparent 70%
+        );
+    }
+
+
+    /* =====================================================
+       LOGO
+       ===================================================== */
+
+    .logo-link {
+      display: block;
+
+      width: fit-content;
+
+      margin:
+        0 auto 18px;
+    }
+
 
     .logo {
       display: block;
 
-      width: 76px;
-      height: 76px;
+      width: 82px;
+      height: 82px;
 
       object-fit: cover;
 
-      margin: 0 auto 18px;
+      border-radius: 14px;
 
-      border-radius: 12px;
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.15);
 
       filter:
         drop-shadow(
-          0 0 12px rgba(255, 170, 35, 0.45)
+          0 0 12px
+          rgba(255, 170, 35, 0.48)
+        )
+
+        drop-shadow(
+          0 0 26px
+          rgba(255, 100, 0, 0.18)
         );
     }
 
+
+    /* =====================================================
+       TEXT
+       ===================================================== */
+
     h1 {
+      position: relative;
+
       text-align: center;
 
       color: var(--gold);
 
-      font-size: 2rem;
+      font-size: 2.15rem;
 
-      margin-bottom: 6px;
+      line-height: 1.15;
+
+      margin-bottom: 8px;
+
+      text-shadow:
+        0 0 15px
+        rgba(255, 185, 65, 0.16);
     }
 
+
     .subtitle {
+      position: relative;
+
+      max-width: 340px;
+
+      margin:
+        0 auto 27px;
+
       text-align: center;
 
       color: var(--muted);
 
-      margin-bottom: 28px;
+      font-size: 0.96rem;
+
+      line-height: 1.55;
     }
 
-    .field {
-      margin-bottom: 17px;
-    }
 
-    label {
-      display: block;
+    /* =====================================================
+       DISCORD BUTTON
+       ===================================================== */
 
-      margin-bottom: 7px;
-
-      color: #ead19b;
-
-      font-weight: bold;
-    }
-
-    input {
+    .discord-button {
       width: 100%;
 
-      padding: 13px 14px;
+      min-height: 54px;
 
-      border-radius: 11px;
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 12px;
+
+      padding:
+        13px 18px;
+
+      border-radius: 13px;
 
       border:
         1px solid
-        rgba(255, 194, 82, 0.14);
+        rgba(255, 255, 255, 0.08);
 
-      background:
-        rgba(5, 8, 12, 0.85);
-
-      color: #fff2cf;
-
-      font-size: 1rem;
-
-      outline: none;
-    }
-
-    input:focus {
-      border-color:
-        rgba(255, 184, 65, 0.50);
-
-      box-shadow:
-        0 0 16px
-        rgba(255, 145, 20, 0.10);
-    }
-
-    button {
-      width: 100%;
-
-      margin-top: 8px;
-
-      padding: 14px;
-
-      border: 0;
-
-      border-radius: 12px;
-
-      cursor: pointer;
-
-      font-weight: bold;
-
-      font-size: 1rem;
-
-      color: #15100a;
+      color: white;
 
       background:
         linear-gradient(
           135deg,
-          #d97706,
-          #f2c15b
+          #5865f2,
+          #4b57d9
         );
 
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-    }
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-    button:hover {
-      transform: translateY(-2px);
+      font-size: 1rem;
+
+      font-weight: 700;
+
+      text-decoration: none;
+
+      cursor: pointer;
 
       box-shadow:
-        0 12px 30px
-        rgba(217, 119, 6, 0.25);
+        0 12px 28px
+        rgba(88, 101, 242, 0.22);
+
+      transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease;
     }
 
-    button:disabled {
-      opacity: 0.55;
-      cursor: default;
-      transform: none;
+
+    .discord-button:hover {
+      transform:
+        translateY(-2px);
+
+      background:
+        linear-gradient(
+          135deg,
+          #6571f5,
+          #5662e7
+        );
+
+      box-shadow:
+        0 16px 36px
+        rgba(88, 101, 242, 0.32),
+
+        0 0 24px
+        rgba(88, 101, 242, 0.13);
     }
+
+
+    .discord-button:active {
+      transform:
+        translateY(0);
+    }
+
+
+    .discord-icon {
+      width: 25px;
+      height: 25px;
+
+      flex-shrink: 0;
+
+      fill: currentColor;
+    }
+
+
+    /* =====================================================
+       DIVIDER
+       ===================================================== */
+
+    .divider {
+      display: flex;
+
+      align-items: center;
+
+      gap: 14px;
+
+      margin:
+        27px 0 21px;
+
+      color: #7e7258;
+
+      font-size: 0.75rem;
+
+      letter-spacing: 2px;
+    }
+
+
+    .divider::before,
+    .divider::after {
+      content: "";
+
+      flex: 1;
+
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 194, 82, 0.20)
+        );
+    }
+
+
+    .divider::after {
+      transform:
+        scaleX(-1);
+    }
+
+
+    /* =====================================================
+       INFO
+       ===================================================== */
+
+    .info {
+      text-align: center;
+
+      color: #9f906c;
+
+      font-size: 0.82rem;
+
+      line-height: 1.55;
+
+      margin-bottom: 21px;
+    }
+
+
+    .info strong {
+      color: #d5bd81;
+    }
+
+
+    /* =====================================================
+       MESSAGE
+       ===================================================== */
 
     .message {
       display: none;
 
-      margin-top: 18px;
+      margin-bottom: 18px;
 
-      padding: 12px;
+      padding:
+        12px 14px;
 
-      border-radius: 10px;
+      border-radius: 11px;
 
       text-align: center;
 
-      font-size: 0.92rem;
+      font-size: 0.88rem;
     }
 
-    .message.success {
-      display: block;
-
-      color: #d9ffc8;
-
-      background:
-        rgba(91, 160, 64, 0.12);
-
-      border:
-        1px solid
-        rgba(120, 210, 90, 0.20);
-    }
 
     .message.error {
       display: block;
@@ -241,249 +529,522 @@
         rgba(230, 90, 60, 0.20);
     }
 
-    .links {
-      margin-top: 22px;
+
+    /* =====================================================
+       FOOTER LINK
+       ===================================================== */
+
+    .home-link {
+      display: block;
 
       text-align: center;
 
-      display: grid;
-
-      gap: 10px;
-    }
-
-    .links a {
       color: var(--orange);
 
       font-weight: bold;
 
       text-decoration: none;
+
+      font-size: 0.9rem;
+
+      transition:
+        color 0.2s ease,
+        text-shadow 0.2s ease;
     }
 
-    .links a:hover {
+
+    .home-link:hover {
       color: var(--gold);
+
+      text-shadow:
+        0 0 10px
+        rgba(255, 180, 50, 0.25);
     }
+
+
+    /* =====================================================
+       LOADING
+       ===================================================== */
+
+    .checking {
+      display: none;
+
+      margin-bottom: 18px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 0.86rem;
+    }
+
+
+    @media (
+      max-width: 520px
+    ) {
+
+      body {
+        padding: 18px;
+      }
+
+
+      .login-card {
+        padding:
+          32px 22px 27px;
+      }
+
+
+      h1 {
+        font-size: 1.85rem;
+      }
+
+    }
+
   </style>
 </head>
 
+
 <body>
 
-  <div class="login-card">
 
-    <img
-      src="ymirmodwebsiteicon.png"
-      alt="YMIR Mods"
-      class="logo"
-    />
+  <div
+    id="galaxy"
+    aria-hidden="true"
+  ></div>
 
-    <h1>Login to YMIR</h1>
+
+  <main class="login-card">
+
+
+    <a
+      href="/"
+      class="logo-link"
+      aria-label="Back to YMIR Mods"
+    >
+
+      <img
+        src="/ymirmodwebsiteicon.png"
+        alt="YMIR Mods"
+        class="logo"
+      />
+
+    </a>
+
+
+    <h1>
+      Welcome to YMIR
+    </h1>
+
 
     <p class="subtitle">
-      Enter your YMIR Mods account.
+      Sign in to your YMIR Mods account
+      to upload mods, manage releases,
+      and access your creator dashboard.
     </p>
 
-    <form id="loginForm">
 
-      <div class="field">
+    <div
+      id="message"
+      class="message"
+    ></div>
 
-        <label for="identifier">
-          Username or Email
-        </label>
 
-        <input
-          id="identifier"
-          name="identifier"
-          type="text"
-          required
-          autocomplete="username"
-        />
-
-      </div>
-
-      <div class="field">
-
-        <label for="password">
-          Password
-        </label>
-
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          autocomplete="current-password"
-        />
-
-      </div>
-
-      <button
-        id="submitButton"
-        type="submit"
-      >
-        Login
-      </button>
-
-      <div
-        id="message"
-        class="message"
-      ></div>
-
-    </form>
-
-    <div class="links">
-
-      <a href="/register">
-        Create Account
-      </a>
-
-      <a href="/">
-        ← Back to YMIR Mods
-      </a>
-
+    <div
+      id="checking"
+      class="checking"
+    >
+      Checking your YMIR session...
     </div>
 
-  </div>
+
+    <a
+      id="discordLogin"
+      class="discord-button"
+      href="/api/auth/discord"
+    >
+
+      <svg
+        class="discord-icon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M20.317 4.3698A19.7913 19.7913 0 0 0 15.8854 3C15.6933 3.3417 15.4785 3.8011 15.3304 4.1654C13.663 3.9147 12.0046 3.9147 10.3682 4.1654C10.2201 3.792 9.9967 3.3417 9.8046 3A19.7362 19.7362 0 0 0 5.3726 4.3789C2.5719 8.5367 1.8144 12.5913 2.1936 16.5885A20.2634 20.2634 0 0 0 7.6316 19.3324C8.0694 18.7365 8.46 18.1035 8.7938 17.4384C8.154 17.1999 7.5401 16.9057 6.9604 16.56C7.113 16.4487 7.2622 16.3336 7.4078 16.2148C10.9349 17.8502 14.7624 17.8502 18.247 16.2148C18.3944 16.3354 18.5437 16.4504 18.6945 16.56C18.1131 16.9075 17.4974 17.2017 16.8577 17.4402C17.1915 18.1053 17.5803 18.7383 18.0199 19.3342A20.2108 20.2108 0 0 0 23.4567 16.5903C23.9024 11.9561 22.6952 7.9387 20.317 4.3698ZM8.9991 14.1244C7.9435 14.1244 7.077 13.1582 7.077 11.9809C7.077 10.8036 7.9258 9.8374 8.9991 9.8374C10.0814 9.8374 10.9391 10.8126 10.9213 11.9809C10.9213 13.1582 10.0725 14.1244 8.9991 14.1244ZM15.6883 14.1244C14.6327 14.1244 13.7662 13.1582 13.7662 11.9809C13.7662 10.8036 14.615 9.8374 15.6883 9.8374C16.7706 9.8374 17.6283 10.8126 17.6105 11.9809C17.6105 13.1582 16.7706 14.1244 15.6883 14.1244Z"
+        />
+      </svg>
+
+      <span>
+        Continue with Discord
+      </span>
+
+    </a>
+
+
+    <div class="divider">
+      YMIR
+    </div>
+
+
+    <p class="info">
+      No separate YMIR password is required.
+      <strong>
+        Signing in with Discord automatically
+        creates your YMIR account
+      </strong>
+      the first time you visit.
+    </p>
+
+
+    <a
+      class="home-link"
+      href="/"
+    >
+      ← Back to YMIR Mods
+    </a>
+
+
+  </main>
 
 
   <script>
-    const form =
+
+    /* =====================================================
+       CHECK EXISTING LOGIN
+       ===================================================== */
+
+    const checking =
       document.getElementById(
-        "loginForm"
+        "checking"
       );
+
+
+    const discordLogin =
+      document.getElementById(
+        "discordLogin"
+      );
+
 
     const message =
       document.getElementById(
         "message"
       );
 
-    const button =
-      document.getElementById(
-        "submitButton"
-      );
+
+    async function checkSession() {
+
+      checking.style.display =
+        "block";
 
 
-    form.addEventListener(
-      "submit",
-      async (event) => {
+      try {
 
-        event.preventDefault();
+        const response =
+          await fetch(
+            "/api/me",
+            {
+              credentials:
+                "same-origin",
 
-        message.className =
-          "message";
-
-        message.textContent =
-          "";
-
-
-        const identifier =
-          document
-            .getElementById("identifier")
-            .value
-            .trim();
-
-
-        const password =
-          document
-            .getElementById("password")
-            .value;
-
-
-        button.disabled = true;
-
-        button.textContent =
-          "Logging In...";
-
-
-        try {
-
-          const response =
-            await fetch(
-              "/api/login",
-              {
-                method: "POST",
-
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                },
-
-                body:
-                  JSON.stringify({
-                    identifier,
-                    password
-                  })
-              }
-            );
-
-
-          const result =
-            await response.json();
-
-
-          if (
-            !response.ok ||
-            !result.success
-          ) {
-
-            showMessage(
-              result.message ||
-              "Login failed.",
-              false
-            );
-
-            return;
-          }
-
-
-          showMessage(
-            "Login successful. Welcome back, " +
-            result.user.username +
-            "!",
-            true
+              cache:
+                "no-store"
+            }
           );
 
 
-          setTimeout(
-            () => {
-              window.location.href =
-                "/dashboard";
-            },
-            900
+        const result =
+          await response.json();
+
+
+        if (
+          response.ok &&
+          result.success &&
+          result.authenticated
+        ) {
+
+          window.location.replace(
+            "/dashboard"
           );
 
 
-        } catch (error) {
-
-          showMessage(
-            "Unable to contact the YMIR server.",
-            false
-          );
-
-        } finally {
-
-          button.disabled = false;
-
-          button.textContent =
-            "Login";
-
+          return;
         }
+
+
+      } catch (error) {
+
+        console.error(
+          "Session check failed:",
+          error
+        );
+
+      } finally {
+
+        checking.style.display =
+          "none";
+      }
+    }
+
+
+    /* =====================================================
+       CALLBACK ERROR MESSAGE
+       ===================================================== */
+
+    function showOAuthError() {
+
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+
+      const error =
+        params.get(
+          "error"
+        );
+
+
+      if (!error) {
+
+        return;
+      }
+
+
+      const messages = {
+
+        discord_cancelled:
+          "Discord login was cancelled.",
+
+        discord_state:
+          "The Discord login session expired. Please try again.",
+
+        discord_token:
+          "Discord could not complete the login. Please try again.",
+
+        discord_user:
+          "YMIR could not read your Discord account information.",
+
+        discord_conflict:
+          "That YMIR account is already linked to another Discord account.",
+
+        discord_failed:
+          "Discord login failed. Please try again."
+
+      };
+
+
+      message.textContent =
+        messages[error] ||
+        "Unable to complete Discord login.";
+
+
+      message.className =
+        "message error";
+
+
+      history.replaceState(
+        {},
+        document.title,
+        "/login"
+      );
+    }
+
+
+    /* =====================================================
+       BUTTON LOADING STATE
+       ===================================================== */
+
+    discordLogin.addEventListener(
+      "click",
+      () => {
+
+        discordLogin.style.pointerEvents =
+          "none";
+
+
+        discordLogin.style.opacity =
+          "0.72";
+
+
+        const text =
+          discordLogin.querySelector(
+            "span"
+          );
+
+
+        if (text) {
+
+          text.textContent =
+            "Connecting to Discord...";
+        }
+
       }
     );
 
 
-    function showMessage(
-      text,
-      success
+    /* =====================================================
+       GALAXY
+       ===================================================== */
+
+    const galaxy =
+      document.getElementById(
+        "galaxy"
+      );
+
+
+    const colours = [
+      "#ffffff",
+      "#fff8df",
+      "#ffe7aa",
+      "#ffd36b",
+      "#ffba45"
+    ];
+
+
+    const mobile =
+      window.matchMedia(
+        "(max-width: 700px)"
+      ).matches;
+
+
+    const STAR_COUNT =
+      mobile
+        ? 55
+        : 100;
+
+
+    for (
+      let i = 0;
+      i < STAR_COUNT;
+      i++
     ) {
 
-      message.textContent =
-        text;
+      const star =
+        document.createElement(
+          "span"
+        );
 
-      message.className =
-        success
-          ? "message success"
-          : "message error";
+
+      star.className =
+        "star";
+
+
+      star.style.left =
+        Math.random() *
+        100 +
+        "%";
+
+
+      star.style.top =
+        Math.random() *
+        100 +
+        "%";
+
+
+      const size =
+        Math.random() *
+        1.6 +
+        0.45;
+
+
+      star.style.setProperty(
+        "--size",
+        size +
+        "px"
+      );
+
+
+      star.style.color =
+        colours[
+          Math.floor(
+            Math.random() *
+            colours.length
+          )
+        ];
+
+
+      star.style.setProperty(
+        "--opacity",
+        (
+          Math.random() *
+          0.40 +
+          0.30
+        ).toFixed(2)
+      );
+
+
+      star.style.setProperty(
+        "--glow",
+        (
+          Math.random() *
+          5 +
+          2
+        ) +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--twinkle",
+        (
+          Math.random() *
+          6 +
+          3
+        ) +
+        "s"
+      );
+
+
+      const horizontalDrift =
+        -(
+          Math.random() *
+          70 +
+          20
+        );
+
+
+      const verticalDrift =
+        Math.random() *
+        8 -
+        4;
+
+
+      star.style.setProperty(
+        "--drift-x",
+        horizontalDrift +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--drift-y",
+        verticalDrift +
+        "px"
+      );
+
+
+      star.style.setProperty(
+        "--drift-speed",
+        (
+          Math.random() *
+          140 +
+          220
+        ) +
+        "s"
+      );
+
+
+      galaxy.appendChild(
+        star
+      );
     }
+
+
+    showOAuthError();
+
+    checkSession();
+
   </script>
 
 </body>
+
 </html>
