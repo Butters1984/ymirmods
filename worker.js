@@ -18,6 +18,12 @@ const MAX_MOD_FILE_SIZE =
 const MAX_ICON_FILE_SIZE =
   5 * 1024 * 1024;
 
+const MAX_FULL_DESCRIPTION_LENGTH =
+  100000;
+
+const MAX_CHANGELOG_LENGTH =
+  50000;
+
 
 /* =========================================================
    YMIR MODS WORKER
@@ -2868,7 +2874,7 @@ async function handleModUpload(
 
     if (
       fullDescription.length >
-        10000
+        MAX_FULL_DESCRIPTION_LENGTH
     ) {
 
       return jsonResponse(
@@ -2877,7 +2883,7 @@ async function handleModUpload(
             false,
 
           message:
-            "Full description is too long."
+            "Full description / README must be 100,000 characters or less."
         },
         400
       );
@@ -2886,7 +2892,7 @@ async function handleModUpload(
 
     if (
       changelog.length >
-        10000
+        MAX_CHANGELOG_LENGTH
     ) {
 
       return jsonResponse(
@@ -2895,7 +2901,7 @@ async function handleModUpload(
             false,
 
           message:
-            "Changelog is too long."
+            "Changelog must be 50,000 characters or less."
         },
         400
       );
