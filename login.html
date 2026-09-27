@@ -13,7 +13,7 @@
 
   <meta
     name="description"
-    content="Sign in to YMIR Mods using Discord."
+    content="Sign in to YMIR Mods using Discord or GitHub."
   />
 
   <style>
@@ -31,6 +31,9 @@
 
       --discord: #5865f2;
       --discord-hover: #6875f5;
+
+      --github: #24292f;
+      --github-hover: #30363d;
     }
 
 
@@ -92,6 +95,34 @@
           #0b1117
         );
     }
+
+
+    githubLogin.addEventListener(
+      "click",
+      () => {
+
+        githubLogin.style.pointerEvents =
+          "none";
+
+
+        githubLogin.style.opacity =
+          "0.72";
+
+
+        const text =
+          githubLogin.querySelector(
+            "span:last-child"
+          );
+
+
+        if (text) {
+
+          text.textContent =
+            "Connecting to GitHub...";
+        }
+
+      }
+    );
 
 
     /* =====================================================
@@ -430,6 +461,120 @@
 
 
     /* =====================================================
+       GITHUB BUTTON
+       ===================================================== */
+
+    .github-button {
+      width: 100%;
+
+      min-height: 54px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 12px;
+
+      padding:
+        13px 18px;
+
+      border-radius: 13px;
+
+      border:
+        1px solid
+        rgba(255, 255, 255, 0.12);
+
+      color: white;
+
+      background:
+        linear-gradient(
+          135deg,
+          #24292f,
+          #1b1f23
+        );
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      font-size: 1rem;
+
+      font-weight: 700;
+
+      text-decoration: none;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 12px 28px
+        rgba(0, 0, 0, 0.28);
+
+      transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease;
+    }
+
+
+    .github-button:hover {
+      transform:
+        translateY(-2px);
+
+      background:
+        linear-gradient(
+          135deg,
+          #30363d,
+          #24292f
+        );
+
+      box-shadow:
+        0 16px 36px
+        rgba(0, 0, 0, 0.38),
+
+        0 0 22px
+        rgba(255, 255, 255, 0.05);
+    }
+
+
+    .github-button:active {
+      transform:
+        translateY(0);
+    }
+
+
+    .github-icon {
+      width: 28px;
+      height: 28px;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      flex-shrink: 0;
+
+      border-radius: 50%;
+
+      color: #111;
+
+      background: #fff;
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      font-size: 0.72rem;
+
+      font-weight: 900;
+    }
+
+
+    /* =====================================================
        DIVIDER
        ===================================================== */
 
@@ -681,14 +826,34 @@
 
 
     <div class="divider">
-      YMIR
+      OR
     </div>
 
 
-    <p class="info">
+    <a
+      id="githubLogin"
+      class="github-button"
+      href="/api/auth/github"
+    >
+
+      <span
+        class="github-icon"
+        aria-hidden="true"
+      >
+        GH
+      </span>
+
+      <span>
+        Continue with GitHub
+      </span>
+
+    </a>
+
+
+    <p class="info" style="margin-top:24px;">
       No separate YMIR password is required.
       <strong>
-        Signing in with Discord automatically
+        Signing in with Discord or GitHub automatically
         creates your YMIR account
       </strong>
       the first time you visit.
@@ -721,6 +886,12 @@
     const discordLogin =
       document.getElementById(
         "discordLogin"
+      );
+
+
+    const githubLogin =
+      document.getElementById(
+        "githubLogin"
       );
 
 
@@ -827,7 +998,25 @@
           "That YMIR account is already linked to another Discord account.",
 
         discord_failed:
-          "Discord login failed. Please try again."
+          "Discord login failed. Please try again.",
+
+        github_cancelled:
+          "GitHub login was cancelled.",
+
+        github_state:
+          "The GitHub login session expired. Please try again.",
+
+        github_token:
+          "GitHub could not complete the login. Please try again.",
+
+        github_user:
+          "YMIR could not read your GitHub account information.",
+
+        github_conflict:
+          "That YMIR account is already linked to another GitHub account.",
+
+        github_failed:
+          "GitHub login failed. Please try again."
 
       };
 
