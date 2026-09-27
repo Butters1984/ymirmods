@@ -3,6 +3,11 @@
   "main": "worker.js",
   "compatibility_date": "2026-09-25",
 
+  "vars": {
+    "DISCORD_CLIENT_ID": "1553756285868970024",
+    "DISCORD_REDIRECT_URI": "https://ymirmods.com/api/auth/discord/callback"
+  },
+
   "assets": {
     "directory": ".",
     "binding": "ASSETS",
