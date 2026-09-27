@@ -30,6 +30,10 @@ const MAX_FULL_DESCRIPTION_LENGTH =
 const MAX_CHANGELOG_LENGTH =
   50000;
 
+// Keep the current release plus 4 older releases.
+const MAX_STORED_MOD_VERSIONS =
+  5;
+
 
 /* =========================================================
    YMIR MODS WORKER
@@ -5098,6 +5102,12 @@ async function handleApiV1PublishRelease(
       .run();
 
 
+    await pruneOldModVersions(
+      env,
+      mod.id
+    );
+
+
     return jsonResponse(
       {
         success:
@@ -5121,6 +5131,18 @@ async function handleApiV1PublishRelease(
 
           icon_url:
             iconUrl
+        },
+
+        version_retention: {
+          current:
+            1,
+
+          older:
+            MAX_STORED_MOD_VERSIONS -
+            1,
+
+          total:
+            MAX_STORED_MOD_VERSIONS
         }
       },
       201
@@ -5610,7 +5632,13 @@ async function handleModUpload(
       await env.DB
         .prepare(
           `
-          SELECT id
+          SELECT
+            id,
+            owner_user_id,
+            name,
+            slug,
+            version,
+            icon_url
 
           FROM mods
 
@@ -5625,6 +5653,58 @@ async function handleModUpload(
         .first();
 
 
+    /*
+     * Same creator + same mod slug = new version of
+     * the existing mod, not a duplicate mod page.
+     */
+    if (
+      existingSlug &&
+      Number(
+        existingSlug.owner_user_id
+      ) ===
+      Number(
+        user.id
+      )
+    ) {
+
+      return handleExistingBrowserModUpdate(
+        env,
+        user,
+        existingSlug,
+        {
+          name:
+            name,
+
+          version:
+            version,
+
+          category:
+            category,
+
+          shortDescription:
+            shortDescription,
+
+          fullDescription:
+            fullDescription,
+
+          changelog:
+            changelog,
+
+          modFile:
+            modFile,
+
+          iconFile:
+            iconFile
+        }
+      );
+    }
+
+
+    /*
+     * Another creator already owns that slug.
+     * Keep their page untouched and generate a
+     * unique URL for this new mod.
+     */
     if (
       existingSlug
     ) {
@@ -5972,6 +6052,509 @@ async function handleModUpload(
       500
     );
   }
+}
+
+
+/* =========================================================
+   EXISTING MOD - BROWSER UPDATE
+   ========================================================= */
+
+async function handleExistingBrowserModUpdate(
+  env,
+  user,
+  mod,
+  fields
+) {
+
+  let packageKey =
+    null;
+
+  let iconKey =
+    null;
+
+
+  try {
+
+    const existingVersion =
+      await env.DB
+        .prepare(
+          `
+          SELECT id
+
+          FROM mod_versions
+
+          WHERE
+            mod_id = ?
+            AND version = ?
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          mod.id,
+          fields.version
+        )
+        .first();
+
+
+    if (
+      existingVersion
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "That version already exists. Use a new version number to update this mod."
+        },
+        409
+      );
+    }
+
+
+    const timestamp =
+      Date.now();
+
+
+    const cleanPackageName =
+      sanitizeFilename(
+        fields.modFile.name
+      );
+
+
+    packageKey =
+      `mods/${user.id}/${mod.slug}/${fields.version}/${timestamp}-${cleanPackageName}`;
+
+
+    await env.MOD_FILES.put(
+      packageKey,
+      fields.modFile.stream(),
+      {
+        httpMetadata: {
+
+          contentType:
+            fields.modFile.type ||
+            "application/zip",
+
+          contentDisposition:
+            `attachment; filename="${cleanPackageName}"`
+        },
+
+        customMetadata: {
+
+          uploader:
+            user.username,
+
+          mod:
+            fields.name,
+
+          version:
+            fields.version,
+
+          source:
+            "browser-update"
+        }
+      }
+    );
+
+
+    if (
+      fields.iconFile instanceof
+        File &&
+      fields.iconFile.size >
+        0
+    ) {
+
+      const extension =
+        getImageExtension(
+          fields.iconFile.type
+        );
+
+
+      iconKey =
+        `mods/${user.id}/${mod.slug}/icon-${timestamp}.${extension}`;
+
+
+      await env.MOD_FILES.put(
+        iconKey,
+        fields.iconFile.stream(),
+        {
+          httpMetadata: {
+
+            contentType:
+              fields.iconFile.type,
+
+            contentDisposition:
+              "inline"
+          }
+        }
+      );
+    }
+
+
+    const packageUrl =
+      "/files/" +
+      encodeURI(
+        packageKey
+      );
+
+
+    const iconUrl =
+      iconKey
+        ? "/files/" +
+          encodeURI(
+            iconKey
+          )
+        : mod.icon_url;
+
+
+    await env.DB
+      .prepare(
+        `
+        INSERT INTO mod_versions (
+          mod_id,
+          version,
+          file_url,
+          changelog,
+          file_size,
+          downloads,
+          created_at
+        )
+
+        VALUES (
+          ?,
+          ?,
+          ?,
+          ?,
+          ?,
+          0,
+          CURRENT_TIMESTAMP
+        )
+        `
+      )
+      .bind(
+        mod.id,
+        fields.version,
+        packageUrl,
+        fields.changelog,
+        fields.modFile.size
+      )
+      .run();
+
+
+    await env.DB
+      .prepare(
+        `
+        UPDATE mods
+
+        SET
+          name = ?,
+          version = ?,
+          category = ?,
+          short_description = ?,
+          full_description = ?,
+          icon_url = ?,
+          download_url = ?,
+          changelog = ?,
+          is_published = 1,
+          updated_at =
+            CURRENT_TIMESTAMP
+
+        WHERE
+          id = ?
+          AND owner_user_id = ?
+        `
+      )
+      .bind(
+        fields.name,
+        fields.version,
+        fields.category,
+        fields.shortDescription,
+        fields.fullDescription,
+        iconUrl,
+        packageUrl,
+        fields.changelog,
+        mod.id,
+        user.id
+      )
+      .run();
+
+
+    await pruneOldModVersions(
+      env,
+      mod.id
+    );
+
+
+    if (
+      iconKey &&
+      mod.icon_url
+    ) {
+
+      await deleteStoredFileByUrl(
+        env,
+        mod.icon_url
+      );
+    }
+
+
+    return jsonResponse(
+      {
+        success:
+          true,
+
+        updated:
+          true,
+
+        message:
+          "Mod updated successfully.",
+
+        mod: {
+          id:
+            mod.id,
+
+          name:
+            fields.name,
+
+          slug:
+            mod.slug,
+
+          version:
+            fields.version,
+
+          category:
+            fields.category,
+
+          icon_url:
+            iconUrl,
+
+          download_url:
+            packageUrl
+        },
+
+        version_retention: {
+          current:
+            1,
+
+          older:
+            MAX_STORED_MOD_VERSIONS -
+            1,
+
+          total:
+            MAX_STORED_MOD_VERSIONS
+        }
+      },
+      200
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Existing mod update error:",
+      error
+    );
+
+
+    try {
+
+      if (
+        packageKey &&
+        env.MOD_FILES
+      ) {
+
+        await env.MOD_FILES.delete(
+          packageKey
+        );
+      }
+
+
+      if (
+        iconKey &&
+        env.MOD_FILES
+      ) {
+
+        await env.MOD_FILES.delete(
+          iconKey
+        );
+      }
+
+    } catch (cleanupError) {
+
+      console.error(
+        "Existing mod update cleanup error:",
+        cleanupError
+      );
+    }
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to update mod."
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   VERSION RETENTION
+   ========================================================= */
+
+async function pruneOldModVersions(
+  env,
+  modId
+) {
+
+  try {
+
+    const oldVersions =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            id,
+            file_url
+
+          FROM mod_versions
+
+          WHERE mod_id = ?
+
+          ORDER BY
+            created_at DESC,
+            id DESC
+
+          LIMIT -1
+          OFFSET ?
+          `
+        )
+        .bind(
+          modId,
+          MAX_STORED_MOD_VERSIONS
+        )
+        .all();
+
+
+    const rows =
+      oldVersions.results ||
+      [];
+
+
+    for (
+      const versionRow of rows
+    ) {
+
+      try {
+
+        await deleteStoredFileByUrl(
+          env,
+          versionRow.file_url
+        );
+
+
+        await env.DB
+          .prepare(
+            `
+            DELETE FROM mod_versions
+
+            WHERE
+              id = ?
+              AND mod_id = ?
+            `
+          )
+          .bind(
+            versionRow.id,
+            modId
+          )
+          .run();
+
+      } catch (versionCleanupError) {
+
+        console.error(
+          "Old version cleanup error:",
+          versionCleanupError
+        );
+      }
+    }
+
+  } catch (error) {
+
+    /*
+     * Retention cleanup must never make a successful
+     * release fail. It can be retried on the next update.
+     */
+    console.error(
+      "Version retention error:",
+      error
+    );
+  }
+}
+
+
+async function deleteStoredFileByUrl(
+  env,
+  fileUrl
+) {
+
+  if (
+    !env.MOD_FILES ||
+    !fileUrl
+  ) {
+
+    return;
+  }
+
+
+  const prefix =
+    "/files/";
+
+
+  if (
+    !String(
+      fileUrl
+    ).startsWith(
+      prefix
+    )
+  ) {
+
+    return;
+  }
+
+
+  const encodedKey =
+    String(
+      fileUrl
+    ).slice(
+      prefix.length
+    );
+
+
+  const key =
+    decodeURIComponent(
+      encodedKey
+    );
+
+
+  if (
+    !key ||
+    key.includes(
+      ".."
+    )
+  ) {
+
+    return;
+  }
+
+
+  await env.MOD_FILES.delete(
+    key
+  );
 }
 
 
