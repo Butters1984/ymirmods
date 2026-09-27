@@ -1655,6 +1655,89 @@
     }
 
 
+    .my-mod-actions {
+
+      margin-top:
+        12px;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        10px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    .my-mod-stars {
+
+      color:
+        #ffd36b;
+
+      font-size:
+        0.82rem;
+
+      font-weight:
+        bold;
+
+    }
+
+
+    .deprecated-badge {
+
+      display:
+        inline-flex;
+
+      margin-left:
+        8px;
+
+      padding:
+        3px 7px;
+
+      border-radius:
+        999px;
+
+      color:
+        #ffb3a4;
+
+      background:
+        rgba(
+          120,
+          35,
+          25,
+          0.18
+        );
+
+      border:
+        1px solid
+        rgba(
+          255,
+          110,
+          85,
+          0.22
+        );
+
+      font-size:
+        0.67rem;
+
+      font-weight:
+        bold;
+
+      vertical-align:
+        middle;
+
+    }
+
+
     .mods-loading,
     .mods-empty,
     .mods-error {
@@ -3669,6 +3752,32 @@
       );
 
 
+      if (
+        Boolean(
+          mod.is_deprecated
+        )
+      ) {
+
+        const deprecatedBadge =
+          document.createElement(
+            "span"
+          );
+
+
+        deprecatedBadge.className =
+          "deprecated-badge";
+
+
+        deprecatedBadge.textContent =
+          "DEPRECATED";
+
+
+        details.appendChild(
+          deprecatedBadge
+        );
+      }
+
+
       const icon =
         document.createElement(
           "img"
@@ -3793,6 +3902,200 @@
 
       card.appendChild(
         footer
+      );
+
+
+      const actions =
+        document.createElement(
+          "div"
+        );
+
+
+      actions.className =
+        "my-mod-actions";
+
+
+      actions.addEventListener(
+        "click",
+        event => {
+
+          event.stopPropagation();
+        }
+      );
+
+
+      const stars =
+        document.createElement(
+          "span"
+        );
+
+
+      stars.className =
+        "my-mod-stars";
+
+
+      stars.textContent =
+        "★ " +
+        Number(
+          mod.star_count ||
+          0
+        )
+          .toLocaleString();
+
+
+      const deprecatedButton =
+        document.createElement(
+          "button"
+        );
+
+
+      deprecatedButton.type =
+        "button";
+
+
+      deprecatedButton.className =
+        Boolean(
+          mod.is_deprecated
+        )
+          ? "button secondary"
+          : "button danger";
+
+
+      deprecatedButton.textContent =
+        Boolean(
+          mod.is_deprecated
+        )
+          ? "Restore Mod"
+          : "Mark Deprecated";
+
+
+      deprecatedButton.addEventListener(
+        "click",
+        async event => {
+
+          event.preventDefault();
+          event.stopPropagation();
+
+
+          const makeDeprecated =
+            !Boolean(
+              mod.is_deprecated
+            );
+
+
+          let message =
+            "";
+
+
+          if (
+            makeDeprecated
+          ) {
+
+            const entered =
+              window.prompt(
+                "Optional deprecated message for visitors:",
+                mod.deprecated_message ||
+                "This mod is no longer actively supported."
+              );
+
+
+            if (
+              entered ===
+              null
+            ) {
+
+              return;
+            }
+
+
+            message =
+              entered.trim();
+          }
+
+
+          deprecatedButton.disabled =
+            true;
+
+
+          try {
+
+            const response =
+              await fetch(
+                "/api/mod/" +
+                encodeURIComponent(
+                  mod.slug
+                ) +
+                "/deprecated",
+                {
+                  method:
+                    "POST",
+
+                  credentials:
+                    "same-origin",
+
+                  headers: {
+                    "Content-Type":
+                      "application/json"
+                  },
+
+                  body:
+                    JSON.stringify({
+                      is_deprecated:
+                        makeDeprecated,
+
+                      deprecated_message:
+                        message
+                    })
+                }
+              );
+
+
+            const result =
+              await response.json();
+
+
+            if (
+              !response.ok ||
+              !result.success
+            ) {
+
+              throw new Error(
+                result.message ||
+                "Unable to update mod status."
+              );
+            }
+
+
+            await loadMyMods();
+
+          } catch (error) {
+
+            alert(
+              error.message ||
+              "Unable to update mod status."
+            );
+
+
+            deprecatedButton.disabled =
+              false;
+          }
+
+        }
+      );
+
+
+      actions.appendChild(
+        stars
+      );
+
+
+      actions.appendChild(
+        deprecatedButton
+      );
+
+
+      card.appendChild(
+        actions
       );
 
 
