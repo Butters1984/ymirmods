@@ -32,7 +32,7 @@ const MAX_CHANGELOG_LENGTH =
 
 // Keep the current release plus 4 older releases.
 const MAX_STORED_MOD_VERSIONS =
-  5;
+  3;
 
 
 /* =========================================================
