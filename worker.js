@@ -12,6 +12,12 @@ const DISCORD_STATE_COOKIE_NAME =
 const DISCORD_STATE_LENGTH_SECONDS =
   60 * 10;
 
+const GITHUB_STATE_COOKIE_NAME =
+  "ymir_github_state";
+
+const GITHUB_STATE_LENGTH_SECONDS =
+  60 * 10;
+
 const MAX_MOD_FILE_SIZE =
   100 * 1024 * 1024;
 
@@ -89,6 +95,42 @@ export default {
     ) {
 
       return handleDiscordCallback(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       GITHUB LOGIN
+       ===================================================== */
+
+    if (
+      url.pathname ===
+        "/api/auth/github" &&
+      request.method ===
+        "GET"
+    ) {
+
+      return handleGitHubLogin(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       GITHUB CALLBACK
+       ===================================================== */
+
+    if (
+      url.pathname ===
+        "/api/auth/github/callback" &&
+      request.method ===
+        "GET"
+    ) {
+
+      return handleGitHubCallback(
         request,
         env
       );
@@ -437,6 +479,12 @@ export default {
       url.pathname ===
         "/api/auth/discord/callback" ||
 
+      url.pathname ===
+        "/api/auth/github" ||
+
+      url.pathname ===
+        "/api/auth/github/callback" ||
+
       url.pathname.startsWith(
         "/api/mod/"
       ) ||
@@ -513,6 +561,15 @@ async function handleTest(
           env.DISCORD_CLIENT_ID &&
           env.DISCORD_CLIENT_SECRET &&
           env.DISCORD_REDIRECT_URI
+        )
+          ? "configured"
+          : "missing",
+
+      github:
+        (
+          env.GITHUB_CLIENT_ID &&
+          env.GITHUB_CLIENT_SECRET &&
+          env.GITHUB_REDIRECT_URI
         )
           ? "configured"
           : "missing",
@@ -1317,6 +1374,999 @@ async function handleDiscordCallback(
 
 
 /* =========================================================
+   GITHUB LOGIN
+   ========================================================= */
+
+async function handleGitHubLogin(
+  request,
+  env
+) {
+
+  try {
+
+    if (
+      !env.GITHUB_CLIENT_ID ||
+      !env.GITHUB_CLIENT_SECRET ||
+      !env.GITHUB_REDIRECT_URI
+    ) {
+
+      return new Response(
+        "GitHub login is not configured.",
+        {
+          status:
+            500
+        }
+      );
+    }
+
+
+    const state =
+      generateSessionToken();
+
+
+    const authorizeUrl =
+      new URL(
+        "https://github.com/login/oauth/authorize"
+      );
+
+
+    authorizeUrl
+      .searchParams
+      .set(
+        "client_id",
+        env.GITHUB_CLIENT_ID
+      );
+
+
+    authorizeUrl
+      .searchParams
+      .set(
+        "redirect_uri",
+        env.GITHUB_REDIRECT_URI
+      );
+
+
+    authorizeUrl
+      .searchParams
+      .set(
+        "scope",
+        "read:user user:email"
+      );
+
+
+    authorizeUrl
+      .searchParams
+      .set(
+        "state",
+        state
+      );
+
+
+    const headers =
+      new Headers();
+
+
+    headers.set(
+      "Location",
+      authorizeUrl.toString()
+    );
+
+
+    headers.set(
+      "Cache-Control",
+      "no-store"
+    );
+
+
+    headers.append(
+      "Set-Cookie",
+      createGitHubStateCookie(
+        state
+      )
+    );
+
+
+    return new Response(
+      null,
+      {
+        status:
+          302,
+
+        headers:
+          headers
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "GitHub login error:",
+      error
+    );
+
+
+    return new Response(
+      "Unable to start GitHub login.",
+      {
+        status:
+          500
+      }
+    );
+  }
+}
+
+
+/* =========================================================
+   GITHUB CALLBACK
+   ========================================================= */
+
+async function handleGitHubCallback(
+  request,
+  env
+) {
+
+  try {
+
+    const url =
+      new URL(
+        request.url
+      );
+
+
+    const githubError =
+      url.searchParams.get(
+        "error"
+      );
+
+
+    if (
+      githubError
+    ) {
+
+      return redirectResponse(
+        "/login?error=github_cancelled",
+        {
+          "Set-Cookie":
+            clearGitHubStateCookie()
+        }
+      );
+    }
+
+
+    const code =
+      url.searchParams.get(
+        "code"
+      );
+
+
+    const returnedState =
+      url.searchParams.get(
+        "state"
+      );
+
+
+    const storedState =
+      getCookie(
+        request,
+        GITHUB_STATE_COOKIE_NAME
+      );
+
+
+    if (
+      !code ||
+      !returnedState ||
+      !storedState ||
+      returnedState !==
+        storedState
+    ) {
+
+      return redirectResponse(
+        "/login?error=github_state",
+        {
+          "Set-Cookie":
+            clearGitHubStateCookie()
+        }
+      );
+    }
+
+
+    const tokenBody =
+      new URLSearchParams();
+
+
+    tokenBody.set(
+      "client_id",
+      env.GITHUB_CLIENT_ID
+    );
+
+
+    tokenBody.set(
+      "client_secret",
+      env.GITHUB_CLIENT_SECRET
+    );
+
+
+    tokenBody.set(
+      "code",
+      code
+    );
+
+
+    tokenBody.set(
+      "redirect_uri",
+      env.GITHUB_REDIRECT_URI
+    );
+
+
+    const tokenResponse =
+      await fetch(
+        "https://github.com/login/oauth/access_token",
+        {
+          method:
+            "POST",
+
+          headers: {
+            "Accept":
+              "application/json",
+
+            "Content-Type":
+              "application/x-www-form-urlencoded",
+
+            "User-Agent":
+              "YMIR-Mods"
+          },
+
+          body:
+            tokenBody
+        }
+      );
+
+
+    if (
+      !tokenResponse.ok
+    ) {
+
+      console.error(
+        "GitHub token exchange failed:",
+        tokenResponse.status
+      );
+
+
+      return redirectResponse(
+        "/login?error=github_token",
+        {
+          "Set-Cookie":
+            clearGitHubStateCookie()
+        }
+      );
+    }
+
+
+    const tokenData =
+      await tokenResponse.json();
+
+
+    const accessToken =
+      String(
+        tokenData.access_token ||
+        ""
+      )
+        .trim();
+
+
+    if (
+      !accessToken
+    ) {
+
+      return redirectResponse(
+        "/login?error=github_token",
+        {
+          "Set-Cookie":
+            clearGitHubStateCookie()
+        }
+      );
+    }
+
+
+    const githubHeaders = {
+      "Accept":
+        "application/vnd.github+json",
+
+      "Authorization":
+        `Bearer ${accessToken}`,
+
+      "User-Agent":
+        "YMIR-Mods",
+
+      "X-GitHub-Api-Version":
+        "2022-11-28"
+    };
+
+
+    const githubUserResponse =
+      await fetch(
+        "https://api.github.com/user",
+        {
+          headers:
+            githubHeaders
+        }
+      );
+
+
+    if (
+      !githubUserResponse.ok
+    ) {
+
+      console.error(
+        "GitHub user request failed:",
+        githubUserResponse.status
+      );
+
+
+      return redirectResponse(
+        "/login?error=github_user",
+        {
+          "Set-Cookie":
+            clearGitHubStateCookie()
+        }
+      );
+    }
+
+
+    const githubUser =
+      await githubUserResponse.json();
+
+
+    const githubId =
+      String(
+        githubUser.id ??
+        ""
+      )
+        .trim();
+
+
+    const githubUsername =
+      String(
+        githubUser.login ??
+        ""
+      )
+        .trim();
+
+
+    const githubDisplayName =
+      String(
+        githubUser.name ||
+        githubUser.login ||
+        ""
+      )
+        .trim();
+
+
+    const githubAvatarUrl =
+      String(
+        githubUser.avatar_url ||
+        ""
+      )
+        .trim() ||
+      null;
+
+
+    if (
+      !githubId ||
+      !githubUsername
+    ) {
+
+      return redirectResponse(
+        "/login?error=github_user",
+        {
+          "Set-Cookie":
+            clearGitHubStateCookie()
+        }
+      );
+    }
+
+
+    let githubEmail =
+      "";
+
+
+    const githubEmailResponse =
+      await fetch(
+        "https://api.github.com/user/emails?per_page=100",
+        {
+          headers:
+            githubHeaders
+        }
+      );
+
+
+    if (
+      githubEmailResponse.ok
+    ) {
+
+      const emails =
+        await githubEmailResponse.json();
+
+
+      if (
+        Array.isArray(
+          emails
+        )
+      ) {
+
+        const primaryVerified =
+          emails.find(
+            email =>
+              email &&
+              email.primary ===
+                true &&
+              email.verified ===
+                true &&
+              email.email
+          );
+
+
+        const anyVerified =
+          emails.find(
+            email =>
+              email &&
+              email.verified ===
+                true &&
+              email.email
+          );
+
+
+        githubEmail =
+          String(
+            (
+              primaryVerified ||
+              anyVerified
+            )
+              ?.email ||
+            ""
+          )
+            .trim()
+            .toLowerCase();
+      }
+    }
+
+
+    if (
+      !githubEmail
+    ) {
+
+      const publicEmail =
+        String(
+          githubUser.email ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      if (
+        publicEmail
+      ) {
+
+        githubEmail =
+          publicEmail;
+      }
+    }
+
+
+    let user =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            id,
+            username,
+            email,
+            role,
+            can_upload,
+            discord_id,
+            discord_username,
+            display_name,
+            avatar_url,
+            github_id,
+            github_username,
+            github_avatar_url
+
+          FROM users
+
+          WHERE github_id = ?
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          githubId
+        )
+        .first();
+
+
+    if (
+      !user &&
+      githubEmail
+    ) {
+
+      const emailUser =
+        await env.DB
+          .prepare(
+            `
+            SELECT
+              id,
+              username,
+              email,
+              role,
+              can_upload,
+              discord_id,
+              discord_username,
+              display_name,
+              avatar_url,
+              github_id,
+              github_username,
+              github_avatar_url
+
+            FROM users
+
+            WHERE LOWER(email) =
+                  LOWER(?)
+
+            LIMIT 1
+            `
+          )
+          .bind(
+            githubEmail
+          )
+          .first();
+
+
+      if (
+        emailUser
+      ) {
+
+        if (
+          emailUser.github_id &&
+          String(
+            emailUser.github_id
+          ) !==
+            githubId
+        ) {
+
+          return redirectResponse(
+            "/login?error=github_conflict",
+            {
+              "Set-Cookie":
+                clearGitHubStateCookie()
+            }
+          );
+        }
+
+
+        await env.DB
+          .prepare(
+            `
+            UPDATE users
+
+            SET
+              github_id = ?,
+              github_username = ?,
+              github_avatar_url = ?,
+              display_name =
+                CASE
+                  WHEN display_name IS NULL
+                    OR TRIM(display_name) = ''
+                  THEN ?
+                  ELSE display_name
+                END,
+              avatar_url =
+                CASE
+                  WHEN avatar_url IS NULL
+                    OR TRIM(avatar_url) = ''
+                  THEN ?
+                  ELSE avatar_url
+                END
+
+            WHERE id = ?
+            `
+          )
+          .bind(
+            githubId,
+            githubUsername,
+            githubAvatarUrl,
+            githubDisplayName,
+            githubAvatarUrl,
+            emailUser.id
+          )
+          .run();
+
+
+        user = {
+          ...emailUser,
+
+          github_id:
+            githubId,
+
+          github_username:
+            githubUsername,
+
+          github_avatar_url:
+            githubAvatarUrl,
+
+          display_name:
+            emailUser.display_name ||
+            githubDisplayName,
+
+          avatar_url:
+            emailUser.avatar_url ||
+            githubAvatarUrl
+        };
+      }
+    }
+
+
+    if (
+      !user
+    ) {
+
+      const username =
+        await createUniqueGitHubUsername(
+          env,
+          githubUsername,
+          githubId
+        );
+
+
+      const email =
+        githubEmail ||
+        `github_${githubId}@users.ymirmods.invalid`;
+
+
+      const randomPassword =
+        generateSessionToken() +
+        generateSessionToken();
+
+
+      const passwordHash =
+        await hashPassword(
+          randomPassword
+        );
+
+
+      const insert =
+        await env.DB
+          .prepare(
+            `
+            INSERT INTO users (
+              username,
+              email,
+              password_hash,
+              role,
+              can_upload,
+              display_name,
+              avatar_url,
+              github_id,
+              github_username,
+              github_avatar_url
+            )
+
+            VALUES (
+              ?,
+              ?,
+              ?,
+              'member',
+              1,
+              ?,
+              ?,
+              ?,
+              ?,
+              ?
+            )
+            `
+          )
+          .bind(
+            username,
+            email,
+            passwordHash,
+            githubDisplayName,
+            githubAvatarUrl,
+            githubId,
+            githubUsername,
+            githubAvatarUrl
+          )
+          .run();
+
+
+      const userId =
+        insert?.meta
+          ?.last_row_id;
+
+
+      if (
+        !userId
+      ) {
+
+        throw new Error(
+          "Unable to create GitHub user."
+        );
+      }
+
+
+      user = {
+        id:
+          userId,
+
+        username:
+          username,
+
+        email:
+          email,
+
+        role:
+          "member",
+
+        can_upload:
+          1,
+
+        discord_id:
+          null,
+
+        discord_username:
+          null,
+
+        display_name:
+          githubDisplayName,
+
+        avatar_url:
+          githubAvatarUrl,
+
+        github_id:
+          githubId,
+
+        github_username:
+          githubUsername,
+
+        github_avatar_url:
+          githubAvatarUrl
+      };
+
+    } else {
+
+      await env.DB
+        .prepare(
+          `
+          UPDATE users
+
+          SET
+            github_username = ?,
+            github_avatar_url = ?,
+            display_name =
+              CASE
+                WHEN display_name IS NULL
+                  OR TRIM(display_name) = ''
+                THEN ?
+                ELSE display_name
+              END,
+            avatar_url =
+              CASE
+                WHEN avatar_url IS NULL
+                  OR TRIM(avatar_url) = ''
+                THEN ?
+                ELSE avatar_url
+              END
+
+          WHERE id = ?
+          `
+        )
+        .bind(
+          githubUsername,
+          githubAvatarUrl,
+          githubDisplayName,
+          githubAvatarUrl,
+          user.id
+        )
+        .run();
+
+
+      user.github_username =
+        githubUsername;
+
+
+      user.github_avatar_url =
+        githubAvatarUrl;
+
+
+      user.display_name =
+        user.display_name ||
+        githubDisplayName;
+
+
+      user.avatar_url =
+        user.avatar_url ||
+        githubAvatarUrl;
+    }
+
+
+    const sessionToken =
+      await createUserSession(
+        env,
+        user.id
+      );
+
+
+    const headers =
+      new Headers();
+
+
+    headers.set(
+      "Location",
+      "/dashboard"
+    );
+
+
+    headers.set(
+      "Cache-Control",
+      "no-store"
+    );
+
+
+    headers.append(
+      "Set-Cookie",
+      createSessionCookie(
+        sessionToken
+      )
+    );
+
+
+    headers.append(
+      "Set-Cookie",
+      clearGitHubStateCookie()
+    );
+
+
+    return new Response(
+      null,
+      {
+        status:
+          302,
+
+        headers:
+          headers
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "GitHub callback error:",
+      error
+    );
+
+
+    return redirectResponse(
+      "/login?error=github_failed",
+      {
+        "Set-Cookie":
+          clearGitHubStateCookie()
+      }
+    );
+  }
+}
+
+
+/* =========================================================
+   UNIQUE GITHUB USERNAME
+   ========================================================= */
+
+async function createUniqueGitHubUsername(
+  env,
+  githubUsername,
+  githubId
+) {
+
+  let base =
+    String(
+      githubUsername ||
+      "GitHubUser"
+    )
+      .trim()
+      .replace(
+        /[^A-Za-z0-9_-]/g,
+        "_"
+      )
+      .replace(
+        /_+/g,
+        "_"
+      );
+
+
+  if (
+    base.length <
+      3
+  ) {
+
+    base =
+      "GitHubUser";
+  }
+
+
+  base =
+    base.slice(
+      0,
+      24
+    );
+
+
+  let candidate =
+    base;
+
+
+  let attempt =
+    0;
+
+
+  while (
+    true
+  ) {
+
+    const existing =
+      await env.DB
+        .prepare(
+          `
+          SELECT id
+
+          FROM users
+
+          WHERE LOWER(username) =
+                LOWER(?)
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          candidate
+        )
+        .first();
+
+
+    if (
+      !existing
+    ) {
+
+      return candidate;
+    }
+
+
+    attempt++;
+
+
+    const suffix =
+      attempt ===
+        1
+        ? "_" +
+          githubId.slice(
+            -4
+          )
+        : "_" +
+          attempt;
+
+
+    candidate =
+      base.slice(
+        0,
+        Math.max(
+          3,
+          24 -
+          suffix.length
+        )
+      ) +
+      suffix;
+  }
+}
+
+
+/* =========================================================
    DISCORD AVATAR
    ========================================================= */
 
@@ -1769,7 +2819,9 @@ async function handlePublicCreator(
             created_at,
             display_name,
             avatar_url,
-            discord_username
+            discord_username,
+            github_username,
+            github_avatar_url
 
           FROM users
 
@@ -1865,8 +2917,13 @@ async function handlePublicCreator(
           creator.discord_username ||
           null,
 
+        github_username:
+          creator.github_username ||
+          null,
+
         avatar_url:
           creator.avatar_url ||
+          creator.github_avatar_url ||
           null,
 
         role:
@@ -3599,7 +4656,10 @@ async function getAuthenticatedUser(
           users.discord_id,
           users.discord_username,
           users.display_name,
-          users.avatar_url
+          users.avatar_url,
+          users.github_id,
+          users.github_username,
+          users.github_avatar_url
 
         FROM sessions
 
@@ -3666,8 +4726,18 @@ function publicUser(
       user.discord_username ||
       null,
 
+    github_linked:
+      Boolean(
+        user.github_id
+      ),
+
+    github_username:
+      user.github_username ||
+      null,
+
     avatar_url:
       user.avatar_url ||
+      user.github_avatar_url ||
       null
   };
 }
@@ -4064,6 +5134,42 @@ function clearDiscordStateCookie() {
 
   return [
     `${DISCORD_STATE_COOKIE_NAME}=`,
+    "Path=/",
+    "HttpOnly",
+    "Secure",
+    "SameSite=Lax",
+    "Max-Age=0"
+  ].join(
+    "; "
+  );
+}
+
+
+/* =========================================================
+   GITHUB STATE COOKIE
+   ========================================================= */
+
+function createGitHubStateCookie(
+  state
+) {
+
+  return [
+    `${GITHUB_STATE_COOKIE_NAME}=${state}`,
+    "Path=/",
+    "HttpOnly",
+    "Secure",
+    "SameSite=Lax",
+    `Max-Age=${GITHUB_STATE_LENGTH_SECONDS}`
+  ].join(
+    "; "
+  );
+}
+
+
+function clearGitHubStateCookie() {
+
+  return [
+    `${GITHUB_STATE_COOKIE_NAME}=`,
     "Path=/",
     "HttpOnly",
     "Secure",
