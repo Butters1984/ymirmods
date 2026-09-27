@@ -364,6 +364,76 @@ export default {
 
 
     /* =====================================================
+       STAR / UNSTAR MOD
+       ===================================================== */
+
+    if (
+      url.pathname.match(
+        /^\/api\/mod\/[a-z0-9-]+\/star$/
+      ) &&
+      request.method ===
+        "POST"
+    ) {
+
+      const parts =
+        url.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      const slug =
+        String(
+          parts[2] ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      return handleToggleModStar(
+        request,
+        env,
+        slug
+      );
+    }
+
+
+    /* =====================================================
+       DEPRECATE / RESTORE MOD
+       ===================================================== */
+
+    if (
+      url.pathname.match(
+        /^\/api\/mod\/[a-z0-9-]+\/deprecated$/
+      ) &&
+      request.method ===
+        "POST"
+    ) {
+
+      const parts =
+        url.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      const slug =
+        String(
+          parts[2] ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      return handleSetModDeprecated(
+        request,
+        env,
+        slug
+      );
+    }
+
+
+    /* =====================================================
        SINGLE PUBLIC MOD
        ===================================================== */
 
@@ -386,6 +456,7 @@ export default {
 
 
       return handlePublicMod(
+        request,
         env,
         slug
       );
@@ -2681,8 +2752,16 @@ async function handlePublicMods(
             mods.download_url,
             mods.changelog,
             mods.is_published,
+            mods.is_deprecated,
+            mods.deprecated_message,
             mods.created_at,
             mods.updated_at,
+
+            (
+              SELECT COUNT(*)
+              FROM mod_stars
+              WHERE mod_stars.mod_id = mods.id
+            ) AS star_count,
 
             users.id AS author_id,
             users.username AS author,
@@ -2749,6 +2828,7 @@ async function handlePublicMods(
    ========================================================= */
 
 async function handlePublicMod(
+  request,
   env,
   slug
 ) {
@@ -2794,8 +2874,16 @@ async function handlePublicMod(
             mods.download_url,
             mods.changelog,
             mods.is_published,
+            mods.is_deprecated,
+            mods.deprecated_message,
             mods.created_at,
             mods.updated_at,
+
+            (
+              SELECT COUNT(*)
+              FROM mod_stars
+              WHERE mod_stars.mod_id = mods.id
+            ) AS star_count,
 
             users.id AS author_id,
             users.username AS author,
@@ -2870,12 +2958,65 @@ async function handlePublicMod(
         .all();
 
 
+    const viewer =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    let starredByUser =
+      false;
+
+
+    if (
+      viewer
+    ) {
+
+      const existingStar =
+        await env.DB
+          .prepare(
+            `
+            SELECT id
+
+            FROM mod_stars
+
+            WHERE
+              mod_id = ?
+              AND user_id = ?
+
+            LIMIT 1
+            `
+          )
+          .bind(
+            mod.id,
+            viewer.id
+          )
+          .first();
+
+
+      starredByUser =
+        Boolean(
+          existingStar
+        );
+    }
+
+
     return jsonResponse({
       success:
         true,
 
       mod: {
         ...mod,
+
+        star_count:
+          Number(
+            mod.star_count ||
+            0
+          ),
+
+        starred_by_user:
+          starredByUser,
 
         versions:
           versions.results ||
@@ -3003,8 +3144,16 @@ async function handlePublicCreator(
             icon_url,
             download_url,
             changelog,
+            is_deprecated,
+            deprecated_message,
             created_at,
-            updated_at
+            updated_at,
+
+            (
+              SELECT COUNT(*)
+              FROM mod_stars
+              WHERE mod_stars.mod_id = mods.id
+            ) AS star_count
 
           FROM mods
 
@@ -3149,8 +3298,16 @@ async function handleMyMods(
             download_url,
             changelog,
             is_published,
+            is_deprecated,
+            deprecated_message,
             created_at,
-            updated_at
+            updated_at,
+
+            (
+              SELECT COUNT(*)
+              FROM mod_stars
+              WHERE mod_stars.mod_id = mods.id
+            ) AS star_count
 
           FROM mods
 
@@ -3207,6 +3364,412 @@ async function handleMyMods(
 
         error:
           error.message
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   MOD STARS
+   ========================================================= */
+
+async function handleToggleModStar(
+  request,
+  env,
+  slug
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in to star a mod."
+        },
+        401
+      );
+    }
+
+
+    const mod =
+      await env.DB
+        .prepare(
+          `
+          SELECT id
+
+          FROM mods
+
+          WHERE
+            slug = ?
+            AND is_published = 1
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          slug
+        )
+        .first();
+
+
+    if (
+      !mod
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Mod not found."
+        },
+        404
+      );
+    }
+
+
+    const existing =
+      await env.DB
+        .prepare(
+          `
+          SELECT id
+
+          FROM mod_stars
+
+          WHERE
+            mod_id = ?
+            AND user_id = ?
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          mod.id,
+          user.id
+        )
+        .first();
+
+
+    let starred;
+
+
+    if (
+      existing
+    ) {
+
+      await env.DB
+        .prepare(
+          `
+          DELETE FROM mod_stars
+
+          WHERE
+            mod_id = ?
+            AND user_id = ?
+          `
+        )
+        .bind(
+          mod.id,
+          user.id
+        )
+        .run();
+
+
+      starred =
+        false;
+
+    } else {
+
+      await env.DB
+        .prepare(
+          `
+          INSERT INTO mod_stars (
+            mod_id,
+            user_id,
+            created_at
+          )
+
+          VALUES (
+            ?,
+            ?,
+            CURRENT_TIMESTAMP
+          )
+          `
+        )
+        .bind(
+          mod.id,
+          user.id
+        )
+        .run();
+
+
+      starred =
+        true;
+    }
+
+
+    const count =
+      await env.DB
+        .prepare(
+          `
+          SELECT COUNT(*) AS count
+
+          FROM mod_stars
+
+          WHERE mod_id = ?
+          `
+        )
+        .bind(
+          mod.id
+        )
+        .first();
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      starred:
+        starred,
+
+      star_count:
+        Number(
+          count?.count ||
+          0
+        )
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Toggle mod star error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to update star."
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   MOD DEPRECATION
+   ========================================================= */
+
+async function handleSetModDeprecated(
+  request,
+  env,
+  slug
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    const mod =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            id,
+            owner_user_id
+
+          FROM mods
+
+          WHERE slug = ?
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          slug
+        )
+        .first();
+
+
+    if (
+      !mod
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Mod not found."
+        },
+        404
+      );
+    }
+
+
+    const canManage =
+      Number(
+        mod.owner_user_id
+      ) ===
+      Number(
+        user.id
+      ) ||
+      user.role ===
+        "admin";
+
+
+    if (
+      !canManage
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You do not have permission to manage this mod."
+        },
+        403
+      );
+    }
+
+
+    let body = {};
+
+
+    try {
+
+      body =
+        await request.json();
+
+    } catch {
+
+      body = {};
+    }
+
+
+    const isDeprecated =
+      Boolean(
+        body.is_deprecated
+      );
+
+
+    const deprecatedMessage =
+      String(
+        body.deprecated_message ||
+        ""
+      )
+        .trim()
+        .slice(
+          0,
+          500
+        );
+
+
+    await env.DB
+      .prepare(
+        `
+        UPDATE mods
+
+        SET
+          is_deprecated = ?,
+          deprecated_message = ?,
+          updated_at =
+            CURRENT_TIMESTAMP
+
+        WHERE id = ?
+        `
+      )
+      .bind(
+        isDeprecated
+          ? 1
+          : 0,
+        isDeprecated
+          ? deprecatedMessage
+          : null,
+        mod.id
+      )
+      .run();
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      is_deprecated:
+        isDeprecated,
+
+      deprecated_message:
+        isDeprecated
+          ? deprecatedMessage
+          : null,
+
+      message:
+        isDeprecated
+          ? "Mod marked as deprecated."
+          : "Mod restored from deprecated status."
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Set deprecated error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to update deprecated status."
       },
       500
     );
