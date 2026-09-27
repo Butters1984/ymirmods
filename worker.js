@@ -245,6 +245,121 @@ export default {
 
 
     /* =====================================================
+       API KEYS - LIST
+       ===================================================== */
+
+    if (
+      url.pathname ===
+        "/api/api-keys" &&
+      request.method ===
+        "GET"
+    ) {
+
+      return handleListApiKeys(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       API KEYS - GENERATE
+       ===================================================== */
+
+    if (
+      url.pathname ===
+        "/api/api-keys" &&
+      request.method ===
+        "POST"
+    ) {
+
+      return handleGenerateApiKey(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       API KEYS - REVOKE
+       ===================================================== */
+
+    if (
+      url.pathname.match(
+        /^\/api\/api-keys\/\d+\/revoke$/
+      ) &&
+      request.method ===
+        "POST"
+    ) {
+
+      const keyId =
+        Number(
+          url.pathname.split("/")[3]
+        );
+
+
+      return handleRevokeApiKey(
+        request,
+        env,
+        keyId
+      );
+    }
+
+
+    /* =====================================================
+       CREATOR API - WHO AM I
+       ===================================================== */
+
+    if (
+      url.pathname ===
+        "/api/v1/me" &&
+      request.method ===
+        "GET"
+    ) {
+
+      return handleApiV1Me(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       CREATOR API - PUBLISH RELEASE
+       ===================================================== */
+
+    if (
+      url.pathname.match(
+        /^\/api\/v1\/mods\/[a-z0-9-]+\/releases$/
+      ) &&
+      request.method ===
+        "POST"
+    ) {
+
+      const parts =
+        url.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      const slug =
+        String(
+          parts[3] ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      return handleApiV1PublishRelease(
+        request,
+        env,
+        slug
+      );
+    }
+
+
+    /* =====================================================
        SINGLE PUBLIC MOD
        ===================================================== */
 
@@ -472,6 +587,20 @@ export default {
 
       url.pathname ===
         "/api/mods/upload" ||
+
+      url.pathname ===
+        "/api/api-keys" ||
+
+      url.pathname.startsWith(
+        "/api/api-keys/"
+      ) ||
+
+      url.pathname ===
+        "/api/v1/me" ||
+
+      url.pathname.startsWith(
+        "/api/v1/mods/"
+      ) ||
 
       url.pathname ===
         "/api/auth/discord" ||
@@ -3681,6 +3810,1369 @@ async function handleLogout(
 
         message:
           "Unable to log out."
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   API KEY MANAGEMENT
+   ========================================================= */
+
+async function handleListApiKeys(
+  request,
+  env
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    const result =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            id,
+            name,
+            key_prefix,
+            scopes,
+            created_at,
+            last_used_at,
+            revoked_at
+
+          FROM api_keys
+
+          WHERE user_id = ?
+
+          ORDER BY
+            id DESC
+          `
+        )
+        .bind(
+          user.id
+        )
+        .all();
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      api_keys:
+        result.results ||
+        []
+    });
+
+  } catch (error) {
+
+    console.error(
+      "List API keys error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to load API keys."
+      },
+      500
+    );
+  }
+}
+
+
+async function handleGenerateApiKey(
+  request,
+  env
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    let body = {};
+
+
+    try {
+
+      body =
+        await request.json();
+
+    } catch {
+
+      body = {};
+    }
+
+
+    const name =
+      String(
+        body.name ||
+        "GitHub Releases"
+      )
+        .trim()
+        .slice(
+          0,
+          80
+        );
+
+
+    if (
+      !name
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "API key name is required."
+        },
+        400
+      );
+    }
+
+
+    const activeCount =
+      await env.DB
+        .prepare(
+          `
+          SELECT COUNT(*) AS count
+
+          FROM api_keys
+
+          WHERE
+            user_id = ?
+            AND revoked_at IS NULL
+          `
+        )
+        .bind(
+          user.id
+        )
+        .first();
+
+
+    if (
+      Number(
+        activeCount?.count ||
+        0
+      ) >= 10
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You can have up to 10 active API keys."
+        },
+        400
+      );
+    }
+
+
+    const rawKey =
+      "ymir_live_" +
+      generateSessionToken();
+
+
+    const keyHash =
+      await hashApiKey(
+        rawKey
+      );
+
+
+    const keyPrefix =
+      rawKey.slice(
+        0,
+        18
+      );
+
+
+    const scopes =
+      "mods:read,mods:upload,mods:update";
+
+
+    const insert =
+      await env.DB
+        .prepare(
+          `
+          INSERT INTO api_keys (
+            user_id,
+            name,
+            key_prefix,
+            key_hash,
+            scopes,
+            created_at
+          )
+
+          VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            CURRENT_TIMESTAMP
+          )
+          `
+        )
+        .bind(
+          user.id,
+          name,
+          keyPrefix,
+          keyHash,
+          scopes
+        )
+        .run();
+
+
+    return jsonResponse(
+      {
+        success:
+          true,
+
+        message:
+          "API key generated. Copy it now — YMIR will not show it again.",
+
+        api_key: {
+          id:
+            insert?.meta
+              ?.last_row_id ||
+            null,
+
+          name:
+            name,
+
+          key:
+            rawKey,
+
+          key_prefix:
+            keyPrefix,
+
+          scopes:
+            scopes
+        }
+      },
+      201
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Generate API key error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to generate API key."
+      },
+      500
+    );
+  }
+}
+
+
+async function handleRevokeApiKey(
+  request,
+  env,
+  keyId
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    if (
+      !Number.isInteger(
+        keyId
+      ) ||
+      keyId < 1
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid API key."
+        },
+        400
+      );
+    }
+
+
+    const result =
+      await env.DB
+        .prepare(
+          `
+          UPDATE api_keys
+
+          SET revoked_at =
+            COALESCE(
+              revoked_at,
+              CURRENT_TIMESTAMP
+            )
+
+          WHERE
+            id = ?
+            AND user_id = ?
+          `
+        )
+        .bind(
+          keyId,
+          user.id
+        )
+        .run();
+
+
+    if (
+      !result?.meta?.changes
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "API key not found."
+        },
+        404
+      );
+    }
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      message:
+        "API key revoked."
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Revoke API key error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to revoke API key."
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   API KEY AUTHENTICATION
+   ========================================================= */
+
+async function getApiKeyUser(
+  request,
+  env,
+  requiredScope = null
+) {
+
+  const authorization =
+    String(
+      request.headers.get(
+        "Authorization"
+      ) ||
+      ""
+    )
+      .trim();
+
+
+  const match =
+    authorization.match(
+      /^Bearer\s+(.+)$/i
+    );
+
+
+  if (
+    !match
+  ) {
+
+    return null;
+  }
+
+
+  const rawKey =
+    match[1]
+      .trim();
+
+
+  if (
+    !rawKey.startsWith(
+      "ymir_live_"
+    )
+  ) {
+
+    return null;
+  }
+
+
+  const keyHash =
+    await hashApiKey(
+      rawKey
+    );
+
+
+  const row =
+    await env.DB
+      .prepare(
+        `
+        SELECT
+          api_keys.id AS api_key_id,
+          api_keys.scopes AS api_key_scopes,
+
+          users.id,
+          users.username,
+          users.email,
+          users.role,
+          users.can_upload,
+          users.display_name,
+          users.avatar_url,
+          users.discord_id,
+          users.discord_username,
+          users.github_id,
+          users.github_username,
+          users.github_avatar_url
+
+        FROM api_keys
+
+        INNER JOIN users
+          ON users.id =
+             api_keys.user_id
+
+        WHERE
+          api_keys.key_hash = ?
+          AND api_keys.revoked_at IS NULL
+
+        LIMIT 1
+        `
+      )
+      .bind(
+        keyHash
+      )
+      .first();
+
+
+  if (
+    !row
+  ) {
+
+    return null;
+  }
+
+
+  const scopes =
+    String(
+      row.api_key_scopes ||
+      ""
+    )
+      .split(",")
+      .map(
+        scope =>
+          scope.trim()
+      )
+      .filter(Boolean);
+
+
+  if (
+    requiredScope &&
+    !scopes.includes(
+      requiredScope
+    )
+  ) {
+
+    return null;
+  }
+
+
+  await env.DB
+    .prepare(
+      `
+      UPDATE api_keys
+
+      SET last_used_at =
+        CURRENT_TIMESTAMP
+
+      WHERE id = ?
+      `
+    )
+    .bind(
+      row.api_key_id
+    )
+    .run();
+
+
+  return {
+    ...row,
+
+    scopes:
+      scopes
+  };
+}
+
+
+async function hashApiKey(
+  rawKey
+) {
+
+  const digest =
+    await crypto.subtle
+      .digest(
+        "SHA-256",
+
+        new TextEncoder()
+          .encode(
+            rawKey
+          )
+      );
+
+
+  return bytesToHex(
+    new Uint8Array(
+      digest
+    )
+  );
+}
+
+
+/* =========================================================
+   CREATOR API V1
+   ========================================================= */
+
+async function handleApiV1Me(
+  request,
+  env
+) {
+
+  try {
+
+    const user =
+      await getApiKeyUser(
+        request,
+        env,
+        "mods:read"
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid or revoked API key."
+        },
+        401
+      );
+    }
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      user: {
+        id:
+          user.id,
+
+        username:
+          user.username,
+
+        display_name:
+          user.display_name ||
+          user.username,
+
+        role:
+          user.role,
+
+        can_upload:
+          Boolean(
+            user.can_upload
+          )
+      },
+
+      scopes:
+        user.scopes
+    });
+
+  } catch (error) {
+
+    console.error(
+      "API v1 me error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to authenticate API key."
+      },
+      500
+    );
+  }
+}
+
+
+async function handleApiV1PublishRelease(
+  request,
+  env,
+  slug
+) {
+
+  let packageKey =
+    null;
+
+  let iconKey =
+    null;
+
+
+  try {
+
+    const user =
+      await getApiKeyUser(
+        request,
+        env,
+        "mods:update"
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid API key or missing mods:update scope."
+        },
+        401
+      );
+    }
+
+
+    if (
+      !Boolean(
+        user.can_upload
+      )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "This creator does not have upload permission."
+        },
+        403
+      );
+    }
+
+
+    if (
+      !slug ||
+      !/^[a-z0-9-]+$/.test(
+        slug
+      )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid mod slug."
+        },
+        400
+      );
+    }
+
+
+    const mod =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            id,
+            owner_user_id,
+            name,
+            slug,
+            version,
+            full_description,
+            icon_url
+
+          FROM mods
+
+          WHERE slug = ?
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          slug
+        )
+        .first();
+
+
+    if (
+      !mod
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Mod not found."
+        },
+        404
+      );
+    }
+
+
+    if (
+      Number(
+        mod.owner_user_id
+      ) !==
+      Number(
+        user.id
+      )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "This API key does not own that mod."
+        },
+        403
+      );
+    }
+
+
+    if (
+      !env.MOD_FILES
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "YMIR file storage is unavailable."
+        },
+        500
+      );
+    }
+
+
+    const form =
+      await request.formData();
+
+
+    const version =
+      String(
+        form.get(
+          "version"
+        ) ||
+        ""
+      )
+        .trim();
+
+
+    const changelog =
+      String(
+        form.get(
+          "changelog"
+        ) ||
+        ""
+      )
+        .trim();
+
+
+    const fullDescriptionValue =
+      form.get(
+        "full_description"
+      );
+
+
+    const fullDescription =
+      fullDescriptionValue ===
+        null
+        ? null
+        : String(
+            fullDescriptionValue
+          );
+
+
+    const modFile =
+      form.get(
+        "mod_file"
+      );
+
+
+    const iconFile =
+      form.get(
+        "icon_file"
+      );
+
+
+    if (
+      !version ||
+      version.length >
+        32
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "A valid version is required."
+        },
+        400
+      );
+    }
+
+
+    if (
+      fullDescription !==
+        null &&
+      fullDescription.length >
+        MAX_FULL_DESCRIPTION_LENGTH
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "README/full description is too long."
+        },
+        400
+      );
+    }
+
+
+    if (
+      changelog.length >
+        MAX_CHANGELOG_LENGTH
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Changelog is too long."
+        },
+        400
+      );
+    }
+
+
+    if (
+      !(
+        modFile instanceof
+        File
+      ) ||
+      modFile.size ===
+        0
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "mod_file ZIP is required."
+        },
+        400
+      );
+    }
+
+
+    if (
+      modFile.size >
+        MAX_MOD_FILE_SIZE
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Mod package is too large."
+        },
+        413
+      );
+    }
+
+
+    if (
+      !modFile.name
+        .toLowerCase()
+        .endsWith(
+          ".zip"
+        )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "mod_file must be a ZIP file."
+        },
+        400
+      );
+    }
+
+
+    if (
+      iconFile instanceof
+        File &&
+      iconFile.size >
+        0
+    ) {
+
+      if (
+        iconFile.size >
+          MAX_ICON_FILE_SIZE
+      ) {
+
+        return jsonResponse(
+          {
+            success:
+              false,
+
+            message:
+              "Icon is too large."
+          },
+          413
+        );
+      }
+
+
+      if (
+        ![
+          "image/png",
+          "image/jpeg",
+          "image/webp"
+        ].includes(
+          iconFile.type
+        )
+      ) {
+
+        return jsonResponse(
+          {
+            success:
+              false,
+
+            message:
+              "Icon must be PNG, JPG or WebP."
+          },
+          400
+        );
+      }
+    }
+
+
+    const existingVersion =
+      await env.DB
+        .prepare(
+          `
+          SELECT id
+
+          FROM mod_versions
+
+          WHERE
+            mod_id = ?
+            AND version = ?
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          mod.id,
+          version
+        )
+        .first();
+
+
+    if (
+      existingVersion
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "That version already exists for this mod."
+        },
+        409
+      );
+    }
+
+
+    const timestamp =
+      Date.now();
+
+
+    const cleanPackageName =
+      sanitizeFilename(
+        modFile.name
+      );
+
+
+    packageKey =
+      `mods/${user.id}/${slug}/${version}/${timestamp}-${cleanPackageName}`;
+
+
+    await env.MOD_FILES.put(
+      packageKey,
+      modFile.stream(),
+      {
+        httpMetadata: {
+          contentType:
+            modFile.type ||
+            "application/zip",
+
+          contentDisposition:
+            `attachment; filename="${cleanPackageName}"`
+        },
+
+        customMetadata: {
+          uploader:
+            user.username,
+
+          mod:
+            mod.name,
+
+          version:
+            version,
+
+          source:
+            "api"
+        }
+      }
+    );
+
+
+    if (
+      iconFile instanceof
+        File &&
+      iconFile.size >
+        0
+    ) {
+
+      const extension =
+        getImageExtension(
+          iconFile.type
+        );
+
+
+      iconKey =
+        `mods/${user.id}/${slug}/icon-${timestamp}.${extension}`;
+
+
+      await env.MOD_FILES.put(
+        iconKey,
+        iconFile.stream(),
+        {
+          httpMetadata: {
+            contentType:
+              iconFile.type,
+
+            contentDisposition:
+              "inline"
+          }
+        }
+      );
+    }
+
+
+    const packageUrl =
+      "/files/" +
+      encodeURI(
+        packageKey
+      );
+
+
+    const iconUrl =
+      iconKey
+        ? "/files/" +
+          encodeURI(
+            iconKey
+          )
+        : mod.icon_url;
+
+
+    await env.DB
+      .prepare(
+        `
+        INSERT INTO mod_versions (
+          mod_id,
+          version,
+          file_url,
+          changelog,
+          file_size,
+          downloads,
+          created_at
+        )
+
+        VALUES (
+          ?,
+          ?,
+          ?,
+          ?,
+          ?,
+          0,
+          CURRENT_TIMESTAMP
+        )
+        `
+      )
+      .bind(
+        mod.id,
+        version,
+        packageUrl,
+        changelog,
+        modFile.size
+      )
+      .run();
+
+
+    await env.DB
+      .prepare(
+        `
+        UPDATE mods
+
+        SET
+          version = ?,
+          download_url = ?,
+          changelog = ?,
+          full_description =
+            CASE
+              WHEN ? IS NULL
+              THEN full_description
+              ELSE ?
+            END,
+          icon_url = ?,
+          updated_at =
+            CURRENT_TIMESTAMP
+
+        WHERE
+          id = ?
+          AND owner_user_id = ?
+        `
+      )
+      .bind(
+        version,
+        packageUrl,
+        changelog,
+        fullDescription,
+        fullDescription,
+        iconUrl,
+        mod.id,
+        user.id
+      )
+      .run();
+
+
+    return jsonResponse(
+      {
+        success:
+          true,
+
+        message:
+          "Release published to YMIR Mods.",
+
+        mod: {
+          id:
+            mod.id,
+
+          slug:
+            slug,
+
+          version:
+            version,
+
+          download_url:
+            packageUrl,
+
+          icon_url:
+            iconUrl
+        }
+      },
+      201
+    );
+
+  } catch (error) {
+
+    console.error(
+      "API release publish error:",
+      error
+    );
+
+
+    try {
+
+      if (
+        packageKey &&
+        env.MOD_FILES
+      ) {
+
+        await env.MOD_FILES.delete(
+          packageKey
+        );
+      }
+
+
+      if (
+        iconKey &&
+        env.MOD_FILES
+      ) {
+
+        await env.MOD_FILES.delete(
+          iconKey
+        );
+      }
+
+    } catch (cleanupError) {
+
+      console.error(
+        "API release cleanup error:",
+        cleanupError
+      );
+    }
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to publish release."
       },
       500
     );
