@@ -3108,13 +3108,6 @@ async function handlePublicMod(
         .all();
 
 
-    const viewer =
-      await getAuthenticatedUser(
-        request,
-        env
-      );
-
-
     let starredByUser =
       false;
 
@@ -3532,6 +3525,13 @@ async function handleGetModComments(
 ) {
 
   try {
+
+    const viewer =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
 
     if (
       !slug ||
