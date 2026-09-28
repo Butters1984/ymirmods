@@ -30,7 +30,7 @@ const MAX_FULL_DESCRIPTION_LENGTH =
 const MAX_CHANGELOG_LENGTH =
   50000;
 
-// Keep the current release plus 4 older releases.
+// Keep the current release plus 2 older releases.
 const MAX_STORED_MOD_VERSIONS =
   3;
 
@@ -322,6 +322,24 @@ export default {
     ) {
 
       return handleApiV1Me(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
+       CREATOR API - CREATE MOD
+       ===================================================== */
+
+    if (
+      url.pathname ===
+        "/api/v1/mods" &&
+      request.method ===
+        "POST"
+    ) {
+
+      return handleApiV1CreateMod(
         request,
         env
       );
@@ -672,6 +690,9 @@ export default {
 
       url.pathname ===
         "/api/v1/me" ||
+
+      url.pathname ===
+        "/api/v1/mods" ||
 
       url.pathname.startsWith(
         "/api/v1/mods/"
@@ -5083,6 +5104,804 @@ async function handleApiV1Me(
 }
 
 
+async function handleApiV1CreateMod(
+  request,
+  env
+) {
+
+  let packageKey =
+    null;
+
+  let iconKey =
+    null;
+
+  let modId =
+    null;
+
+
+  try {
+
+    const user =
+      await getApiKeyUser(
+        request,
+        env,
+        "mods:upload"
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid API key or missing mods:upload scope."
+        },
+        401
+      );
+    }
+
+
+    if (
+      !Boolean(
+        user.can_upload
+      )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "This creator does not have upload permission."
+        },
+        403
+      );
+    }
+
+
+    if (
+      !env.MOD_FILES
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "YMIR file storage is unavailable."
+        },
+        500
+      );
+    }
+
+
+    let form;
+
+
+    try {
+
+      form =
+        await request.formData();
+
+    } catch (error) {
+
+      console.error(
+        "Create mod multipart parse error:",
+        error
+      );
+
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid multipart form data."
+        },
+        400
+      );
+    }
+
+
+    const name =
+      String(
+        form.get(
+          "name"
+        ) ??
+        ""
+      )
+        .trim();
+
+
+    const version =
+      String(
+        form.get(
+          "version"
+        ) ??
+        ""
+      )
+        .trim();
+
+
+    const category =
+      String(
+        form.get(
+          "category"
+        ) ??
+        ""
+      )
+        .trim();
+
+
+    const shortDescription =
+      String(
+        form.get(
+          "short_description"
+        ) ??
+        ""
+      )
+        .trim();
+
+
+    const fullDescription =
+      String(
+        form.get(
+          "full_description"
+        ) ??
+        ""
+      );
+
+
+    const changelog =
+      String(
+        form.get(
+          "changelog"
+        ) ??
+        ""
+      )
+        .trim();
+
+
+    const modFile =
+      form.get(
+        "mod_file"
+      );
+
+
+    const iconFile =
+      form.get(
+        "icon_file"
+      );
+
+
+    if (
+      name.length <
+        2 ||
+      name.length >
+        80
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Mod name must be between 2 and 80 characters."
+        },
+        400
+      );
+    }
+
+
+    if (
+      !version ||
+      version.length >
+        32
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "A valid version is required."
+        },
+        400
+      );
+    }
+
+
+    if (
+      category.length <
+        2 ||
+      category.length >
+        60
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Category must be between 2 and 60 characters."
+        },
+        400
+      );
+    }
+
+
+    if (
+      shortDescription.length <
+        10 ||
+      shortDescription.length >
+        250
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Short description must be between 10 and 250 characters."
+        },
+        400
+      );
+    }
+
+
+    if (
+      fullDescription.length >
+        MAX_FULL_DESCRIPTION_LENGTH
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "README/full description is too long."
+        },
+        400
+      );
+    }
+
+
+    if (
+      changelog.length >
+        MAX_CHANGELOG_LENGTH
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Changelog is too long."
+        },
+        400
+      );
+    }
+
+
+    if (
+      !(
+        modFile instanceof
+        File
+      ) ||
+      modFile.size ===
+        0
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "mod_file ZIP is required."
+        },
+        400
+      );
+    }
+
+
+    if (
+      modFile.size >
+        MAX_MOD_FILE_SIZE
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Mod package is too large."
+        },
+        413
+      );
+    }
+
+
+    if (
+      !modFile.name
+        .toLowerCase()
+        .endsWith(
+          ".zip"
+        )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "mod_file must be a ZIP file."
+        },
+        400
+      );
+    }
+
+
+    if (
+      iconFile instanceof
+        File &&
+      iconFile.size >
+        0
+    ) {
+
+      if (
+        iconFile.size >
+          MAX_ICON_FILE_SIZE
+      ) {
+
+        return jsonResponse(
+          {
+            success:
+              false,
+
+            message:
+              "Icon is too large."
+          },
+          413
+        );
+      }
+
+
+      if (
+        ![
+          "image/png",
+          "image/jpeg",
+          "image/webp"
+        ].includes(
+          iconFile.type
+        )
+      ) {
+
+        return jsonResponse(
+          {
+            success:
+              false,
+
+            message:
+              "Icon must be PNG, JPG or WebP."
+          },
+          400
+        );
+      }
+    }
+
+
+    const slug =
+      createSlug(
+        name
+      );
+
+
+    if (
+      !slug
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Unable to create a valid mod slug."
+        },
+        400
+      );
+    }
+
+
+    const existing =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            id,
+            owner_user_id
+
+          FROM mods
+
+          WHERE slug = ?
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          slug
+        )
+        .first();
+
+
+    if (
+      existing
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "A mod with that slug already exists.",
+
+          slug:
+            slug
+        },
+        409
+      );
+    }
+
+
+    const timestamp =
+      Date.now();
+
+
+    const cleanPackageName =
+      sanitizeFilename(
+        modFile.name
+      );
+
+
+    packageKey =
+      `mods/${user.id}/${slug}/${version}/${timestamp}-${cleanPackageName}`;
+
+
+    await env.MOD_FILES.put(
+      packageKey,
+      modFile.stream(),
+      {
+        httpMetadata: {
+
+          contentType:
+            modFile.type ||
+            "application/zip",
+
+          contentDisposition:
+            `attachment; filename="${cleanPackageName}"`
+        },
+
+        customMetadata: {
+
+          uploader:
+            user.username,
+
+          mod:
+            name,
+
+          version:
+            version,
+
+          source:
+            "api-create"
+        }
+      }
+    );
+
+
+    if (
+      iconFile instanceof
+        File &&
+      iconFile.size >
+        0
+    ) {
+
+      const extension =
+        getImageExtension(
+          iconFile.type
+        );
+
+
+      iconKey =
+        `mods/${user.id}/${slug}/icon-${timestamp}.${extension}`;
+
+
+      await env.MOD_FILES.put(
+        iconKey,
+        iconFile.stream(),
+        {
+          httpMetadata: {
+
+            contentType:
+              iconFile.type,
+
+            contentDisposition:
+              "inline"
+          }
+        }
+      );
+    }
+
+
+    const packageUrl =
+      "/files/" +
+      encodeURI(
+        packageKey
+      );
+
+
+    const iconUrl =
+      iconKey
+        ? "/files/" +
+          encodeURI(
+            iconKey
+          )
+        : null;
+
+
+    const insert =
+      await env.DB
+        .prepare(
+          `
+          INSERT INTO mods (
+            owner_user_id,
+            name,
+            slug,
+            version,
+            category,
+            short_description,
+            full_description,
+            icon_url,
+            download_url,
+            changelog,
+            is_published,
+            created_at,
+            updated_at
+          )
+
+          VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            1,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
+          )
+          `
+        )
+        .bind(
+          user.id,
+          name,
+          slug,
+          version,
+          category,
+          shortDescription,
+          fullDescription,
+          iconUrl,
+          packageUrl,
+          changelog
+        )
+        .run();
+
+
+    modId =
+      insert?.meta
+        ?.last_row_id;
+
+
+    if (
+      !modId
+    ) {
+
+      throw new Error(
+        "Unable to determine new mod ID."
+      );
+    }
+
+
+    await env.DB
+      .prepare(
+        `
+        INSERT INTO mod_versions (
+          mod_id,
+          version,
+          file_url,
+          changelog,
+          file_size,
+          downloads,
+          created_at
+        )
+
+        VALUES (
+          ?,
+          ?,
+          ?,
+          ?,
+          ?,
+          0,
+          CURRENT_TIMESTAMP
+        )
+        `
+      )
+      .bind(
+        modId,
+        version,
+        packageUrl,
+        changelog,
+        modFile.size
+      )
+      .run();
+
+
+    return jsonResponse(
+      {
+        success:
+          true,
+
+        message:
+          "Mod created on YMIR Mods.",
+
+        mod: {
+          id:
+            modId,
+
+          name:
+            name,
+
+          slug:
+            slug,
+
+          version:
+            version,
+
+          category:
+            category,
+
+          short_description:
+            shortDescription,
+
+          icon_url:
+            iconUrl,
+
+          download_url:
+            packageUrl
+        },
+
+        version_retention: {
+          current:
+            1,
+
+          older:
+            MAX_STORED_MOD_VERSIONS -
+            1,
+
+          total:
+            MAX_STORED_MOD_VERSIONS
+        }
+      },
+      201
+    );
+
+  } catch (error) {
+
+    console.error(
+      "API create mod error:",
+      error
+    );
+
+
+    try {
+
+      if (
+        modId
+      ) {
+
+        await env.DB
+          .prepare(
+            `
+            DELETE FROM mod_versions
+            WHERE mod_id = ?
+            `
+          )
+          .bind(
+            modId
+          )
+          .run();
+
+
+        await env.DB
+          .prepare(
+            `
+            DELETE FROM mods
+            WHERE id = ?
+            `
+          )
+          .bind(
+            modId
+          )
+          .run();
+      }
+
+
+      if (
+        packageKey &&
+        env.MOD_FILES
+      ) {
+
+        await env.MOD_FILES.delete(
+          packageKey
+        );
+      }
+
+
+      if (
+        iconKey &&
+        env.MOD_FILES
+      ) {
+
+        await env.MOD_FILES.delete(
+          iconKey
+        );
+      }
+
+    } catch (cleanupError) {
+
+      console.error(
+        "API create mod cleanup error:",
+        cleanupError
+      );
+    }
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to create mod."
+      },
+      500
+    );
+  }
+}
+
+
 async function handleApiV1PublishRelease(
   request,
   env,
@@ -5244,8 +6063,33 @@ async function handleApiV1PublishRelease(
     }
 
 
-    const form =
-      await request.formData();
+    let form;
+
+
+    try {
+
+      form =
+        await request.formData();
+
+    } catch (error) {
+
+      console.error(
+        "Release multipart parse error:",
+        error
+      );
+
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid multipart form data."
+        },
+        400
+      );
+    }
 
 
     const version =
