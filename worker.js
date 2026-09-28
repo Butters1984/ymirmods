@@ -743,6 +743,33 @@ export default {
 
 
     /* =====================================================
+       DISCORD INVITE ICON
+       ===================================================== */
+
+    if (
+      url.pathname.startsWith(
+        "/api/discord-invite-icon/"
+      ) &&
+      request.method ===
+        "GET"
+    ) {
+
+      const inviteCode =
+        decodeURIComponent(
+          url.pathname.slice(
+            "/api/discord-invite-icon/".length
+          )
+        )
+          .trim();
+
+
+      return handleDiscordInviteIcon(
+        inviteCode
+      );
+    }
+
+
+    /* =====================================================
        R2 FILES
        ===================================================== */
 
@@ -8832,6 +8859,150 @@ async function handleStoredFile(
         status:
           500
       }
+    );
+  }
+}
+
+
+/* =========================================================
+   DISCORD INVITE ICON
+   ========================================================= */
+
+async function handleDiscordInviteIcon(
+  inviteCode
+) {
+
+  const fallback =
+    "/ymirmodwebsiteicon.png";
+
+
+  try {
+
+    if (
+      !inviteCode ||
+      inviteCode.length >
+        32 ||
+      !/^[A-Za-z0-9_-]+$/.test(
+        inviteCode
+      )
+    ) {
+
+      return Response.redirect(
+        fallback,
+        302
+      );
+    }
+
+
+    const response =
+      await fetch(
+        "https://discord.com/api/v10/invites/" +
+        encodeURIComponent(
+          inviteCode
+        ) +
+        "?with_counts=false&with_expiration=false",
+        {
+          headers: {
+            "Accept":
+              "application/json",
+
+            "User-Agent":
+              "YMIRMods/1.0 (https://ymirmods.com)"
+          }
+        }
+      );
+
+
+    if (
+      !response.ok
+    ) {
+
+      return Response.redirect(
+        fallback,
+        302
+      );
+    }
+
+
+    const data =
+      await response.json();
+
+
+    const guildId =
+      String(
+        data?.guild?.id ||
+        ""
+      );
+
+
+    const iconHash =
+      String(
+        data?.guild?.icon ||
+        ""
+      );
+
+
+    if (
+      !guildId ||
+      !iconHash
+    ) {
+
+      return Response.redirect(
+        fallback,
+        302
+      );
+    }
+
+
+    const extension =
+      iconHash.startsWith(
+        "a_"
+      )
+        ? "gif"
+        : "png";
+
+
+    const iconUrl =
+      "https://cdn.discordapp.com/icons/" +
+      encodeURIComponent(
+        guildId
+      ) +
+      "/" +
+      encodeURIComponent(
+        iconHash
+      ) +
+      "." +
+      extension +
+      "?size=128";
+
+
+    return new Response(
+      null,
+      {
+        status:
+          302,
+
+        headers: {
+          "Location":
+            iconUrl,
+
+          "Cache-Control":
+            "public, max-age=3600"
+        }
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Discord invite icon error:",
+      error
+    );
+
+
+    return Response.redirect(
+      fallback,
+      302
     );
   }
 }
