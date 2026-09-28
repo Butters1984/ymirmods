@@ -1925,6 +1925,201 @@
     }
 
 
+    .comment-reply {
+      padding:
+        2px 6px;
+
+      border-radius:
+        7px;
+
+      cursor:
+        pointer;
+
+      color:
+        #d8c28c;
+
+      background:
+        transparent;
+
+      border:
+        1px solid
+        rgba(255,192,70,0.14);
+
+      font:
+        inherit;
+
+      font-size:
+        0.66rem;
+
+      font-weight:
+        700;
+    }
+
+
+    .comment-reply:hover {
+      color:
+        #ffe09a;
+
+      border-color:
+        rgba(255,205,95,0.28);
+
+      background:
+        rgba(255,170,30,0.05);
+    }
+
+
+    .comment-children {
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        8px;
+
+      margin:
+        9px 0 0 14px;
+
+      padding-left:
+        10px;
+
+      border-left:
+        1px solid
+        rgba(255,192,70,0.12);
+    }
+
+
+    .comment-item.reply-item {
+      background:
+        rgba(255,170,30,0.02);
+    }
+
+
+    .reply-form {
+      display:
+        none;
+
+      margin-top:
+        9px;
+
+      padding-top:
+        9px;
+
+      border-top:
+        1px solid
+        rgba(255,192,70,0.08);
+    }
+
+
+    .reply-form.open {
+      display:
+        block;
+    }
+
+
+    .reply-input {
+      width:
+        100%;
+
+      min-height:
+        62px;
+
+      resize:
+        vertical;
+
+      padding:
+        9px 10px;
+
+      border-radius:
+        9px;
+
+      color:
+        #ead9ad;
+
+      background:
+        rgba(7,10,14,0.78);
+
+      border:
+        1px solid
+        rgba(255,192,70,0.14);
+
+      font:
+        inherit;
+
+      font-size:
+        0.78rem;
+    }
+
+
+    .reply-actions {
+      display:
+        flex;
+
+      justify-content:
+        flex-end;
+
+      gap:
+        7px;
+
+      margin-top:
+        7px;
+    }
+
+
+    .reply-submit,
+    .reply-cancel {
+      padding:
+        5px 8px;
+
+      border-radius:
+        8px;
+
+      cursor:
+        pointer;
+
+      font:
+        inherit;
+
+      font-size:
+        0.7rem;
+
+      font-weight:
+        800;
+    }
+
+
+    .reply-submit {
+      color:
+        #171006;
+
+      background:
+        linear-gradient(
+          135deg,
+          #d77808,
+          #ffad28,
+          #f1c45c
+        );
+
+      border:
+        1px solid
+        rgba(255,220,130,0.48);
+    }
+
+
+    .reply-cancel {
+      color:
+        #c8b684;
+
+      background:
+        transparent;
+
+      border:
+        1px solid
+        rgba(255,192,70,0.14);
+    }
+
+
     .comment-body {
       color:
         #cbb88d;
@@ -3713,8 +3908,43 @@
       }
 
 
+      const byParent =
+        new Map();
+
+
       for (
         const comment of comments
+      ) {
+
+        const key =
+          comment.parent_comment_id ||
+          0;
+
+
+        if (
+          !byParent.has(
+            key
+          )
+        ) {
+
+          byParent.set(
+            key,
+            []
+          );
+        }
+
+
+        byParent.get(
+          key
+        ).push(
+          comment
+        );
+      }
+
+
+      function buildComment(
+        comment,
+        depth = 0
       ) {
 
         const item =
@@ -3724,7 +3954,9 @@
 
 
         item.className =
-          "comment-item";
+          depth > 0
+            ? "comment-item reply-item"
+            : "comment-item";
 
 
         const meta =
@@ -3801,6 +4033,29 @@
 
         metaRight.appendChild(
           date
+        );
+
+
+        const replyButton =
+          document.createElement(
+            "button"
+          );
+
+
+        replyButton.type =
+          "button";
+
+
+        replyButton.className =
+          "comment-reply";
+
+
+        replyButton.textContent =
+          "Reply";
+
+
+        metaRight.appendChild(
+          replyButton
         );
 
 
@@ -3926,9 +4181,350 @@
         );
 
 
-        list.appendChild(
-          item
+        const replyForm =
+          document.createElement(
+            "div"
+          );
+
+
+        replyForm.className =
+          "reply-form";
+
+
+        const replyInput =
+          document.createElement(
+            "textarea"
+          );
+
+
+        replyInput.className =
+          "reply-input";
+
+
+        replyInput.maxLength =
+          1000;
+
+
+        replyInput.placeholder =
+          "Reply to " +
+          (
+            comment.display_name ||
+            comment.username ||
+            "this user"
+          ) +
+          "...";
+
+
+        const replyActions =
+          document.createElement(
+            "div"
+          );
+
+
+        replyActions.className =
+          "reply-actions";
+
+
+        const cancelButton =
+          document.createElement(
+            "button"
+          );
+
+
+        cancelButton.type =
+          "button";
+
+
+        cancelButton.className =
+          "reply-cancel";
+
+
+        cancelButton.textContent =
+          "Cancel";
+
+
+        const submitButton =
+          document.createElement(
+            "button"
+          );
+
+
+        submitButton.type =
+          "button";
+
+
+        submitButton.className =
+          "reply-submit";
+
+
+        submitButton.textContent =
+          "Reply";
+
+
+        replyActions.appendChild(
+          cancelButton
         );
+
+
+        replyActions.appendChild(
+          submitButton
+        );
+
+
+        replyForm.appendChild(
+          replyInput
+        );
+
+
+        replyForm.appendChild(
+          replyActions
+        );
+
+
+        item.appendChild(
+          replyForm
+        );
+
+
+        replyButton.addEventListener(
+          "click",
+          () => {
+
+            replyForm.classList.toggle(
+              "open"
+            );
+
+
+            if (
+              replyForm.classList.contains(
+                "open"
+              )
+            ) {
+
+              replyInput.focus();
+            }
+          }
+        );
+
+
+        cancelButton.addEventListener(
+          "click",
+          () => {
+
+            replyInput.value =
+              "";
+
+
+            replyForm.classList.remove(
+              "open"
+            );
+          }
+        );
+
+
+        submitButton.addEventListener(
+          "click",
+          async () => {
+
+            const reply =
+              replyInput.value
+                .trim();
+
+
+            if (
+              !reply
+            ) {
+
+              return;
+            }
+
+
+            submitButton.disabled =
+              true;
+
+
+            try {
+
+              const response =
+                await fetch(
+                  "/api/mod/" +
+                    encodeURIComponent(
+                      getModSlug()
+                    ) +
+                    "/comments",
+                  {
+                    method:
+                      "POST",
+
+                    credentials:
+                      "same-origin",
+
+                    headers: {
+                      "Content-Type":
+                        "application/json"
+                    },
+
+                    body:
+                      JSON.stringify({
+                        comment:
+                          reply,
+
+                        parent_comment_id:
+                          comment.id
+                      })
+                  }
+                );
+
+
+              const result =
+                await response.json();
+
+
+              if (
+                response.status ===
+                401
+              ) {
+
+                window.location.href =
+                  "/login";
+
+                return;
+              }
+
+
+              if (
+                !response.ok ||
+                !result.success
+              ) {
+
+                throw new Error(
+                  result.message ||
+                  "Unable to post reply."
+                );
+              }
+
+
+              replyInput.value =
+                "";
+
+
+              replyForm.classList.remove(
+                "open"
+              );
+
+
+              await loadComments();
+
+            } catch (error) {
+
+              alert(
+                error.message ||
+                "Unable to post reply."
+              );
+
+            } finally {
+
+              submitButton.disabled =
+                false;
+            }
+          }
+        );
+
+
+        const children =
+          byParent.get(
+            comment.id
+          ) ||
+          [];
+
+
+        if (
+          children.length >
+          0
+        ) {
+
+          const childWrap =
+            document.createElement(
+              "div"
+            );
+
+
+          childWrap.className =
+            "comment-children";
+
+
+          for (
+            const child of children
+          ) {
+
+            childWrap.appendChild(
+              buildComment(
+                child,
+                depth + 1
+              )
+            );
+          }
+
+
+          item.appendChild(
+            childWrap
+          );
+        }
+
+
+        return item;
+      }
+
+
+      const roots =
+        byParent.get(
+          0
+        ) ||
+        [];
+
+
+      for (
+        const comment of roots
+      ) {
+
+        list.appendChild(
+          buildComment(
+            comment
+          )
+        );
+      }
+
+
+      const rootIds =
+        new Set(
+          comments.map(
+            comment =>
+              Number(
+                comment.id
+              )
+          )
+        );
+
+
+      for (
+        const comment of comments
+      ) {
+
+        if (
+          comment.parent_comment_id &&
+          !rootIds.has(
+            Number(
+              comment.parent_comment_id
+            )
+          )
+        ) {
+
+          list.appendChild(
+            buildComment(
+              comment
+            )
+          );
+        }
       }
     }
 
