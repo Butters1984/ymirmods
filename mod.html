@@ -2027,9 +2027,6 @@
       padding:
         10px;
 
-      cursor:
-        pointer;
-
       border-radius:
         10px;
 
@@ -2043,15 +2040,6 @@
       transition:
         border-color 0.18s ease,
         background 0.18s ease;
-    }
-
-
-    .comment-item:hover {
-      border-color:
-        rgba(255,194,82,0.20);
-
-      background:
-        rgba(255,170,30,0.045);
     }
 
 
@@ -2441,46 +2429,6 @@
     /* =====================================================
        COMMENT CONVERSATION MODAL
        ===================================================== */
-
-    .comment-expand-button {
-      padding:
-        5px 9px;
-
-      border-radius:
-        9px;
-
-      cursor:
-        pointer;
-
-      color:
-        #d9c38d;
-
-      background:
-        rgba(255,170,30,0.04);
-
-      border:
-        1px solid
-        rgba(255,192,70,0.14);
-
-      font:
-        inherit;
-
-      font-size:
-        0.72rem;
-
-      font-weight:
-        800;
-    }
-
-
-    .comment-expand-button:hover {
-      color:
-        #ffe09a;
-
-      border-color:
-        rgba(255,205,95,0.30);
-    }
-
 
     .comment-modal {
       position:
@@ -3667,22 +3615,9 @@
 
               <div class="panel sidebar-panel">
 
-                <div class="panel-title-row">
-
-                  <h2 class="panel-title">
-                    Comments
-                  </h2>
-
-
-                  <button
-                    id="commentExpand"
-                    class="comment-expand-button"
-                    type="button"
-                  >
-                    Expand
-                  </button>
-
-                </div>
+                <h2 class="panel-title">
+                  Comments
+                </h2>
 
 
                 <div class="comment-form">
@@ -5291,27 +5226,6 @@
         );
 
 
-        item.addEventListener(
-          "click",
-          event => {
-
-            if (
-              event.target.closest(
-                "button, textarea, input, a"
-              )
-            ) {
-
-              return;
-            }
-
-
-            openCommentTicket(
-              comment.id
-            );
-          }
-        );
-
-
         const replyForm =
           document.createElement(
             "div"
@@ -5421,19 +5335,50 @@
           "click",
           () => {
 
-            replyForm.classList.toggle(
-              "open"
+            openCommentTicket(
+              comment.id
             );
 
 
-            if (
-              replyForm.classList.contains(
-                "open"
-              )
-            ) {
+            requestAnimationFrame(
+              () => {
 
-              replyInput.focus();
-            }
+                const modalItems =
+                  document
+                    .getElementById(
+                      "commentModalList"
+                    )
+                    .querySelectorAll(
+                      ".comment-item"
+                    );
+
+
+                const lastItem =
+                  modalItems[
+                    modalItems.length -
+                    1
+                  ];
+
+
+                if (
+                  lastItem
+                ) {
+
+                  const modalReply =
+                    lastItem.querySelector(
+                      ".comment-reply"
+                    );
+
+
+                  if (
+                    modalReply
+                  ) {
+
+                    modalReply.click();
+                  }
+                }
+              }
+            );
           }
         );
 
@@ -5816,12 +5761,6 @@
       );
 
 
-    const commentExpand =
-      document.getElementById(
-        "commentExpand"
-      );
-
-
     const commentModalClose =
       document.getElementById(
         "commentModalClose"
@@ -6124,50 +6063,6 @@
     }
 
 
-    function openCommentModal() {
-
-      activeCommentTicketId =
-        null;
-
-
-      document
-        .getElementById(
-          "commentModalTitle"
-        )
-        .textContent =
-          "All Comments";
-
-
-      renderComments(
-        currentComments,
-        "commentModalList",
-        true
-      );
-
-
-      commentModal.classList.add(
-        "open"
-      );
-
-
-      commentModal.setAttribute(
-        "aria-hidden",
-        "false"
-      );
-
-
-      commentModalBody.scrollTop =
-        0;
-
-
-      refreshJumpLatestButtonSoon();
-
-
-      document.body.style.overflow =
-        "hidden";
-    }
-
-
     function closeCommentModal() {
 
       activeCommentTicketId =
@@ -6193,12 +6088,6 @@
       document.body.style.overflow =
         "";
     }
-
-
-    commentExpand.addEventListener(
-      "click",
-      openCommentModal
-    );
 
 
     commentModalClose.addEventListener(
