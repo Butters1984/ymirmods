@@ -812,7 +812,7 @@
 
       gap: 20px;
 
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
 
     .section-heading h2 {
@@ -827,16 +827,158 @@
       font-size: 0.9rem;
     }
 
+
+    .creator-toolbar {
+      display: grid;
+
+      grid-template-columns:
+        auto 1fr minmax(220px, 320px);
+
+      align-items: center;
+
+      gap: 14px;
+
+      margin-bottom: 18px;
+
+      padding-bottom: 14px;
+
+      border-bottom:
+        1px solid
+        rgba(255,194,82,0.10);
+    }
+
+
+    .creator-mod-total {
+      color: var(--gold2);
+
+      font-weight: 800;
+
+      white-space: nowrap;
+    }
+
+
+    .creator-pagination {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 6px;
+
+      min-width: 0;
+    }
+
+
+    .creator-page-button,
+    .creator-page-arrow {
+      min-width: 30px;
+
+      height: 30px;
+
+      padding: 0 8px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      color: #d9c28c;
+
+      background:
+        rgba(255,183,77,0.045);
+
+      border:
+        1px solid
+        rgba(255,194,82,0.14);
+
+      font: inherit;
+
+      font-size: 0.76rem;
+
+      font-weight: 800;
+    }
+
+
+    .creator-page-button.active {
+      color: #181006;
+
+      background:
+        linear-gradient(
+          135deg,
+          #da7e0a,
+          #f4c45b
+        );
+
+      border-color:
+        rgba(255,220,130,0.44);
+    }
+
+
+    .creator-page-arrow:disabled {
+      opacity: 0.28;
+
+      cursor: default;
+    }
+
+
+    .creator-search {
+      position: relative;
+    }
+
+
+    .creator-search input {
+      width: 100%;
+
+      height: 38px;
+
+      padding:
+        0 38px 0 12px;
+
+      border-radius: 10px;
+
+      outline: none;
+
+      color: var(--text);
+
+      background:
+        rgba(11,15,20,0.92);
+
+      border:
+        1px solid
+        rgba(255,194,82,0.14);
+
+      font: inherit;
+
+      font-size: 0.82rem;
+    }
+
+
+    .creator-search-icon {
+      position: absolute;
+
+      top: 50%;
+
+      right: 12px;
+
+      transform:
+        translateY(-50%);
+
+      color: var(--orange2);
+
+      pointer-events: none;
+    }
+
+
     .creator-mod-grid {
       display: grid;
 
       grid-template-columns:
         repeat(
-          3,
+          5,
           minmax(0,1fr)
         );
 
-      gap: 20px;
+      gap: 16px;
     }
 
 
@@ -847,9 +989,9 @@
     .creator-mod-card {
       position: relative;
 
-      min-height: 275px;
+      min-height: 360px;
 
-      padding: 18px;
+      padding: 0;
 
       display: flex;
 
@@ -989,21 +1131,47 @@
     }
 
     .mod-card-top {
+      display: block;
+
+      margin-bottom: 0;
+    }
+
+
+    .mod-image-wrap {
+      height: 180px;
+
       display: flex;
 
-      align-items: flex-start;
+      align-items: center;
 
-      justify-content: space-between;
+      justify-content: center;
 
-      gap: 14px;
+      overflow: hidden;
 
-      margin-bottom: 13px;
+      background:
+        radial-gradient(
+          circle at 50% 35%,
+          rgba(255,164,35,0.14),
+          transparent 55%
+        ),
+
+        linear-gradient(
+          180deg,
+          #11161d,
+          #0c1015
+        );
+
+      border-bottom:
+        1px solid
+        rgba(255,194,82,0.10);
     }
+
 
     .mod-main {
       min-width: 0;
 
-      flex: 1;
+      padding:
+        14px 14px 0;
     }
 
     .mod-category {
@@ -1032,7 +1200,7 @@
     .mod-name {
       color: #f2d797;
 
-      font-size: 1.38rem;
+      font-size: 1.05rem;
 
       line-height: 1.2;
     }
@@ -1047,12 +1215,19 @@
     }
 
     .mod-icon {
-      width: 108px;
-      height: 108px;
+      width: min(
+        154px,
+        calc(100% - 28px)
+      );
+
+      height: min(
+        154px,
+        calc(100% - 24px)
+      );
 
       flex-shrink: 0;
 
-      object-fit: cover;
+      object-fit: contain;
 
       border-radius: 11px;
 
@@ -1094,11 +1269,12 @@
     .mod-description {
       color: #cdb786;
 
-      font-size: 0.9rem;
+      font-size: 0.79rem;
 
-      line-height: 1.5;
+      line-height: 1.45;
 
-      margin-bottom: 16px;
+      margin:
+        10px 14px 14px;
 
       display: -webkit-box;
 
@@ -1112,7 +1288,8 @@
     .mod-footer {
       margin-top: auto;
 
-      padding-top: 12px;
+      padding:
+        10px 14px 12px;
 
       display: flex;
 
@@ -1218,7 +1395,47 @@
        ===================================================== */
 
     @media (
-      max-width: 1000px
+      max-width: 1320px
+    ) {
+
+      .creator-mod-grid {
+        grid-template-columns:
+          repeat(
+            4,
+            minmax(0,1fr)
+          );
+      }
+    }
+
+
+    @media (
+      max-width: 1080px
+    ) {
+
+      .creator-mod-grid {
+        grid-template-columns:
+          repeat(
+            3,
+            minmax(0,1fr)
+          );
+      }
+
+
+      .creator-toolbar {
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .creator-pagination {
+        justify-content:
+          flex-start;
+      }
+    }
+
+
+    @media (
+      max-width: 760px
     ) {
 
       .creator-mod-grid {
@@ -1661,6 +1878,45 @@
           </div>
 
 
+          <div class="creator-toolbar">
+
+            <div
+              id="creatorModTotal"
+              class="creator-mod-total"
+            >
+              Mods 0
+            </div>
+
+
+            <div
+              id="creatorPagination"
+              class="creator-pagination"
+              aria-label="Creator mod pages"
+            ></div>
+
+
+            <div class="creator-search">
+
+              <input
+                id="creatorModSearch"
+                type="search"
+                placeholder="Search mods..."
+                autocomplete="off"
+                aria-label="Search creator mods"
+              />
+
+              <span
+                class="creator-search-icon"
+                aria-hidden="true"
+              >
+                ⌕
+              </span>
+
+            </div>
+
+          </div>
+
+
           <div
             id="creatorMods"
             class="creator-mod-grid"
@@ -1698,6 +1954,22 @@
 
     const FALLBACK_AVATAR =
       "/ymirmodwebsiteicon.png";
+
+
+    const CREATOR_PAGE_SIZE =
+      20;
+
+
+    let creatorAllMods =
+      [];
+
+
+    let creatorFilteredMods =
+      [];
+
+
+    let creatorPage =
+      1;
 
 
     /* =====================================================
@@ -2247,9 +2519,22 @@
       );
 
 
-      renderMods(
-        mods
-      );
+      creatorAllMods =
+        mods;
+
+
+      creatorFilteredMods =
+        mods;
+
+
+      creatorPage =
+        1;
+
+
+      updateCreatorModTotal();
+
+
+      renderCreatorModsPage();
     }
 
 
@@ -2257,9 +2542,23 @@
        RENDER MODS
        ===================================================== */
 
-    function renderMods(
-      mods
-    ) {
+    function updateCreatorModTotal() {
+
+      const total =
+        creatorFilteredMods.length;
+
+
+      document
+        .getElementById(
+          "creatorModTotal"
+        )
+        .textContent =
+          "Mods " +
+          total.toLocaleString();
+    }
+
+
+    function renderCreatorModsPage() {
 
       const container =
         document.getElementById(
@@ -2272,7 +2571,8 @@
 
 
       if (
-        mods.length === 0
+        creatorFilteredMods.length ===
+        0
       ) {
 
         const empty =
@@ -2286,7 +2586,9 @@
 
 
         empty.textContent =
-          "This creator has no published mods yet.";
+          creatorAllMods.length === 0
+            ? "This creator has no published mods yet."
+            : "No mods match your search.";
 
 
         container.appendChild(
@@ -2294,12 +2596,50 @@
         );
 
 
+        renderCreatorPagination();
+
         return;
       }
 
 
+      const totalPages =
+        Math.max(
+          1,
+          Math.ceil(
+            creatorFilteredMods.length /
+            CREATOR_PAGE_SIZE
+          )
+        );
+
+
+      if (
+        creatorPage >
+        totalPages
+      ) {
+
+        creatorPage =
+          totalPages;
+      }
+
+
+      const start =
+        (
+          creatorPage -
+          1
+        ) *
+        CREATOR_PAGE_SIZE;
+
+
+      const visibleMods =
+        creatorFilteredMods.slice(
+          start,
+          start +
+          CREATOR_PAGE_SIZE
+        );
+
+
       for (
-        const mod of mods
+        const mod of visibleMods
       ) {
 
         container.appendChild(
@@ -2308,7 +2648,279 @@
           )
         );
       }
+
+
+      renderCreatorPagination();
     }
+
+
+    function renderCreatorPagination() {
+
+      const pagination =
+        document.getElementById(
+          "creatorPagination"
+        );
+
+
+      pagination.innerHTML =
+        "";
+
+
+      const totalPages =
+        Math.max(
+          1,
+          Math.ceil(
+            creatorFilteredMods.length /
+            CREATOR_PAGE_SIZE
+          )
+        );
+
+
+      const prev =
+        document.createElement(
+          "button"
+        );
+
+
+      prev.type =
+        "button";
+
+
+      prev.className =
+        "creator-page-arrow";
+
+
+      prev.textContent =
+        "‹";
+
+
+      prev.disabled =
+        creatorPage <= 1;
+
+
+      prev.addEventListener(
+        "click",
+        () => {
+
+          if (
+            creatorPage <= 1
+          ) {
+
+            return;
+          }
+
+
+          creatorPage--;
+
+
+          renderCreatorModsPage();
+
+
+          document
+            .querySelector(
+              ".mods-section"
+            )
+            .scrollIntoView({
+              behavior:
+                "smooth",
+
+              block:
+                "start"
+            });
+        }
+      );
+
+
+      pagination.appendChild(
+        prev
+      );
+
+
+      for (
+        let page = 1;
+        page <= totalPages;
+        page++
+      ) {
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+
+        button.type =
+          "button";
+
+
+        button.className =
+          page ===
+            creatorPage
+            ? "creator-page-button active"
+            : "creator-page-button";
+
+
+        button.textContent =
+          String(
+            page
+          );
+
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            if (
+              creatorPage ===
+              page
+            ) {
+
+              return;
+            }
+
+
+            creatorPage =
+              page;
+
+
+            renderCreatorModsPage();
+
+
+            document
+              .querySelector(
+                ".mods-section"
+              )
+              .scrollIntoView({
+                behavior:
+                  "smooth",
+
+                block:
+                  "start"
+              });
+          }
+        );
+
+
+        pagination.appendChild(
+          button
+        );
+      }
+
+
+      const next =
+        document.createElement(
+          "button"
+        );
+
+
+      next.type =
+        "button";
+
+
+      next.className =
+        "creator-page-arrow";
+
+
+      next.textContent =
+        "›";
+
+
+      next.disabled =
+        creatorPage >=
+        totalPages;
+
+
+      next.addEventListener(
+        "click",
+        () => {
+
+          if (
+            creatorPage >=
+            totalPages
+          ) {
+
+            return;
+          }
+
+
+          creatorPage++;
+
+
+          renderCreatorModsPage();
+
+
+          document
+            .querySelector(
+              ".mods-section"
+            )
+            .scrollIntoView({
+              behavior:
+                "smooth",
+
+              block:
+                "start"
+            });
+        }
+      );
+
+
+      pagination.appendChild(
+        next
+      );
+    }
+
+
+    document
+      .getElementById(
+        "creatorModSearch"
+      )
+      .addEventListener(
+        "input",
+        event => {
+
+          const query =
+            String(
+              event.target.value ||
+              ""
+            )
+              .trim()
+              .toLowerCase();
+
+
+          creatorFilteredMods =
+            !query
+              ? creatorAllMods
+              : creatorAllMods.filter(
+                  mod => {
+
+                    const haystack =
+                      [
+                        mod.name,
+                        mod.category,
+                        mod.short_description,
+                        mod.version
+                      ]
+                        .filter(Boolean)
+                        .join(" ")
+                        .toLowerCase();
+
+
+                    return haystack.includes(
+                      query
+                    );
+                  }
+                );
+
+
+          creatorPage =
+            1;
+
+
+          updateCreatorModTotal();
+
+
+          renderCreatorModsPage();
+        }
+      );
 
 
     /* =====================================================
@@ -2394,6 +3006,16 @@
 
       top.className =
         "mod-card-top";
+
+
+      const imageWrap =
+        document.createElement(
+          "div"
+        );
+
+
+      imageWrap.className =
+        "mod-image-wrap";
 
 
       const main =
@@ -2484,13 +3106,18 @@
         };
 
 
-      top.appendChild(
-        main
+      imageWrap.appendChild(
+        icon
       );
 
 
       top.appendChild(
-        icon
+        imageWrap
+      );
+
+
+      top.appendChild(
+        main
       );
 
 
