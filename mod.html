@@ -1798,6 +1798,61 @@
     }
 
 
+    .comment-meta-right {
+      display:
+        inline-flex;
+
+      align-items:
+        center;
+
+      gap:
+        8px;
+    }
+
+
+    .comment-delete {
+      padding:
+        2px 6px;
+
+      border-radius:
+        7px;
+
+      cursor:
+        pointer;
+
+      color:
+        #e79a8e;
+
+      background:
+        transparent;
+
+      border:
+        1px solid
+        rgba(220,90,70,0.18);
+
+      font:
+        inherit;
+
+      font-size:
+        0.66rem;
+
+      font-weight:
+        700;
+    }
+
+
+    .comment-delete:hover {
+      color:
+        #ffd0c7;
+
+      border-color:
+        rgba(255,115,90,0.34);
+
+      background:
+        rgba(120,35,25,0.08);
+    }
+
+
     .comment-body {
       color:
         #cbb88d;
@@ -3563,8 +3618,130 @@
         );
 
 
-        meta.appendChild(
+        const metaRight =
+          document.createElement(
+            "div"
+          );
+
+
+        metaRight.className =
+          "comment-meta-right";
+
+
+        metaRight.appendChild(
           date
+        );
+
+
+        if (
+          Boolean(
+            comment.can_delete
+          )
+        ) {
+
+          const deleteButton =
+            document.createElement(
+              "button"
+            );
+
+
+          deleteButton.type =
+            "button";
+
+
+          deleteButton.className =
+            "comment-delete";
+
+
+          deleteButton.textContent =
+            "Delete";
+
+
+          deleteButton.addEventListener(
+            "click",
+            async () => {
+
+              const confirmed =
+                window.confirm(
+                  "Delete this comment?"
+                );
+
+
+              if (
+                !confirmed
+              ) {
+
+                return;
+              }
+
+
+              deleteButton.disabled =
+                true;
+
+
+              try {
+
+                const response =
+                  await fetch(
+                    "/api/mod/" +
+                      encodeURIComponent(
+                        getModSlug()
+                      ) +
+                      "/comments/" +
+                      encodeURIComponent(
+                        comment.id
+                      ),
+                    {
+                      method:
+                        "DELETE",
+
+                      credentials:
+                        "same-origin"
+                    }
+                  );
+
+
+                const result =
+                  await response.json();
+
+
+                if (
+                  !response.ok ||
+                  !result.success
+                ) {
+
+                  throw new Error(
+                    result.message ||
+                    "Unable to delete comment."
+                  );
+                }
+
+
+                await loadComments();
+
+              } catch (error) {
+
+                alert(
+                  error.message ||
+                  "Unable to delete comment."
+                );
+
+
+                deleteButton.disabled =
+                  false;
+              }
+            }
+          );
+
+
+          metaRight.appendChild(
+            deleteButton
+          );
+        }
+
+
+        meta.appendChild(
+          metaRight
         );
 
 
