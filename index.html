@@ -1611,11 +1611,11 @@
 
       grid-template-columns:
         repeat(
-          4,
+          5,
           minmax(0, 1fr)
         );
 
-      gap: 18px;
+      gap: 16px;
     }
 
 
@@ -1623,7 +1623,7 @@
       position: relative;
 
       min-width: 0;
-      min-height: 335px;
+      min-height: 360px;
 
       display: flex;
 
@@ -1683,7 +1683,7 @@
 
 
     .catalog-card-image-wrap {
-      height: 155px;
+      height: 180px;
 
       display: flex;
 
@@ -1730,10 +1730,17 @@
 
 
     .catalog-card-icon {
-      width: 118px;
-      height: 118px;
+      width: min(
+        154px,
+        calc(100% - 28px)
+      );
 
-      object-fit: cover;
+      height: min(
+        154px,
+        calc(100% - 24px)
+      );
+
+      object-fit: contain;
 
       border-radius: 13px;
 
@@ -1769,14 +1776,14 @@
 
       flex-direction: column;
 
-      padding: 17px;
+      padding: 14px;
     }
 
 
     .catalog-card-title {
       color: #f2d797;
 
-      font-size: 1.18rem;
+      font-size: 1.05rem;
 
       line-height: 1.25;
 
@@ -1838,7 +1845,7 @@
     .catalog-card-description {
       color: #c4ae7d;
 
-      font-size: 0.83rem;
+      font-size: 0.79rem;
 
       line-height: 1.48;
 
@@ -2531,6 +2538,18 @@
     /* =====================================================
        RESPONSIVE
        ===================================================== */
+
+    @media (max-width: 1320px) {
+
+      .catalog-grid {
+        grid-template-columns:
+          repeat(
+            4,
+            minmax(0, 1fr)
+          );
+      }
+    }
+
 
     @media (max-width: 1080px) {
 
@@ -3837,7 +3856,7 @@
 
 
     const CATALOG_PAGE_SIZE =
-      12;
+      20;
 
 
     const LATEST_PAGE_SIZE =
