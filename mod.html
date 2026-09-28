@@ -2519,6 +2519,9 @@
 
 
     .comment-modal-dialog {
+      position:
+        relative;
+
       width:
         min(980px, 96vw);
 
@@ -2625,6 +2628,85 @@
 
       padding:
         18px;
+
+      scroll-behavior:
+        smooth;
+    }
+
+
+    .jump-latest-button {
+      position:
+        absolute;
+
+      left:
+        50%;
+
+      bottom:
+        16px;
+
+      transform:
+        translateX(-50%);
+
+      z-index:
+        5;
+
+      display:
+        none;
+
+      align-items:
+        center;
+
+      gap:
+        7px;
+
+      padding:
+        8px 13px;
+
+      border-radius:
+        999px;
+
+      cursor:
+        pointer;
+
+      color:
+        #171006;
+
+      background:
+        linear-gradient(
+          135deg,
+          #d77808,
+          #ffad28,
+          #f1c45c
+        );
+
+      border:
+        1px solid
+        rgba(255,220,130,0.48);
+
+      box-shadow:
+        0 8px 24px
+        rgba(0,0,0,0.35);
+
+      font:
+        inherit;
+
+      font-size:
+        0.76rem;
+
+      font-weight:
+        900;
+    }
+
+
+    .jump-latest-button.show {
+      display:
+        inline-flex;
+    }
+
+
+    .jump-latest-button:hover {
+      filter:
+        brightness(1.05);
     }
 
 
@@ -3762,7 +3844,10 @@
       </div>
 
 
-      <div class="comment-modal-body">
+      <div
+        id="commentModalBody"
+        class="comment-modal-body"
+      >
 
         <div
           id="commentModalList"
@@ -3770,6 +3855,15 @@
         ></div>
 
       </div>
+
+
+      <button
+        id="jumpLatestButton"
+        class="jump-latest-button"
+        type="button"
+      >
+        ↓ Jump to Latest
+      </button>
 
     </div>
 
@@ -4873,6 +4967,9 @@
               true
             );
           }
+
+
+          refreshJumpLatestButtonSoon();
         }
 
       } catch (error) {
@@ -5731,6 +5828,93 @@
       );
 
 
+    const commentModalBody =
+      document.getElementById(
+        "commentModalBody"
+      );
+
+
+    const jumpLatestButton =
+      document.getElementById(
+        "jumpLatestButton"
+      );
+
+
+    function updateJumpLatestButton() {
+
+      if (
+        !commentModal.classList.contains(
+          "open"
+        )
+      ) {
+
+        jumpLatestButton.classList.remove(
+          "show"
+        );
+
+        return;
+      }
+
+
+      const hasOverflow =
+        commentModalBody.scrollHeight >
+        commentModalBody.clientHeight +
+        24;
+
+
+      const distanceFromBottom =
+        commentModalBody.scrollHeight -
+        commentModalBody.scrollTop -
+        commentModalBody.clientHeight;
+
+
+      const nearBottom =
+        distanceFromBottom <
+        80;
+
+
+      jumpLatestButton.classList.toggle(
+        "show",
+        hasOverflow &&
+        !nearBottom
+      );
+    }
+
+
+    function refreshJumpLatestButtonSoon() {
+
+      requestAnimationFrame(
+        () => {
+
+          requestAnimationFrame(
+            updateJumpLatestButton
+          );
+        }
+      );
+    }
+
+
+    jumpLatestButton.addEventListener(
+      "click",
+      () => {
+
+        commentModalBody.scrollTo({
+          top:
+            commentModalBody.scrollHeight,
+
+          behavior:
+            "smooth"
+        });
+      }
+    );
+
+
+    commentModalBody.addEventListener(
+      "scroll",
+      updateJumpLatestButton
+    );
+
+
     function getCommentThread(
       commentId
     ) {
@@ -5928,6 +6112,13 @@
       );
 
 
+      commentModalBody.scrollTop =
+        0;
+
+
+      refreshJumpLatestButtonSoon();
+
+
       document.body.style.overflow =
         "hidden";
     }
@@ -5965,6 +6156,13 @@
       );
 
 
+      commentModalBody.scrollTop =
+        0;
+
+
+      refreshJumpLatestButtonSoon();
+
+
       document.body.style.overflow =
         "hidden";
     }
@@ -5984,6 +6182,11 @@
       commentModal.setAttribute(
         "aria-hidden",
         "true"
+      );
+
+
+      jumpLatestButton.classList.remove(
+        "show"
       );
 
 
