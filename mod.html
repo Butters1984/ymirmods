@@ -443,6 +443,214 @@
     }
 
 
+    .header-notifications {
+      position: relative;
+
+      display: inline-flex;
+
+      align-items: center;
+    }
+
+
+    .notification-bell {
+      position: relative;
+
+      width: 34px;
+
+      height: 34px;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      border-radius: 9px;
+
+      cursor: pointer;
+
+      color: var(--gold2);
+
+      background:
+        rgba(255,183,77,0.055);
+
+      border:
+        1px solid
+        rgba(255,194,82,0.17);
+
+      font-size: 1rem;
+
+      line-height: 1;
+    }
+
+
+    .notification-bell:hover {
+      border-color:
+        rgba(255,194,82,0.34);
+
+      box-shadow:
+        0 0 12px
+        rgba(255,160,30,0.10);
+    }
+
+
+    .notification-badge {
+      position: absolute;
+
+      top: -5px;
+
+      right: -5px;
+
+      min-width: 17px;
+
+      height: 17px;
+
+      padding: 0 4px;
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: center;
+
+      border-radius: 999px;
+
+      color: #160e05;
+
+      background:
+        linear-gradient(
+          135deg,
+          #e9890d,
+          #ffd36b
+        );
+
+      font-size: 0.62rem;
+
+      font-weight: 900;
+
+      box-shadow:
+        0 0 9px
+        rgba(255,170,30,0.30);
+    }
+
+
+    .notification-dropdown {
+      position: absolute;
+
+      top: 42px;
+
+      right: 0;
+
+      width: min(360px, 86vw);
+
+      max-height: 420px;
+
+      overflow-y: auto;
+
+      display: none;
+
+      z-index: 999;
+
+      padding: 10px;
+
+      border-radius: 13px;
+
+      background:
+        rgba(11,14,19,0.98);
+
+      border:
+        1px solid
+        rgba(255,194,82,0.18);
+
+      box-shadow:
+        0 18px 45px
+        rgba(0,0,0,0.46);
+    }
+
+
+    .notification-dropdown.open {
+      display: block;
+    }
+
+
+    .notification-dropdown-title {
+      color: var(--gold2);
+
+      font-weight: 800;
+
+      margin:
+        2px 4px 8px;
+    }
+
+
+    .header-notification-item {
+      display: block;
+
+      width: 100%;
+
+      padding: 10px;
+
+      border-radius: 9px;
+
+      cursor: pointer;
+
+      text-align: left;
+
+      background:
+        rgba(255,170,30,0.025);
+
+      border:
+        1px solid
+        rgba(255,192,70,0.08);
+
+      color: inherit;
+
+      margin-bottom: 7px;
+    }
+
+
+    .header-notification-item.unread {
+      background:
+        rgba(255,160,30,0.07);
+
+      border-color:
+        rgba(255,194,82,0.16);
+    }
+
+
+    .header-notification-item:hover {
+      border-color:
+        rgba(255,205,95,0.28);
+    }
+
+
+    .header-notification-main {
+      color: #ead9ad;
+
+      font-size: 0.79rem;
+
+      line-height: 1.35;
+
+      margin-bottom: 4px;
+    }
+
+
+    .header-notification-meta {
+      color: #8f8264;
+
+      font-size: 0.68rem;
+    }
+
+
+    .header-notification-empty {
+      padding: 14px 10px;
+
+      color: #8f8264;
+
+      font-size: 0.76rem;
+    }
+
+
     .account-name {
       color:
         var(--gold2);
@@ -2653,6 +2861,49 @@
           class="account-user"
         >
 
+          <div class="header-notifications">
+
+            <button
+              id="headerNotificationBell"
+              class="notification-bell"
+              type="button"
+              aria-label="Notifications"
+              title="Notifications"
+            >
+              🔔
+
+              <span
+                id="headerNotificationBadge"
+                class="notification-badge"
+              >
+                0
+              </span>
+
+            </button>
+
+
+            <div
+              id="headerNotificationDropdown"
+              class="notification-dropdown"
+            >
+
+              <div class="notification-dropdown-title">
+                Notifications
+              </div>
+
+
+              <div
+                id="headerNotificationList"
+                class="header-notification-empty"
+              >
+                Loading...
+              </div>
+
+            </div>
+
+          </div>
+
+
           <span
             id="headerUsername"
             class="account-name"
@@ -3206,6 +3457,30 @@
       );
 
 
+    const headerNotificationBell =
+      document.getElementById(
+        "headerNotificationBell"
+      );
+
+
+    const headerNotificationBadge =
+      document.getElementById(
+        "headerNotificationBadge"
+      );
+
+
+    const headerNotificationDropdown =
+      document.getElementById(
+        "headerNotificationDropdown"
+      );
+
+
+    const headerNotificationList =
+      document.getElementById(
+        "headerNotificationList"
+      );
+
+
     const headerUsername =
       document.getElementById(
         "headerUsername"
@@ -3261,6 +3536,9 @@
           accountLoggedOut.style.display =
             "none";
 
+
+          loadHeaderNotifications();
+
         } else {
 
           accountLoggedIn.style.display =
@@ -3286,6 +3564,293 @@
           "block";
       }
     }
+
+
+    async function loadHeaderNotifications() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/notifications",
+            {
+              credentials:
+                "same-origin",
+
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          throw new Error(
+            result.message ||
+            "Unable to load notifications."
+          );
+        }
+
+
+        const notifications =
+          Array.isArray(
+            result.notifications
+          )
+            ? result.notifications
+            : [];
+
+
+        const unreadCount =
+          Number(
+            result.unread_count ||
+            0
+          );
+
+
+        headerNotificationBadge.textContent =
+          unreadCount > 99
+            ? "99+"
+            : String(
+                unreadCount
+              );
+
+
+        headerNotificationBadge.style.display =
+          unreadCount > 0
+            ? "inline-flex"
+            : "none";
+
+
+        renderHeaderNotifications(
+          notifications
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Header notifications error:",
+          error
+        );
+
+
+        headerNotificationList.className =
+          "header-notification-empty";
+
+
+        headerNotificationList.textContent =
+          "Unable to load notifications.";
+      }
+    }
+
+
+    function renderHeaderNotifications(
+      notifications
+    ) {
+
+      headerNotificationList.className =
+        "";
+
+
+      headerNotificationList.innerHTML =
+        "";
+
+
+      if (
+        notifications.length ===
+        0
+      ) {
+
+        headerNotificationList.className =
+          "header-notification-empty";
+
+
+        headerNotificationList.textContent =
+          "No notifications yet.";
+
+        return;
+      }
+
+
+      for (
+        const notification of notifications.slice(
+          0,
+          10
+        )
+      ) {
+
+        const item =
+          document.createElement(
+            "button"
+          );
+
+
+        item.type =
+          "button";
+
+
+        item.className =
+          notification.is_read
+            ? "header-notification-item"
+            : "header-notification-item unread";
+
+
+        const main =
+          document.createElement(
+            "div"
+          );
+
+
+        main.className =
+          "header-notification-main";
+
+
+        main.textContent =
+          (
+            notification.actor_display_name ||
+            notification.actor_username ||
+            "Someone"
+          ) +
+          " replied to you" +
+          (
+            notification.mod_name
+              ? " on " +
+                notification.mod_name
+              : ""
+          );
+
+
+        const meta =
+          document.createElement(
+            "div"
+          );
+
+
+        meta.className =
+          "header-notification-meta";
+
+
+        meta.textContent =
+          notification.created_at
+            ? new Date(
+                notification.created_at.endsWith &&
+                notification.created_at.endsWith(
+                  "Z"
+                )
+                  ? notification.created_at
+                  : notification.created_at +
+                    "Z"
+              ).toLocaleString()
+            : "";
+
+
+        item.appendChild(
+          main
+        );
+
+
+        item.appendChild(
+          meta
+        );
+
+
+        item.addEventListener(
+          "click",
+          async () => {
+
+            try {
+
+              await fetch(
+                "/api/notifications/" +
+                  encodeURIComponent(
+                    notification.id
+                  ) +
+                  "/read",
+                {
+                  method:
+                    "POST",
+
+                  credentials:
+                    "same-origin"
+                }
+              );
+
+            } catch (error) {
+
+              console.error(
+                "Notification read error:",
+                error
+              );
+            }
+
+
+            if (
+              notification.mod_slug
+            ) {
+
+              window.location.href =
+                "/mod/" +
+                encodeURIComponent(
+                  notification.mod_slug
+                );
+            }
+          }
+        );
+
+
+        headerNotificationList.appendChild(
+          item
+        );
+      }
+    }
+
+
+    headerNotificationBell.addEventListener(
+      "click",
+      event => {
+
+        event.stopPropagation();
+
+
+        headerNotificationDropdown.classList.toggle(
+          "open"
+        );
+
+
+        if (
+          headerNotificationDropdown.classList.contains(
+            "open"
+          )
+        ) {
+
+          loadHeaderNotifications();
+        }
+      }
+    );
+
+
+    document.addEventListener(
+      "click",
+      event => {
+
+        if (
+          !event.target.closest(
+            ".header-notifications"
+          )
+        ) {
+
+          headerNotificationDropdown.classList.remove(
+            "open"
+          );
+        }
+      }
+    );
 
 
     headerLogout.addEventListener(
