@@ -1106,6 +1106,12 @@
     }
 
 
+    #mods {
+      scroll-margin-top:
+        108px;
+    }
+
+
     /* =====================================================
        MOD CATALOG HEADER
        ===================================================== */
@@ -3744,14 +3750,26 @@
             page;
 
 
-          /*
-           * Keep the visitor at the same scroll position
-           * when changing catalog pages. The old code
-           * scrolled the whole Mods section into view,
-           * which made pagination feel like the page
-           * jumped after every click.
-           */
           renderCatalogPage();
+
+
+          /*
+           * Return to the top of the mod catalog after
+           * switching pages, but leave enough room for
+           * the sticky header so the counters, page
+           * numbers and search box stay fully visible.
+           */
+          document
+            .getElementById(
+              "mods"
+            )
+            .scrollIntoView({
+              behavior:
+                "smooth",
+
+              block:
+                "start"
+            });
         }
       );
 
