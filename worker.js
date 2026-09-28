@@ -495,6 +495,44 @@ export default {
 
     if (
       url.pathname.match(
+        /^\/api\/mod\/[a-z0-9-]+\/comments\/\d+\/thread-state$/
+      ) &&
+      request.method ===
+        "POST"
+    ) {
+
+      const parts =
+        url.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      const slug =
+        String(
+          parts[2] ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      const commentId =
+        Number(
+          parts[4]
+        );
+
+
+      return handleSetCommentThreadState(
+        request,
+        env,
+        slug,
+        commentId
+      );
+    }
+
+
+    if (
+      url.pathname.match(
         /^\/api\/mod\/[a-z0-9-]+\/comments\/\d+$/
       ) &&
       request.method ===
@@ -3905,7 +3943,8 @@ async function handleGetModComments(
           SELECT
             id,
             name,
-            slug
+            slug,
+            owner_user_id
 
           FROM mods
 
@@ -3979,6 +4018,82 @@ async function handleGetModComments(
         .all();
 
 
+    let threadStateAvailable =
+      true;
+
+
+    let threadStates =
+      new Map();
+
+
+    try {
+
+      const stateResult =
+        await env.DB
+          .prepare(
+            `
+            SELECT
+              root_comment_id,
+              status,
+              is_pinned,
+              updated_at
+
+            FROM comment_threads
+
+            WHERE mod_id = ?
+            `
+          )
+          .bind(
+            mod.id
+          )
+          .all();
+
+
+      threadStates =
+        new Map(
+          (
+            stateResult.results ||
+            []
+          ).map(
+            row => [
+              Number(
+                row.root_comment_id
+              ),
+              row
+            ]
+          )
+        );
+
+    } catch (error) {
+
+      threadStateAvailable =
+        false;
+
+
+      console.warn(
+        "Comment thread state unavailable:",
+        error?.message ||
+        error
+      );
+    }
+
+
+    const canManageThreads =
+      Boolean(
+        viewer &&
+        (
+          Number(
+            mod.owner_user_id
+          ) ===
+          Number(
+            viewer.id
+          ) ||
+          viewer.role ===
+            "admin"
+        )
+      );
+
+
     const comments =
       (
         result.results ||
@@ -4012,6 +4127,36 @@ async function handleGetModComments(
             row.avatar_url ||
             row.github_avatar_url ||
             null,
+
+          thread_status:
+            row.parent_comment_id
+              ? null
+              : (
+                  threadStates.get(
+                    Number(
+                      row.id
+                    )
+                  )?.status ||
+                  "open"
+                ),
+
+          is_pinned:
+            row.parent_comment_id
+              ? false
+              : Boolean(
+                  threadStates.get(
+                    Number(
+                      row.id
+                    )
+                  )?.is_pinned
+                ),
+
+          can_manage_thread:
+            Boolean(
+              !row.parent_comment_id &&
+              threadStateAvailable &&
+              canManageThreads
+            ),
 
           can_delete:
             Boolean(
@@ -4427,6 +4572,288 @@ async function handlePostModComment(
 }
 
 
+async function handleSetCommentThreadState(
+  request,
+  env,
+  slug,
+  commentId
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    if (
+      !slug ||
+      !/^[a-z0-9-]+$/.test(
+        slug
+      ) ||
+      !Number.isInteger(
+        commentId
+      ) ||
+      commentId < 1
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid thread."
+        },
+        400
+      );
+    }
+
+
+    const thread =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            mod_comments.id,
+            mod_comments.parent_comment_id,
+            mods.id AS mod_id,
+            mods.owner_user_id
+
+          FROM mod_comments
+
+          INNER JOIN mods
+            ON mods.id =
+               mod_comments.mod_id
+
+          WHERE
+            mod_comments.id = ?
+            AND mods.slug = ?
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          commentId,
+          slug
+        )
+        .first();
+
+
+    if (
+      !thread
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Comment thread not found."
+        },
+        404
+      );
+    }
+
+
+    if (
+      thread.parent_comment_id
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Thread state can only be changed on the original comment."
+        },
+        400
+      );
+    }
+
+
+    const canManage =
+      Number(
+        thread.owner_user_id
+      ) ===
+      Number(
+        user.id
+      ) ||
+      user.role ===
+        "admin";
+
+
+    if (
+      !canManage
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Only the mod author or an admin can manage this conversation."
+        },
+        403
+      );
+    }
+
+
+    let body = {};
+
+
+    try {
+
+      body =
+        await request.json();
+
+    } catch {
+
+      body = {};
+    }
+
+
+    const status =
+      String(
+        body.status ||
+        "open"
+      )
+        .trim()
+        .toLowerCase();
+
+
+    if (
+      status !==
+        "open" &&
+      status !==
+        "solved"
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Thread status must be open or solved."
+        },
+        400
+      );
+    }
+
+
+    const isPinned =
+      Boolean(
+        body.is_pinned
+      );
+
+
+    await env.DB
+      .prepare(
+        `
+        INSERT INTO comment_threads (
+          root_comment_id,
+          mod_id,
+          status,
+          is_pinned,
+          updated_by_user_id,
+          updated_at
+        )
+
+        VALUES (
+          ?,
+          ?,
+          ?,
+          ?,
+          ?,
+          CURRENT_TIMESTAMP
+        )
+
+        ON CONFLICT(root_comment_id)
+        DO UPDATE SET
+          status = excluded.status,
+          is_pinned = excluded.is_pinned,
+          updated_by_user_id = excluded.updated_by_user_id,
+          updated_at = CURRENT_TIMESTAMP
+        `
+      )
+      .bind(
+        commentId,
+        thread.mod_id,
+        status,
+        isPinned
+          ? 1
+          : 0,
+        user.id
+      )
+      .run();
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      status:
+        status,
+
+      is_pinned:
+        isPinned,
+
+      message:
+        isPinned
+          ? "Conversation pinned."
+          : (
+              status ===
+                "solved"
+                ? "Conversation marked solved."
+                : "Conversation reopened."
+            )
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Set comment thread state error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to update conversation status."
+      },
+      500
+    );
+  }
+}
+
+
 async function handleDeleteModComment(
   request,
   env,
@@ -4554,6 +4981,31 @@ async function handleDeleteModComment(
             "You can only delete your own comments."
         },
         403
+      );
+    }
+
+
+    try {
+
+      await env.DB
+        .prepare(
+          `
+          DELETE FROM comment_threads
+
+          WHERE root_comment_id = ?
+          `
+        )
+        .bind(
+          commentId
+        )
+        .run();
+
+    } catch (error) {
+
+      console.warn(
+        "Comment thread cleanup skipped:",
+        error?.message ||
+        error
       );
     }
 
