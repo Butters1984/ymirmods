@@ -2027,6 +2027,9 @@
       padding:
         10px;
 
+      cursor:
+        pointer;
+
       border-radius:
         10px;
 
@@ -2036,6 +2039,19 @@
       border:
         1px solid
         rgba(255,192,70,0.08);
+
+      transition:
+        border-color 0.18s ease,
+        background 0.18s ease;
+    }
+
+
+    .comment-item:hover {
+      border-color:
+        rgba(255,194,82,0.20);
+
+      background:
+        rgba(255,170,30,0.045);
     }
 
 
@@ -4817,7 +4833,8 @@
 
           renderComments(
             currentComments,
-            "commentModalList"
+            "commentModalList",
+            true
           );
         }
 
@@ -4838,7 +4855,9 @@
     function renderComments(
       comments,
       targetId =
-        "commentList"
+        "commentList",
+      expandAll =
+        false
     ) {
 
       const list =
@@ -5136,6 +5155,27 @@
         );
 
 
+        item.addEventListener(
+          "click",
+          event => {
+
+            if (
+              event.target.closest(
+                "button, textarea, input, a"
+              )
+            ) {
+
+              return;
+            }
+
+
+            openCommentTicket(
+              comment.id
+            );
+          }
+        );
+
+
         const replyForm =
           document.createElement(
             "div"
@@ -5427,7 +5467,9 @@
 
 
           childWrap.className =
-            "comment-children";
+            expandAll
+              ? "comment-children open"
+              : "comment-children";
 
 
           for (
@@ -5467,9 +5509,14 @@
           );
 
 
-          item.appendChild(
-            toggle
-          );
+          if (
+            !expandAll
+          ) {
+
+            item.appendChild(
+              toggle
+            );
+          }
 
 
           item.appendChild(
@@ -5553,11 +5600,215 @@
       );
 
 
+    function getCommentThread(
+      commentId
+    ) {
+
+      const byId =
+        new Map(
+          currentComments.map(
+            comment => [
+              Number(
+                comment.id
+              ),
+              comment
+            ]
+          )
+        );
+
+
+      let selected =
+        byId.get(
+          Number(
+            commentId
+          )
+        );
+
+
+      if (
+        !selected
+      ) {
+
+        return [];
+      }
+
+
+      while (
+        selected.parent_comment_id
+      ) {
+
+        const parent =
+          byId.get(
+            Number(
+              selected.parent_comment_id
+            )
+          );
+
+
+        if (
+          !parent
+        ) {
+
+          break;
+        }
+
+
+        selected =
+          parent;
+      }
+
+
+      const rootId =
+        Number(
+          selected.id
+        );
+
+
+      const threadIds =
+        new Set([
+          rootId
+        ]);
+
+
+      let changed =
+        true;
+
+
+      while (
+        changed
+      ) {
+
+        changed =
+          false;
+
+
+        for (
+          const comment of currentComments
+        ) {
+
+          const parentId =
+            Number(
+              comment.parent_comment_id ||
+              0
+            );
+
+
+          const id =
+            Number(
+              comment.id
+            );
+
+
+          if (
+            parentId &&
+            threadIds.has(
+              parentId
+            ) &&
+            !threadIds.has(
+              id
+            )
+          ) {
+
+            threadIds.add(
+              id
+            );
+
+
+            changed =
+              true;
+          }
+        }
+      }
+
+
+      return currentComments.filter(
+        comment =>
+          threadIds.has(
+            Number(
+              comment.id
+            )
+          )
+      );
+    }
+
+
+    function openCommentTicket(
+      commentId
+    ) {
+
+      const thread =
+        getCommentThread(
+          commentId
+        );
+
+
+      if (
+        thread.length ===
+        0
+      ) {
+
+        return;
+      }
+
+
+      const root =
+        thread.find(
+          comment =>
+            !comment.parent_comment_id
+        ) ||
+        thread[0];
+
+
+      document
+        .getElementById(
+          "commentModalTitle"
+        )
+        .textContent =
+          "Conversation with " +
+          (
+            root.display_name ||
+            root.username ||
+            "User"
+          );
+
+
+      renderComments(
+        thread,
+        "commentModalList",
+        true
+      );
+
+
+      commentModal.classList.add(
+        "open"
+      );
+
+
+      commentModal.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+
+
+      document.body.style.overflow =
+        "hidden";
+    }
+
+
     function openCommentModal() {
+
+      document
+        .getElementById(
+          "commentModalTitle"
+        )
+        .textContent =
+          "All Comments";
+
 
       renderComments(
         currentComments,
-        "commentModalList"
+        "commentModalList",
+        true
       );
 
 
