@@ -1961,31 +1961,47 @@
     }
 
 
-    .info-box {
-      padding: 28px;
+    .community-card {
+      min-height: 250px;
+
+      padding: 34px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      justify-content: center;
+
+      text-align: center;
     }
 
 
-    .info-box h4 {
+    .community-card h3 {
       color: var(--gold2);
 
-      font-size: 1.7rem;
+      font-size: 2rem;
 
       margin-bottom: 10px;
     }
 
 
-    .info-box p {
+    .community-card p {
       color: #cdb786;
 
-      margin-bottom: 15px;
+      max-width: 620px;
+
+      margin:
+        0 auto 22px;
     }
 
 
-    .info-box ul {
-      color: var(--muted);
+    .community-card .hero-actions {
+      margin-top: auto;
+    }
 
-      padding-left: 20px;
+
+    .server-card .btn {
+      min-width: 160px;
     }
 
 
@@ -2327,8 +2343,8 @@
             Mods
           </a>
 
-          <a href="#features">
-            Features
+          <a href="#community">
+            Servers
           </a>
 
           <a href="#community">
@@ -2609,112 +2625,6 @@
     </div>
 
 
-    <!-- FEATURES -->
-
-    <section id="features">
-
-      <div class="container">
-
-
-        <div class="section-heading">
-
-          <h3>
-            Why YMIR Mods?
-          </h3>
-
-          <p>
-            Built with a darker Valheim identity
-            in mind — part mythic forge,
-            part cosmic hall of the gods.
-          </p>
-
-        </div>
-
-
-        <div class="split">
-
-
-          <div class="panel info-box">
-
-            <h4>
-              Aesir Theme
-            </h4>
-
-            <p>
-              Dark backgrounds,
-              orange-gold highlights,
-              mythic atmosphere,
-              and subtle cosmic energy.
-            </p>
-
-            <ul>
-
-              <li>
-                Dark Norse-inspired identity
-              </li>
-
-              <li>
-                Warm orange and gold highlights
-              </li>
-
-              <li>
-                Mythic fantasy atmosphere
-              </li>
-
-            </ul>
-
-          </div>
-
-
-          <div class="panel info-box">
-
-            <h4>
-              Growing Mod Hub
-            </h4>
-
-            <p>
-              YMIR Mods is becoming a central home
-              for creators, downloads, updates,
-              and community content.
-            </p>
-
-            <ul>
-
-              <li>
-                Creator accounts
-              </li>
-
-              <li>
-                Secure mod uploads
-              </li>
-
-              <li>
-                Version history and downloads
-              </li>
-
-            </ul>
-
-          </div>
-
-
-        </div>
-
-
-      </div>
-
-    </section>
-
-
-    <div
-      class="runic-divider"
-      aria-hidden="true"
-    >
-      <span>
-        ᛟ ᛞ ᛁ ᚾ
-      </span>
-    </div>
-
-
     <!-- COMMUNITY -->
 
     <section id="community">
@@ -2722,36 +2632,62 @@
       <div class="container">
 
 
-        <div class="panel cta">
-
-          <h3>
-            Join the YMIR Community
-          </h3>
-
-          <p>
-            Follow development,
-            check server updates,
-            discover new mods,
-            and become part of
-            the growing YMIR Valheim world.
-          </p>
+        <div class="split">
 
 
-          <div class="hero-actions">
+          <div class="panel community-card">
 
-            <a
-              class="btn primary"
-              href="#"
-            >
-              Discord
-            </a>
+            <h3>
+              Join the YMIR Community
+            </h3>
 
-            <a
-              class="btn secondary"
-              href="#"
-            >
-              Server Info
-            </a>
+            <p>
+              Follow development,
+              discover new mods,
+              get updates,
+              and become part of
+              the growing YMIR Valheim community.
+            </p>
+
+
+            <div class="hero-actions">
+
+              <a
+                class="btn primary"
+                href="#"
+              >
+                Discord
+              </a>
+
+            </div>
+
+          </div>
+
+
+          <div class="panel community-card server-card">
+
+            <h3>
+              Join a Valheim Server
+            </h3>
+
+            <p>
+              Browse community Valheim servers
+              and jump directly to their
+              Discord channels for rules,
+              access, events, and server information.
+            </p>
+
+
+            <div class="hero-actions">
+
+              <a
+                class="btn secondary"
+                href="#"
+              >
+                Browse Servers
+              </a>
+
+            </div>
 
           </div>
 
@@ -2786,8 +2722,8 @@
           Mods
         </a>
 
-        <a href="#features">
-          Features
+        <a href="#community">
+          Servers
         </a>
 
         <a href="#community">
