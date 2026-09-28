@@ -4774,6 +4774,10 @@
       [];
 
 
+    let activeCommentTicketId =
+      null;
+
+
 
 
     async function loadComments() {
@@ -4844,11 +4848,31 @@
             )
         ) {
 
-          renderComments(
-            currentComments,
-            "commentModalList",
-            true
-          );
+          if (
+            activeCommentTicketId
+          ) {
+
+            const thread =
+              getCommentThread(
+                activeCommentTicketId
+              );
+
+
+            renderComments(
+              thread,
+              "commentModalList",
+              true,
+              true
+            );
+
+          } else {
+
+            renderComments(
+              currentComments,
+              "commentModalList",
+              true
+            );
+          }
         }
 
       } catch (error) {
@@ -5843,6 +5867,12 @@
       commentId
     ) {
 
+      activeCommentTicketId =
+        Number(
+          commentId
+        );
+
+
       const thread =
         getCommentThread(
           commentId
@@ -5905,6 +5935,10 @@
 
     function openCommentModal() {
 
+      activeCommentTicketId =
+        null;
+
+
       document
         .getElementById(
           "commentModalTitle"
@@ -5937,6 +5971,10 @@
 
 
     function closeCommentModal() {
+
+      activeCommentTicketId =
+        null;
+
 
       commentModal.classList.remove(
         "open"
