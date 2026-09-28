@@ -2640,6 +2640,19 @@
     }
 
 
+    .comment-modal-body .comment-item.reply-item {
+      margin-left:
+        26px;
+
+      width:
+        calc(100% - 26px);
+
+      border-left:
+        2px solid
+        rgba(255,174,35,0.30);
+    }
+
+
     .comment-modal-body .comment-body {
       font-size:
         0.92rem;
@@ -4857,6 +4870,8 @@
       targetId =
         "commentList",
       expandAll =
+        false,
+      flatThread =
         false
     ) {
 
@@ -5435,7 +5450,8 @@
 
         if (
           children.length >
-          0
+          0 &&
+          !flatThread
         ) {
 
           const toggle =
@@ -5534,6 +5550,97 @@
           0
         ) ||
         [];
+
+
+      if (
+        flatThread
+      ) {
+
+        const root =
+          roots[0] ||
+          comments[0];
+
+
+        if (
+          root
+        ) {
+
+          list.appendChild(
+            buildComment(
+              root,
+              0
+            )
+          );
+        }
+
+
+        const replies =
+          comments
+            .filter(
+              comment =>
+                !root ||
+                Number(
+                  comment.id
+                ) !==
+                Number(
+                  root.id
+                )
+            )
+            .slice()
+            .sort(
+              (a, b) => {
+
+                const aTime =
+                  new Date(
+                    a.created_at ||
+                    0
+                  )
+                    .getTime();
+
+
+                const bTime =
+                  new Date(
+                    b.created_at ||
+                    0
+                  )
+                    .getTime();
+
+
+                if (
+                  aTime ===
+                  bTime
+                ) {
+
+                  return Number(
+                    a.id
+                  ) -
+                  Number(
+                    b.id
+                  );
+                }
+
+
+                return aTime -
+                  bTime;
+              }
+            );
+
+
+        for (
+          const reply of replies
+        ) {
+
+          list.appendChild(
+            buildComment(
+              reply,
+              1
+            )
+          );
+        }
+
+
+        return;
+      }
 
 
       for (
@@ -5775,6 +5882,7 @@
       renderComments(
         thread,
         "commentModalList",
+        true,
         true
       );
 
