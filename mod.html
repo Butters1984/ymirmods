@@ -1505,6 +1505,95 @@
        CHANGELOG
        ===================================================== */
 
+    .panel-title-row {
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        12px;
+
+      margin-bottom:
+        16px;
+
+      padding-bottom:
+        10px;
+
+      border-bottom:
+        1px solid
+        rgba(255,195,75,0.12);
+    }
+
+
+    .panel-title-row .panel-title {
+      margin-bottom:
+        0;
+
+      padding-bottom:
+        0;
+
+      border-bottom:
+        none;
+    }
+
+
+    .collapse-button {
+      padding:
+        5px 9px;
+
+      border-radius:
+        9px;
+
+      cursor:
+        pointer;
+
+      color:
+        #d9c38d;
+
+      background:
+        rgba(255,170,30,0.04);
+
+      border:
+        1px solid
+        rgba(255,192,70,0.14);
+
+      font-family:
+        inherit;
+
+      font-size:
+        0.74rem;
+
+      font-weight:
+        700;
+    }
+
+
+    .collapse-button:hover {
+      color:
+        #ffe09a;
+
+      border-color:
+        rgba(255,205,95,0.30);
+    }
+
+
+    .changelog-content {
+      display:
+        none;
+    }
+
+
+    .changelog-content.open {
+      display:
+        block;
+    }
+
+
     .changelog-text {
       color:
         #ccb98c;
@@ -1517,6 +1606,213 @@
 
       font-size:
         0.91rem;
+    }
+
+
+    .comment-form {
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        9px;
+
+      margin-bottom:
+        14px;
+    }
+
+
+    .comment-input {
+      width:
+        100%;
+
+      min-height:
+        78px;
+
+      resize:
+        vertical;
+
+      padding:
+        10px 11px;
+
+      border-radius:
+        10px;
+
+      color:
+        #ead9ad;
+
+      background:
+        rgba(7,10,14,0.78);
+
+      border:
+        1px solid
+        rgba(255,192,70,0.14);
+
+      font:
+        inherit;
+
+      font-size:
+        0.82rem;
+    }
+
+
+    .comment-input:focus {
+      outline:
+        none;
+
+      border-color:
+        rgba(255,190,70,0.34);
+
+      box-shadow:
+        0 0 0 2px
+        rgba(255,160,20,0.05);
+    }
+
+
+    .comment-actions {
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        10px;
+    }
+
+
+    .comment-note {
+      color:
+        #82775f;
+
+      font-size:
+        0.72rem;
+    }
+
+
+    .comment-submit {
+      padding:
+        7px 10px;
+
+      border-radius:
+        9px;
+
+      cursor:
+        pointer;
+
+      color:
+        #171006;
+
+      background:
+        linear-gradient(
+          135deg,
+          #d77808,
+          #ffad28,
+          #f1c45c
+        );
+
+      border:
+        1px solid
+        rgba(255,220,130,0.48);
+
+      font:
+        inherit;
+
+      font-size:
+        0.78rem;
+
+      font-weight:
+        800;
+    }
+
+
+    .comment-list {
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        10px;
+    }
+
+
+    .comment-item {
+      padding:
+        10px;
+
+      border-radius:
+        10px;
+
+      background:
+        rgba(255,170,30,0.03);
+
+      border:
+        1px solid
+        rgba(255,192,70,0.08);
+    }
+
+
+    .comment-meta {
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        10px;
+
+      margin-bottom:
+        6px;
+    }
+
+
+    .comment-author {
+      color:
+        #ffd16d;
+
+      font-size:
+        0.78rem;
+
+      font-weight:
+        800;
+    }
+
+
+    .comment-date {
+      color:
+        #766c58;
+
+      font-size:
+        0.68rem;
+    }
+
+
+    .comment-body {
+      color:
+        #cbb88d;
+
+      white-space:
+        pre-wrap;
+
+      overflow-wrap:
+        anywhere;
+
+      font-size:
+        0.81rem;
+
+      line-height:
+        1.45;
     }
 
 
@@ -2342,18 +2638,93 @@
               </div>
 
 
-              <!-- CHANGELOG -->
+              <!-- COMMENTS -->
 
               <div class="panel sidebar-panel">
 
                 <h2 class="panel-title">
-                  Changelog
+                  Comments
                 </h2>
 
+
+                <div class="comment-form">
+
+                  <textarea
+                    id="commentInput"
+                    class="comment-input"
+                    maxlength="1000"
+                    placeholder="Leave a request, suggestion, bug report, or feedback..."
+                  ></textarea>
+
+
+                  <div class="comment-actions">
+
+                    <span class="comment-note">
+                      Login required • 1000 character max
+                    </span>
+
+
+                    <button
+                      id="commentSubmit"
+                      class="comment-submit"
+                      type="button"
+                    >
+                      Post
+                    </button>
+
+                  </div>
+
+                </div>
+
+
                 <div
-                  id="changelogContent"
-                  class="changelog-text"
-                ></div>
+                  id="commentList"
+                  class="comment-list"
+                >
+
+                  <span class="empty-text">
+                    Loading comments...
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <!-- CHANGELOG -->
+
+              <div class="panel sidebar-panel">
+
+                <div class="panel-title-row">
+
+                  <h2 class="panel-title">
+                    Changelog
+                  </h2>
+
+
+                  <button
+                    id="changelogToggle"
+                    class="collapse-button"
+                    type="button"
+                    aria-expanded="false"
+                  >
+                    Show
+                  </button>
+
+                </div>
+
+
+                <div
+                  id="changelogWrap"
+                  class="changelog-content"
+                >
+
+                  <div
+                    id="changelogContent"
+                    class="changelog-text"
+                  ></div>
+
+                </div>
 
               </div>
 
@@ -2968,7 +3339,367 @@
           ? mod.versions
           : []
       );
+
+
+      loadComments();
     }
+
+
+    /* =====================================================
+       CHANGELOG TOGGLE
+       ===================================================== */
+
+    document
+      .getElementById(
+        "changelogToggle"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          const wrap =
+            document.getElementById(
+              "changelogWrap"
+            );
+
+
+          const button =
+            document.getElementById(
+              "changelogToggle"
+            );
+
+
+          const open =
+            wrap.classList.toggle(
+              "open"
+            );
+
+
+          button.textContent =
+            open
+              ? "Hide"
+              : "Show";
+
+
+          button.setAttribute(
+            "aria-expanded",
+            open
+              ? "true"
+              : "false"
+          );
+        }
+      );
+
+
+    /* =====================================================
+       COMMENTS
+       ===================================================== */
+
+    async function loadComments() {
+
+      const slug =
+        getModSlug();
+
+
+      const list =
+        document.getElementById(
+          "commentList"
+        );
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/mod/" +
+              encodeURIComponent(
+                slug
+              ) +
+              "/comments",
+            {
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          throw new Error(
+            result.message ||
+            "Unable to load comments."
+          );
+        }
+
+
+        renderComments(
+          Array.isArray(
+            result.comments
+          )
+            ? result.comments
+            : []
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Comments load error:",
+          error
+        );
+
+
+        list.innerHTML =
+          '<span class="empty-text">Comments are temporarily unavailable.</span>';
+      }
+    }
+
+
+    function renderComments(
+      comments
+    ) {
+
+      const list =
+        document.getElementById(
+          "commentList"
+        );
+
+
+      list.innerHTML =
+        "";
+
+
+      if (
+        comments.length ===
+        0
+      ) {
+
+        list.innerHTML =
+          '<span class="empty-text">No comments yet.</span>';
+
+        return;
+      }
+
+
+      for (
+        const comment of comments
+      ) {
+
+        const item =
+          document.createElement(
+            "div"
+          );
+
+
+        item.className =
+          "comment-item";
+
+
+        const meta =
+          document.createElement(
+            "div"
+          );
+
+
+        meta.className =
+          "comment-meta";
+
+
+        const author =
+          document.createElement(
+            "span"
+          );
+
+
+        author.className =
+          "comment-author";
+
+
+        author.textContent =
+          comment.display_name ||
+          comment.username ||
+          "User";
+
+
+        const date =
+          document.createElement(
+            "span"
+          );
+
+
+        date.className =
+          "comment-date";
+
+
+        date.textContent =
+          formatDate(
+            comment.created_at
+          );
+
+
+        const body =
+          document.createElement(
+            "div"
+          );
+
+
+        body.className =
+          "comment-body";
+
+
+        body.textContent =
+          comment.comment ||
+          "";
+
+
+        meta.appendChild(
+          author
+        );
+
+
+        meta.appendChild(
+          date
+        );
+
+
+        item.appendChild(
+          meta
+        );
+
+
+        item.appendChild(
+          body
+        );
+
+
+        list.appendChild(
+          item
+        );
+      }
+    }
+
+
+    document
+      .getElementById(
+        "commentSubmit"
+      )
+      .addEventListener(
+        "click",
+        async () => {
+
+          const input =
+            document.getElementById(
+              "commentInput"
+            );
+
+
+          const button =
+            document.getElementById(
+              "commentSubmit"
+            );
+
+
+          const comment =
+            input.value
+              .trim();
+
+
+          if (
+            !comment
+          ) {
+
+            return;
+          }
+
+
+          button.disabled =
+            true;
+
+
+          try {
+
+            const response =
+              await fetch(
+                "/api/mod/" +
+                  encodeURIComponent(
+                    getModSlug()
+                  ) +
+                  "/comments",
+                {
+                  method:
+                    "POST",
+
+                  credentials:
+                    "same-origin",
+
+                  headers: {
+                    "Content-Type":
+                      "application/json"
+                  },
+
+                  body:
+                    JSON.stringify({
+                      comment:
+                        comment
+                    })
+                }
+              );
+
+
+            const result =
+              await response.json();
+
+
+            if (
+              response.status ===
+              401
+            ) {
+
+              window.location.href =
+                "/login";
+
+              return;
+            }
+
+
+            if (
+              !response.ok ||
+              !result.success
+            ) {
+
+              throw new Error(
+                result.message ||
+                "Unable to post comment."
+              );
+            }
+
+
+            input.value =
+              "";
+
+
+            await loadComments();
+
+          } catch (error) {
+
+            alert(
+              error.message ||
+              "Unable to post comment."
+            );
+
+          } finally {
+
+            button.disabled =
+              false;
+          }
+        }
+      );
 
 
     /* =====================================================
