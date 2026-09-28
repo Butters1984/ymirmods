@@ -3744,20 +3744,14 @@
             page;
 
 
+          /*
+           * Keep the visitor at the same scroll position
+           * when changing catalog pages. The old code
+           * scrolled the whole Mods section into view,
+           * which made pagination feel like the page
+           * jumped after every click.
+           */
           renderCatalogPage();
-
-
-          document
-            .getElementById(
-              "mods"
-            )
-            .scrollIntoView({
-              behavior:
-                "smooth",
-
-              block:
-                "start"
-            });
         }
       );
 
