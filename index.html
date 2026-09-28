@@ -1580,12 +1580,32 @@
     }
 
 
+    .catalog-card-author-row {
+      display: flex;
+
+      align-items: center;
+
+      justify-content:
+        space-between;
+
+      gap: 10px;
+
+      margin-bottom: 10px;
+    }
+
+
     .catalog-card-author {
+      min-width: 0;
+
       color: #8f8264;
 
       font-size: 0.78rem;
 
-      margin-bottom: 10px;
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+
+      white-space: nowrap;
     }
 
 
@@ -1645,9 +1665,97 @@
 
 
     .catalog-version {
+      flex-shrink: 0;
+
       color: #a89974;
 
       font-size: 0.76rem;
+
+      white-space: nowrap;
+    }
+
+
+    .catalog-card-stats {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 12px;
+    }
+
+
+    .catalog-like-button {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 5px;
+
+      padding: 0;
+
+      border: 0;
+
+      cursor: pointer;
+
+      color: #c7b88e;
+
+      background: transparent;
+
+      font: inherit;
+
+      font-size: 0.76rem;
+    }
+
+
+    .catalog-like-heart {
+      color: #e53935;
+
+      font-size: 0.94rem;
+
+      line-height: 1;
+
+      text-shadow: none;
+
+      transition:
+        transform 0.18s ease,
+        text-shadow 0.18s ease,
+        filter 0.18s ease;
+    }
+
+
+    .catalog-like-button:hover
+    .catalog-like-heart {
+      transform: scale(1.08);
+
+      filter: brightness(1.12);
+
+      text-shadow:
+        0 0 7px
+        rgba(229,57,53,0.58);
+    }
+
+
+    .catalog-download-stat {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 5px;
+
+      color: #a89974;
+
+      font-size: 0.76rem;
+
+      cursor: default;
+    }
+
+
+    .catalog-download-icon {
+      color: #d8b35a;
+
+      font-size: 0.93rem;
+
+      line-height: 1;
     }
 
 
@@ -3962,6 +4070,16 @@
         "Unnamed Mod";
 
 
+      const authorRow =
+        document.createElement(
+          "div"
+        );
+
+
+      authorRow.className =
+        "catalog-card-author-row";
+
+
       const author =
         document.createElement(
           "div"
@@ -3981,6 +4099,33 @@
         createCreatorLink(
           mod
         )
+      );
+
+
+      const version =
+        document.createElement(
+          "span"
+        );
+
+
+      version.className =
+        "catalog-version";
+
+
+      version.textContent =
+        mod.version
+          ? "v" +
+            mod.version
+          : "";
+
+
+      authorRow.appendChild(
+        author
+      );
+
+
+      authorRow.appendChild(
+        version
       );
 
 
@@ -4009,21 +4154,228 @@
         "catalog-card-footer";
 
 
-      const version =
+      const stats =
+        document.createElement(
+          "div"
+        );
+
+
+      stats.className =
+        "catalog-card-stats";
+
+
+      const likeButton =
+        document.createElement(
+          "button"
+        );
+
+
+      likeButton.type =
+        "button";
+
+
+      likeButton.className =
+        "catalog-like-button";
+
+
+      likeButton.title =
+        "Like this mod";
+
+
+      likeButton.setAttribute(
+        "aria-label",
+        "Like " +
+        (
+          mod.name ||
+          "this mod"
+        )
+      );
+
+
+      const likeHeart =
         document.createElement(
           "span"
         );
 
 
-      version.className =
-        "catalog-version";
+      likeHeart.className =
+        "catalog-like-heart";
 
 
-      version.textContent =
-        mod.version
-          ? "v" +
-            mod.version
-          : "";
+      likeHeart.textContent =
+        "♥";
+
+
+      const likeCount =
+        document.createElement(
+          "span"
+        );
+
+
+      likeCount.textContent =
+        Number(
+          mod.star_count ||
+          0
+        )
+          .toLocaleString();
+
+
+      likeButton.appendChild(
+        likeHeart
+      );
+
+
+      likeButton.appendChild(
+        likeCount
+      );
+
+
+      likeButton.addEventListener(
+        "click",
+        async event => {
+
+          event.preventDefault();
+          event.stopPropagation();
+
+
+          likeButton.disabled =
+            true;
+
+
+          try {
+
+            const response =
+              await fetch(
+                "/api/mod/" +
+                encodeURIComponent(
+                  mod.slug
+                ) +
+                "/star",
+                {
+                  method:
+                    "POST",
+
+                  credentials:
+                    "same-origin"
+                }
+              );
+
+
+            const result =
+              await response.json();
+
+
+            if (
+              response.status ===
+              401
+            ) {
+
+              window.location.href =
+                "/login";
+
+              return;
+            }
+
+
+            if (
+              !response.ok ||
+              !result.success
+            ) {
+
+              throw new Error(
+                result.message ||
+                "Unable to update like."
+              );
+            }
+
+
+            mod.star_count =
+              Number(
+                result.star_count ||
+                0
+              );
+
+
+            likeCount.textContent =
+              mod.star_count
+                .toLocaleString();
+
+          } catch (error) {
+
+            console.error(
+              "Like error:",
+              error
+            );
+
+          } finally {
+
+            likeButton.disabled =
+              false;
+          }
+        }
+      );
+
+
+      const downloadStat =
+        document.createElement(
+          "span"
+        );
+
+
+      downloadStat.className =
+        "catalog-download-stat";
+
+
+      downloadStat.title =
+        "Downloads";
+
+
+      const downloadIcon =
+        document.createElement(
+          "span"
+        );
+
+
+      downloadIcon.className =
+        "catalog-download-icon";
+
+
+      downloadIcon.textContent =
+        "↓";
+
+
+      const downloadCount =
+        document.createElement(
+          "span"
+        );
+
+
+      downloadCount.textContent =
+        Number(
+          mod.download_count ||
+          0
+        )
+          .toLocaleString();
+
+
+      downloadStat.appendChild(
+        downloadIcon
+      );
+
+
+      downloadStat.appendChild(
+        downloadCount
+      );
+
+
+      stats.appendChild(
+        likeButton
+      );
+
+
+      stats.appendChild(
+        downloadStat
+      );
 
 
       const view =
@@ -4041,7 +4393,7 @@
 
 
       footer.appendChild(
-        version
+        stats
       );
 
 
@@ -4056,7 +4408,7 @@
 
 
       body.appendChild(
-        author
+        authorRow
       );
 
 
