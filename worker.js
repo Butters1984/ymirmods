@@ -409,6 +409,7 @@ export default {
 
 
       return handleGetModComments(
+        request,
         env,
         slug
       );
@@ -442,6 +443,44 @@ export default {
         request,
         env,
         slug
+      );
+    }
+
+
+    if (
+      url.pathname.match(
+        /^\/api\/mod\/[a-z0-9-]+\/comments\/\d+$/
+      ) &&
+      request.method ===
+        "DELETE"
+    ) {
+
+      const parts =
+        url.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      const slug =
+        String(
+          parts[2] ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      const commentId =
+        Number(
+          parts[4]
+        );
+
+
+      return handleDeleteModComment(
+        request,
+        env,
+        slug,
+        commentId
       );
     }
 
@@ -2930,6 +2969,13 @@ async function handlePublicMod(
 
   try {
 
+    const viewer =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
     if (
       !slug ||
       slug.length >
@@ -3480,6 +3526,7 @@ async function handleMyMods(
    ========================================================= */
 
 async function handleGetModComments(
+  request,
   env,
   slug
 ) {
@@ -3550,6 +3597,7 @@ async function handleGetModComments(
           `
           SELECT
             mod_comments.id,
+            mod_comments.user_id,
             mod_comments.comment,
             mod_comments.created_at,
 
@@ -3607,7 +3655,22 @@ async function handleGetModComments(
           avatar_url:
             row.avatar_url ||
             row.github_avatar_url ||
-            null
+            null,
+
+          can_delete:
+            Boolean(
+              viewer &&
+              (
+                Number(
+                  row.user_id
+                ) ===
+                Number(
+                  viewer.id
+                ) ||
+                viewer.role ===
+                  "admin"
+              )
+            )
         })
       );
 
@@ -3862,6 +3925,181 @@ async function handlePostModComment(
 
         message:
           "Unable to post comment."
+      },
+      500
+    );
+  }
+}
+
+
+async function handleDeleteModComment(
+  request,
+  env,
+  slug,
+  commentId
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in to delete a comment."
+        },
+        401
+      );
+    }
+
+
+    if (
+      !slug ||
+      !/^[a-z0-9-]+$/.test(
+        slug
+      ) ||
+      !Number.isInteger(
+        commentId
+      ) ||
+      commentId < 1
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid comment."
+        },
+        400
+      );
+    }
+
+
+    const comment =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            mod_comments.id,
+            mod_comments.user_id,
+            mods.slug
+
+          FROM mod_comments
+
+          INNER JOIN mods
+            ON mods.id =
+               mod_comments.mod_id
+
+          WHERE
+            mod_comments.id = ?
+            AND mods.slug = ?
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          commentId,
+          slug
+        )
+        .first();
+
+
+    if (
+      !comment
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Comment not found."
+        },
+        404
+      );
+    }
+
+
+    const canDelete =
+      Number(
+        comment.user_id
+      ) ===
+      Number(
+        user.id
+      ) ||
+      user.role ===
+        "admin";
+
+
+    if (
+      !canDelete
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You can only delete your own comments."
+        },
+        403
+      );
+    }
+
+
+    await env.DB
+      .prepare(
+        `
+        DELETE FROM mod_comments
+
+        WHERE id = ?
+        `
+      )
+      .bind(
+        commentId
+      )
+      .run();
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      message:
+        "Comment deleted."
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Delete mod comment error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to delete comment."
       },
       500
     );
