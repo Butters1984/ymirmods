@@ -2001,7 +2001,10 @@
 
           packageManifest =
             JSON.parse(
-              manifestText
+              manifestText.replace(
+                /^\uFEFF/,
+                ""
+              )
             );
 
         } catch {
