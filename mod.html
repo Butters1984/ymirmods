@@ -5335,50 +5335,19 @@
           "click",
           () => {
 
-            openCommentTicket(
-              comment.id
+            replyForm.classList.toggle(
+              "open"
             );
 
 
-            requestAnimationFrame(
-              () => {
+            if (
+              replyForm.classList.contains(
+                "open"
+              )
+            ) {
 
-                const modalItems =
-                  document
-                    .getElementById(
-                      "commentModalList"
-                    )
-                    .querySelectorAll(
-                      ".comment-item"
-                    );
-
-
-                const lastItem =
-                  modalItems[
-                    modalItems.length -
-                    1
-                  ];
-
-
-                if (
-                  lastItem
-                ) {
-
-                  const modalReply =
-                    lastItem.querySelector(
-                      ".comment-reply"
-                    );
-
-
-                  if (
-                    modalReply
-                  ) {
-
-                    modalReply.click();
-                  }
-                }
-              }
-            );
+              replyInput.focus();
+            }
           }
         );
 
@@ -5571,22 +5540,9 @@
             "click",
             () => {
 
-              const open =
-                childWrap.classList.toggle(
-                  "open"
-                );
-
-
-              toggle.textContent =
-                open
-                  ? "Hide replies"
-                  : (
-                      children.length === 1
-                        ? "View 1 reply"
-                        : "View " +
-                          children.length +
-                          " replies"
-                    );
+              openCommentTicket(
+                comment.id
+              );
             }
           );
 
@@ -5598,12 +5554,13 @@
             item.appendChild(
               toggle
             );
+
+          } else {
+
+            item.appendChild(
+              childWrap
+            );
           }
-
-
-          item.appendChild(
-            childWrap
-          );
         }
 
 
