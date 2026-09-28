@@ -8894,7 +8894,34 @@ async function handleDiscordInviteIcon(
     }
 
 
-    const response =
+    const cache =
+      caches.default;
+
+
+    const cacheKey =
+      new Request(
+        "https://ymirmods.com/__discord-icon-cache/" +
+        encodeURIComponent(
+          inviteCode
+        )
+      );
+
+
+    const cached =
+      await cache.match(
+        cacheKey
+      );
+
+
+    if (
+      cached
+    ) {
+
+      return cached;
+    }
+
+
+    const inviteResponse =
       await fetch(
         "https://discord.com/api/v10/invites/" +
         encodeURIComponent(
@@ -8908,13 +8935,21 @@ async function handleDiscordInviteIcon(
 
             "User-Agent":
               "YMIRMods/1.0 (https://ymirmods.com)"
+          },
+
+          cf: {
+            cacheTtl:
+              86400,
+
+            cacheEverything:
+              true
           }
         }
       );
 
 
     if (
-      !response.ok
+      !inviteResponse.ok
     ) {
 
       return Response.redirect(
@@ -8925,7 +8960,7 @@ async function handleDiscordInviteIcon(
 
 
     const data =
-      await response.json();
+      await inviteResponse.json();
 
 
     const guildId =
@@ -8976,21 +9011,69 @@ async function handleDiscordInviteIcon(
       "?size=128";
 
 
-    return new Response(
-      null,
-      {
-        status:
-          302,
+    const iconResponse =
+      await fetch(
+        iconUrl,
+        {
+          cf: {
+            cacheTtl:
+              86400,
 
-        headers: {
-          "Location":
-            iconUrl,
-
-          "Cache-Control":
-            "public, max-age=3600"
+            cacheEverything:
+              true
+          }
         }
-      }
+      );
+
+
+    if (
+      !iconResponse.ok
+    ) {
+
+      return Response.redirect(
+        fallback,
+        302
+      );
+    }
+
+
+    const headers =
+      new Headers(
+        iconResponse.headers
+      );
+
+
+    headers.set(
+      "Cache-Control",
+      "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
     );
+
+
+    headers.delete(
+      "Set-Cookie"
+    );
+
+
+    const response =
+      new Response(
+        iconResponse.body,
+        {
+          status:
+            200,
+
+          headers:
+            headers
+        }
+      );
+
+
+    await cache.put(
+      cacheKey,
+      response.clone()
+    );
+
+
+    return response;
 
   } catch (error) {
 
