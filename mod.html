@@ -917,6 +917,18 @@
     }
 
 
+    .mod-quick-stats {
+      display:
+        inline-flex;
+
+      align-items:
+        center;
+
+      gap:
+        10px;
+    }
+
+
     .star-button {
       min-width:
         58px;
@@ -1025,6 +1037,64 @@
     .like-heart {
       color:
         #e53935;
+
+      font-size:
+        0.95rem;
+
+      line-height:
+        1;
+    }
+
+
+    .mod-download-stat {
+      min-height:
+        30px;
+
+      padding:
+        4px 10px;
+
+      display:
+        inline-flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      gap:
+        6px;
+
+      border-radius:
+        999px;
+
+      color:
+        #f2c14e;
+
+      background:
+        transparent;
+
+      border:
+        1px solid
+        rgba(255,190,70,0.18);
+
+      font-size:
+        0.82rem;
+
+      font-weight:
+        800;
+
+      line-height:
+        1;
+
+      cursor:
+        default;
+    }
+
+
+    .mod-download-icon {
+      color:
+        #d8b35a;
 
       font-size:
         0.95rem;
@@ -1582,13 +1652,15 @@
     }
 
 
-    .changelog-content {
+    .changelog-content,
+    .details-content {
       display:
         none;
     }
 
 
-    .changelog-content.open {
+    .changelog-content.open,
+    .details-content.open {
       display:
         block;
     }
@@ -2500,25 +2572,47 @@
               </div>
 
 
-              <button
-                id="starButton"
-                class="star-button"
-                type="button"
-                aria-label="Like this mod"
-                title="Like this mod"
-              >
-                <span
-                  id="starLabel"
-                  class="like-heart"
-                  aria-hidden="true"
+              <div class="mod-quick-stats">
+
+                <button
+                  id="starButton"
+                  class="star-button"
+                  type="button"
+                  aria-label="Like this mod"
+                  title="Like this mod"
                 >
-                  ♥
+                  <span
+                    id="starLabel"
+                    class="like-heart"
+                    aria-hidden="true"
+                  >
+                    ♥
+                  </span>
+
+                  <span id="starCount">
+                    0
+                  </span>
+                </button>
+
+
+                <span
+                  class="mod-download-stat"
+                  title="Downloads"
+                  aria-label="Total downloads"
+                >
+                  <span
+                    class="mod-download-icon"
+                    aria-hidden="true"
+                  >
+                    ↓
+                  </span>
+
+                  <span id="downloadCount">
+                    0
+                  </span>
                 </span>
 
-                <span id="starCount">
-                  0
-                </span>
-              </button>
+              </div>
 
             </div>
 
@@ -2621,71 +2715,92 @@
 
               <div class="panel sidebar-panel">
 
-                <h2 class="panel-title">
-                  Mod Details
-                </h2>
+                <div class="panel-title-row">
+
+                  <h2 class="panel-title">
+                    Mod Details
+                  </h2>
 
 
-                <div class="detail-row">
-
-                  <span class="detail-label">
-                    Creator
-                  </span>
-
-                  <span
-                    id="detailAuthor"
-                    class="detail-value"
+                  <button
+                    id="detailsToggle"
+                    class="collapse-button"
+                    type="button"
+                    aria-expanded="false"
                   >
-                    -
-                  </span>
+                    Show
+                  </button>
 
                 </div>
 
 
-                <div class="detail-row">
+                <div
+                  id="detailsWrap"
+                  class="details-content"
+                >
 
-                  <span class="detail-label">
-                    Version
-                  </span>
+                  <div class="detail-row">
 
-                  <span
-                    id="detailVersion"
-                    class="detail-value"
-                  >
-                    -
-                  </span>
+                    <span class="detail-label">
+                      Creator
+                    </span>
 
-                </div>
+                    <span
+                      id="detailAuthor"
+                      class="detail-value"
+                    >
+                      -
+                    </span>
 
-
-                <div class="detail-row">
-
-                  <span class="detail-label">
-                    Category
-                  </span>
-
-                  <span
-                    id="detailCategory"
-                    class="detail-value"
-                  >
-                    -
-                  </span>
-
-                </div>
+                  </div>
 
 
-                <div class="detail-row">
+                  <div class="detail-row">
 
-                  <span class="detail-label">
-                    Updated
-                  </span>
+                    <span class="detail-label">
+                      Version
+                    </span>
 
-                  <span
-                    id="detailUpdated"
-                    class="detail-value"
-                  >
-                    -
-                  </span>
+                    <span
+                      id="detailVersion"
+                      class="detail-value"
+                    >
+                      -
+                    </span>
+
+                  </div>
+
+
+                  <div class="detail-row">
+
+                    <span class="detail-label">
+                      Category
+                    </span>
+
+                    <span
+                      id="detailCategory"
+                      class="detail-value"
+                    >
+                      -
+                    </span>
+
+                  </div>
+
+
+                  <div class="detail-row">
+
+                    <span class="detail-label">
+                      Updated
+                    </span>
+
+                    <span
+                      id="detailUpdated"
+                      class="detail-value"
+                    >
+                      -
+                    </span>
+
+                  </div>
 
                 </div>
 
@@ -3266,6 +3381,16 @@
       );
 
 
+      setText(
+        "downloadCount",
+        Number(
+          mod.download_count ||
+          0
+        )
+          .toLocaleString()
+      );
+
+
       /* DOWNLOAD */
 
       const download =
@@ -3398,6 +3523,52 @@
 
       loadComments();
     }
+
+
+    /* =====================================================
+       MOD DETAILS TOGGLE
+       ===================================================== */
+
+    document
+      .getElementById(
+        "detailsToggle"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          const wrap =
+            document.getElementById(
+              "detailsWrap"
+            );
+
+
+          const button =
+            document.getElementById(
+              "detailsToggle"
+            );
+
+
+          const open =
+            wrap.classList.toggle(
+              "open"
+            );
+
+
+          button.textContent =
+            open
+              ? "Hide"
+              : "Show";
+
+
+          button.setAttribute(
+            "aria-expanded",
+            open
+              ? "true"
+              : "false"
+          );
+        }
+      );
 
 
     /* =====================================================
