@@ -1286,6 +1286,152 @@
 
 
     /* =====================================================
+       NOTIFICATIONS
+       ===================================================== */
+
+    .notifications-section {
+      margin-top:
+        34px;
+
+      padding-top:
+        10px;
+
+      scroll-margin-top:
+        110px;
+    }
+
+
+    .notification-list {
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        10px;
+    }
+
+
+    .notification-item {
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        16px;
+
+      padding:
+        15px 16px;
+
+      border-radius:
+        13px;
+
+      cursor:
+        pointer;
+
+      background:
+        rgba(18,21,27,0.72);
+
+      border:
+        1px solid
+        var(--line);
+
+      transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease;
+    }
+
+
+    .notification-item:hover {
+      transform:
+        translateY(-2px);
+
+      border-color:
+        rgba(255,194,82,0.28);
+    }
+
+
+    .notification-item.unread {
+      background:
+        rgba(255,160,30,0.055);
+
+      border-color:
+        rgba(255,194,82,0.22);
+    }
+
+
+    .notification-main {
+      min-width:
+        0;
+    }
+
+
+    .notification-title {
+      color:
+        var(--gold);
+
+      font-weight:
+        bold;
+
+      margin-bottom:
+        4px;
+    }
+
+
+    .notification-text {
+      color:
+        var(--muted);
+
+      font-size:
+        0.88rem;
+
+      line-height:
+        1.45;
+
+      overflow-wrap:
+        anywhere;
+    }
+
+
+    .notification-meta {
+      flex-shrink:
+        0;
+
+      color:
+        #8f8264;
+
+      font-size:
+        0.76rem;
+    }
+
+
+    .notification-empty {
+      padding:
+        18px;
+
+      border-radius:
+        13px;
+
+      color:
+        var(--muted);
+
+      background:
+        rgba(18,21,27,0.55);
+
+      border:
+        1px solid
+        var(--line);
+    }
+
+
+    /* =====================================================
        MY MODS SECTION
        ===================================================== */
 
@@ -2566,6 +2712,15 @@
 
           <h3>
             Notification
+
+            <span
+              id="notificationCount"
+              class="mod-count"
+              style="display:none;"
+            >
+              0
+            </span>
+
           </h3>
 
 
@@ -2578,13 +2733,12 @@
           </p>
 
 
-          <button
+          <a
             class="button secondary"
-            type="button"
-            disabled
+            href="#notificationsSection"
           >
-            Coming Soon
-          </button>
+            View Notifications
+          </a>
 
         </article>
 
@@ -2786,6 +2940,47 @@
         <p id="accessStatus">
           Checking upload permissions...
         </p>
+
+      </section>
+
+
+      <!-- =================================================
+           NOTIFICATIONS
+           ================================================= -->
+
+      <section
+        id="notificationsSection"
+        class="notifications-section"
+      >
+
+        <div class="my-mods-heading">
+
+          <div>
+
+            <h2>
+              Notifications
+            </h2>
+
+            <p>
+              Replies and account activity
+              connected to your YMIR account.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="notificationList"
+          class="notification-list"
+        >
+
+          <div class="notification-empty">
+            Loading notifications...
+          </div>
+
+        </div>
 
       </section>
 
@@ -3070,6 +3265,18 @@
       );
 
 
+    const notificationCount =
+      document.getElementById(
+        "notificationCount"
+      );
+
+
+    const notificationList =
+      document.getElementById(
+        "notificationList"
+      );
+
+
     const myModsCount =
       document.getElementById(
         "myModsCount"
@@ -3188,6 +3395,7 @@
 
 
         await Promise.all([
+          loadNotifications(),
           loadMyMods(),
           loadApiKeys()
         ]);
@@ -3413,6 +3621,367 @@
 
       }
 
+    }
+
+
+    /* =====================================================
+       LOAD NOTIFICATIONS
+       ===================================================== */
+
+    async function loadNotifications() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/notifications",
+            {
+              method:
+                "GET",
+
+              credentials:
+                "same-origin",
+
+              cache:
+                "no-store"
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+
+          throw new Error(
+            result.message ||
+            "Unable to load notifications."
+          );
+        }
+
+
+        const notifications =
+          Array.isArray(
+            result.notifications
+          )
+            ? result.notifications
+            : [];
+
+
+        const unreadCount =
+          Number(
+            result.unread_count ||
+            0
+          );
+
+
+        notificationCount.textContent =
+          unreadCount
+            .toLocaleString();
+
+
+        notificationCount.style.display =
+          unreadCount > 0
+            ? "inline-flex"
+            : "none";
+
+
+        renderNotifications(
+          notifications
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Notifications error:",
+          error
+        );
+
+
+        notificationList.innerHTML =
+          '<div class="notification-empty">Unable to load notifications.</div>';
+      }
+    }
+
+
+    function renderNotifications(
+      notifications
+    ) {
+
+      notificationList.innerHTML =
+        "";
+
+
+      if (
+        notifications.length ===
+        0
+      ) {
+
+        notificationList.innerHTML =
+          '<div class="notification-empty">No notifications yet.</div>';
+
+        return;
+      }
+
+
+      for (
+        const notification of notifications
+      ) {
+
+        const item =
+          document.createElement(
+            "div"
+          );
+
+
+        item.className =
+          notification.is_read
+            ? "notification-item"
+            : "notification-item unread";
+
+
+        item.setAttribute(
+          "role",
+          "link"
+        );
+
+
+        item.setAttribute(
+          "tabindex",
+          "0"
+        );
+
+
+        const main =
+          document.createElement(
+            "div"
+          );
+
+
+        main.className =
+          "notification-main";
+
+
+        const title =
+          document.createElement(
+            "div"
+          );
+
+
+        title.className =
+          "notification-title";
+
+
+        title.textContent =
+          (
+            notification.actor_display_name ||
+            notification.actor_username ||
+            "Someone"
+          ) +
+          " replied to your comment";
+
+
+        const text =
+          document.createElement(
+            "div"
+          );
+
+
+        text.className =
+          "notification-text";
+
+
+        const preview =
+          String(
+            notification.comment_text ||
+            ""
+          )
+            .trim();
+
+
+        text.textContent =
+          (
+            notification.mod_name
+              ? "On " +
+                notification.mod_name +
+                ": "
+              : ""
+          ) +
+          (
+            preview
+              ? preview.slice(
+                  0,
+                  180
+                )
+              : "View the reply."
+          );
+
+
+        const meta =
+          document.createElement(
+            "div"
+          );
+
+
+        meta.className =
+          "notification-meta";
+
+
+        meta.textContent =
+          formatDashboardDate(
+            notification.created_at
+          );
+
+
+        main.appendChild(
+          title
+        );
+
+
+        main.appendChild(
+          text
+        );
+
+
+        item.appendChild(
+          main
+        );
+
+
+        item.appendChild(
+          meta
+        );
+
+
+        const openNotification =
+          async () => {
+
+            try {
+
+              await fetch(
+                "/api/notifications/" +
+                  encodeURIComponent(
+                    notification.id
+                  ) +
+                  "/read",
+                {
+                  method:
+                    "POST",
+
+                  credentials:
+                    "same-origin"
+                }
+              );
+
+            } catch (error) {
+
+              console.error(
+                "Notification read error:",
+                error
+              );
+            }
+
+
+            if (
+              notification.mod_slug
+            ) {
+
+              window.location.href =
+                "/mod/" +
+                encodeURIComponent(
+                  notification.mod_slug
+                );
+
+            } else {
+
+              await loadNotifications();
+            }
+          };
+
+
+        item.addEventListener(
+          "click",
+          openNotification
+        );
+
+
+        item.addEventListener(
+          "keydown",
+          event => {
+
+            if (
+              event.key ===
+                "Enter" ||
+              event.key ===
+                " "
+            ) {
+
+              event.preventDefault();
+
+
+              openNotification();
+            }
+          }
+        );
+
+
+        notificationList.appendChild(
+          item
+        );
+      }
+    }
+
+
+    function formatDashboardDate(
+      value
+    ) {
+
+      if (
+        !value
+      ) {
+
+        return "";
+      }
+
+
+      const date =
+        new Date(
+          value.endsWith &&
+          value.endsWith(
+            "Z"
+          )
+            ? value
+            : value + "Z"
+        );
+
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+
+        return value;
+      }
+
+
+      return date.toLocaleDateString(
+        undefined,
+        {
+          month:
+            "short",
+
+          day:
+            "numeric",
+
+          year:
+            "numeric"
+        }
+      );
     }
 
 
