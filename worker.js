@@ -2784,6 +2784,15 @@ async function handlePublicMods(
               WHERE mod_stars.mod_id = mods.id
             ) AS star_count,
 
+            (
+              SELECT COALESCE(
+                SUM(mod_versions.downloads),
+                0
+              )
+              FROM mod_versions
+              WHERE mod_versions.mod_id = mods.id
+            ) AS download_count,
+
             users.id AS author_id,
             users.username AS author,
             users.display_name AS author_display_name,
@@ -2905,6 +2914,15 @@ async function handlePublicMod(
               FROM mod_stars
               WHERE mod_stars.mod_id = mods.id
             ) AS star_count,
+
+            (
+              SELECT COALESCE(
+                SUM(mod_versions.downloads),
+                0
+              )
+              FROM mod_versions
+              WHERE mod_versions.mod_id = mods.id
+            ) AS download_count,
 
             users.id AS author_id,
             users.username AS author,
@@ -8037,6 +8055,40 @@ async function handleStoredFile(
             404
         }
       );
+    }
+
+
+    if (
+      !request.headers.get(
+        "Range"
+      )
+    ) {
+
+      try {
+
+        await env.DB
+          .prepare(
+            `
+            UPDATE mod_versions
+
+            SET downloads =
+              downloads + 1
+
+            WHERE file_url = ?
+            `
+          )
+          .bind(
+            url.pathname
+          )
+          .run();
+
+      } catch (downloadCountError) {
+
+        console.error(
+          "Download counter error:",
+          downloadCountError
+        );
+      }
     }
 
 
