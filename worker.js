@@ -3702,9 +3702,19 @@ async function handleGetNotifications(
 
           WHERE
             notifications.recipient_user_id = ?
+            AND
+            (
+              notifications.is_read = 0
+              OR
+              datetime(
+                notifications.created_at
+              ) >= datetime(
+                'now',
+                '-7 days'
+              )
+            )
 
           ORDER BY
-            notifications.is_read ASC,
             datetime(
               notifications.created_at
             ) DESC,
