@@ -19,7 +19,7 @@ const GITHUB_STATE_LENGTH_SECONDS =
   60 * 10;
 
 const MAX_MOD_FILE_SIZE =
-  100 * 1024 * 1024;
+  500 * 1024 * 1024;
 
 const MAX_ICON_FILE_SIZE =
   5 * 1024 * 1024;
