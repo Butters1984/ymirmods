@@ -382,6 +382,52 @@ export default {
 
 
     /* =====================================================
+       NOTIFICATIONS
+       ===================================================== */
+
+    if (
+      url.pathname ===
+        "/api/notifications" &&
+      request.method ===
+        "GET"
+    ) {
+
+      return handleGetNotifications(
+        request,
+        env
+      );
+    }
+
+
+    if (
+      url.pathname.match(
+        /^\/api\/notifications\/\d+\/read$/
+      ) &&
+      request.method ===
+        "POST"
+    ) {
+
+      const parts =
+        url.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      const notificationId =
+        Number(
+          parts[2]
+        );
+
+
+      return handleReadNotification(
+        request,
+        env,
+        notificationId
+      );
+    }
+
+
+    /* =====================================================
        MOD COMMENTS
        ===================================================== */
 
@@ -817,6 +863,13 @@ export default {
 
       url.pathname.startsWith(
         "/api/api-keys/"
+      ) ||
+
+      url.pathname ===
+        "/api/notifications" ||
+
+      url.pathname.startsWith(
+        "/api/notifications/"
       ) ||
 
       url.pathname ===
@@ -3542,6 +3595,271 @@ async function handleMyMods(
 
 
 /* =========================================================
+   NOTIFICATIONS
+   ========================================================= */
+
+async function handleGetNotifications(
+  request,
+  env
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    const result =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            notifications.id,
+            notifications.type,
+            notifications.comment_id,
+            notifications.is_read,
+            notifications.created_at,
+
+            actor.username AS actor_username,
+            actor.display_name AS actor_display_name,
+
+            mods.name AS mod_name,
+            mods.slug AS mod_slug,
+
+            mod_comments.comment AS comment_text
+
+          FROM notifications
+
+          INNER JOIN users AS actor
+            ON actor.id =
+               notifications.actor_user_id
+
+          INNER JOIN mods
+            ON mods.id =
+               notifications.mod_id
+
+          LEFT JOIN mod_comments
+            ON mod_comments.id =
+               notifications.comment_id
+
+          WHERE
+            notifications.recipient_user_id = ?
+
+          ORDER BY
+            notifications.is_read ASC,
+            datetime(
+              notifications.created_at
+            ) DESC,
+            notifications.id DESC
+
+          LIMIT 50
+          `
+        )
+        .bind(
+          user.id
+        )
+        .all();
+
+
+    const notifications =
+      result.results ||
+      [];
+
+
+    const unreadCount =
+      notifications.filter(
+        item =>
+          !Boolean(
+            item.is_read
+          )
+      ).length;
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      unread_count:
+        unreadCount,
+
+      notifications:
+        notifications.map(
+          item => ({
+            id:
+              item.id,
+
+            type:
+              item.type,
+
+            is_read:
+              Boolean(
+                item.is_read
+              ),
+
+            created_at:
+              item.created_at,
+
+            actor_username:
+              item.actor_username,
+
+            actor_display_name:
+              item.actor_display_name ||
+              item.actor_username,
+
+            mod_name:
+              item.mod_name,
+
+            mod_slug:
+              item.mod_slug,
+
+            comment_text:
+              item.comment_text ||
+              ""
+          })
+        )
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Notifications load error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to load notifications."
+      },
+      500
+    );
+  }
+}
+
+
+async function handleReadNotification(
+  request,
+  env,
+  notificationId
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    if (
+      !Number.isInteger(
+        notificationId
+      ) ||
+      notificationId < 1
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid notification."
+        },
+        400
+      );
+    }
+
+
+    await env.DB
+      .prepare(
+        `
+        UPDATE notifications
+
+        SET is_read = 1
+
+        WHERE
+          id = ?
+          AND recipient_user_id = ?
+        `
+      )
+      .bind(
+        notificationId,
+        user.id
+      )
+      .run();
+
+
+    return jsonResponse({
+      success:
+        true
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Notification read error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to update notification."
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
    MOD COMMENTS
    ========================================================= */
 
@@ -3584,7 +3902,10 @@ async function handleGetModComments(
       await env.DB
         .prepare(
           `
-          SELECT id
+          SELECT
+            id,
+            name,
+            slug
 
           FROM mods
 
@@ -3625,6 +3946,7 @@ async function handleGetModComments(
           SELECT
             mod_comments.id,
             mod_comments.user_id,
+            mod_comments.parent_comment_id,
             mod_comments.comment,
             mod_comments.created_at,
 
@@ -3665,6 +3987,13 @@ async function handleGetModComments(
         row => ({
           id:
             row.id,
+
+          parent_comment_id:
+            row.parent_comment_id
+              ? Number(
+                  row.parent_comment_id
+                )
+              : null,
 
           comment:
             row.comment,
@@ -3815,6 +4144,38 @@ async function handlePostModComment(
         .trim();
 
 
+    const parentCommentId =
+      body.parent_comment_id
+        ? Number(
+            body.parent_comment_id
+          )
+        : null;
+
+
+    if (
+      parentCommentId !==
+        null &&
+      (
+        !Number.isInteger(
+          parentCommentId
+        ) ||
+        parentCommentId < 1
+      )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid reply target."
+        },
+        400
+      );
+    }
+
+
     if (
       comment.length <
         1 ||
@@ -3873,6 +4234,57 @@ async function handlePostModComment(
     }
 
 
+    let parentComment =
+      null;
+
+
+    if (
+      parentCommentId !==
+        null
+    ) {
+
+      parentComment =
+        await env.DB
+          .prepare(
+            `
+            SELECT
+              id,
+              user_id
+
+            FROM mod_comments
+
+            WHERE
+              id = ?
+              AND mod_id = ?
+
+            LIMIT 1
+            `
+          )
+          .bind(
+            parentCommentId,
+            mod.id
+          )
+          .first();
+
+
+      if (
+        !parentComment
+      ) {
+
+        return jsonResponse(
+          {
+            success:
+              false,
+
+            message:
+              "Reply target not found."
+          },
+          404
+        );
+      }
+    }
+
+
     const insert =
       await env.DB
         .prepare(
@@ -3880,11 +4292,13 @@ async function handlePostModComment(
           INSERT INTO mod_comments (
             mod_id,
             user_id,
+            parent_comment_id,
             comment,
             created_at
           )
 
           VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -3895,9 +4309,60 @@ async function handlePostModComment(
         .bind(
           mod.id,
           user.id,
+          parentCommentId,
           comment
         )
         .run();
+
+
+    const newCommentId =
+      insert?.meta
+        ?.last_row_id ||
+      null;
+
+
+    if (
+      parentComment &&
+      Number(
+        parentComment.user_id
+      ) !==
+      Number(
+        user.id
+      )
+    ) {
+
+      await env.DB
+        .prepare(
+          `
+          INSERT INTO notifications (
+            recipient_user_id,
+            actor_user_id,
+            type,
+            mod_id,
+            comment_id,
+            is_read,
+            created_at
+          )
+
+          VALUES (
+            ?,
+            ?,
+            'comment_reply',
+            ?,
+            ?,
+            0,
+            CURRENT_TIMESTAMP
+          )
+          `
+        )
+        .bind(
+          parentComment.user_id,
+          user.id,
+          mod.id,
+          newCommentId
+        )
+        .run();
+    }
 
 
     return jsonResponse(
@@ -3906,13 +4371,16 @@ async function handlePostModComment(
           true,
 
         message:
-          "Comment posted.",
+          parentComment
+            ? "Reply posted."
+            : "Comment posted.",
 
         comment: {
           id:
-            insert?.meta
-              ?.last_row_id ||
-            null,
+            newCommentId,
+
+          parent_comment_id:
+            parentCommentId,
 
           comment:
             comment,
@@ -4093,12 +4561,36 @@ async function handleDeleteModComment(
     await env.DB
       .prepare(
         `
-        DELETE FROM mod_comments
+        DELETE FROM notifications
 
-        WHERE id = ?
+        WHERE
+          comment_id = ?
+          OR comment_id IN (
+            SELECT id
+            FROM mod_comments
+            WHERE parent_comment_id = ?
+          )
         `
       )
       .bind(
+        commentId,
+        commentId
+      )
+      .run();
+
+
+    await env.DB
+      .prepare(
+        `
+        DELETE FROM mod_comments
+
+        WHERE
+          id = ?
+          OR parent_comment_id = ?
+        `
+      )
+      .bind(
+        commentId,
         commentId
       )
       .run();
