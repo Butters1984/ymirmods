@@ -2072,6 +2072,65 @@
         800;
     }
 
+    .comment-author-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .thread-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.62rem;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .thread-badge.pinned {
+      color: #ffd879;
+      background: rgba(255,173,35,0.08);
+      border: 1px solid rgba(255,194,82,0.20);
+    }
+
+    .thread-badge.solved {
+      color: #9de7ad;
+      background: rgba(50,170,90,0.08);
+      border: 1px solid rgba(80,210,120,0.18);
+    }
+
+    .thread-manage {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .thread-manage-button {
+      padding: 2px 6px;
+      border-radius: 7px;
+      cursor: pointer;
+      color: #d8c28c;
+      background: transparent;
+      border: 1px solid rgba(255,192,70,0.14);
+      font: inherit;
+      font-size: 0.64rem;
+      font-weight: 800;
+    }
+
+    .thread-manage-button:hover {
+      color: #ffe09a;
+      border-color: rgba(255,205,95,0.28);
+      background: rgba(255,170,30,0.05);
+    }
+
+    .thread-manage-button.solved-action {
+      color: #9edbaa;
+      border-color: rgba(80,210,120,0.16);
+    }
+
 
     .comment-date {
       color:
@@ -5061,8 +5120,65 @@
           "";
 
 
-        meta.appendChild(
+        const authorLine =
+          document.createElement(
+            "div"
+          );
+
+        authorLine.className =
+          "comment-author-line";
+
+        authorLine.appendChild(
           author
+        );
+
+        if (
+          depth === 0 &&
+          Boolean(
+            comment.is_pinned
+          )
+        ) {
+
+          const pinnedBadge =
+            document.createElement(
+              "span"
+            );
+
+          pinnedBadge.className =
+            "thread-badge pinned";
+
+          pinnedBadge.textContent =
+            "📌 Pinned";
+
+          authorLine.appendChild(
+            pinnedBadge
+          );
+        }
+
+        if (
+          depth === 0 &&
+          comment.thread_status ===
+            "solved"
+        ) {
+
+          const solvedBadge =
+            document.createElement(
+              "span"
+            );
+
+          solvedBadge.className =
+            "thread-badge solved";
+
+          solvedBadge.textContent =
+            "✓ Solved";
+
+          authorLine.appendChild(
+            solvedBadge
+          );
+        }
+
+        meta.appendChild(
+          authorLine
         );
 
 
@@ -5102,6 +5218,227 @@
         metaRight.appendChild(
           replyButton
         );
+
+
+        if (
+          depth === 0 &&
+          Boolean(
+            comment.can_manage_thread
+          )
+        ) {
+
+          const manage =
+            document.createElement(
+              "span"
+            );
+
+          manage.className =
+            "thread-manage";
+
+          const pinButton =
+            document.createElement(
+              "button"
+            );
+
+          pinButton.type =
+            "button";
+
+          pinButton.className =
+            "thread-manage-button";
+
+          pinButton.textContent =
+            comment.is_pinned
+              ? "Unpin"
+              : "Pin";
+
+          const solveButton =
+            document.createElement(
+              "button"
+            );
+
+          solveButton.type =
+            "button";
+
+          solveButton.className =
+            "thread-manage-button solved-action";
+
+          solveButton.textContent =
+            comment.thread_status ===
+              "solved"
+              ? "Reopen"
+              : "Solve";
+
+          async function updateThreadState(
+            nextStatus,
+            nextPinned
+          ) {
+
+            pinButton.disabled =
+              true;
+
+            solveButton.disabled =
+              true;
+
+            try {
+
+              const response =
+                await fetch(
+                  "/api/mod/" +
+                    encodeURIComponent(
+                      getModSlug()
+                    ) +
+                    "/comments/" +
+                    encodeURIComponent(
+                      comment.id
+                    ) +
+                    "/thread-state",
+                  {
+                    method:
+                      "POST",
+
+                    credentials:
+                      "same-origin",
+
+                    headers: {
+                      "Content-Type":
+                        "application/json"
+                    },
+
+                    body:
+                      JSON.stringify({
+                        status:
+                          nextStatus,
+
+                        is_pinned:
+                          nextPinned
+                      })
+                  }
+                );
+
+              const result =
+                await response.json();
+
+              if (
+                !response.ok ||
+                !result.success
+              ) {
+
+                throw new Error(
+                  result.message ||
+                  "Unable to update conversation."
+                );
+              }
+
+              const root =
+                currentComments.find(
+                  item =>
+                    Number(
+                      item.id
+                    ) ===
+                    Number(
+                      comment.id
+                    )
+                );
+
+              if (
+                root
+              ) {
+
+                root.thread_status =
+                  result.status;
+
+                root.is_pinned =
+                  Boolean(
+                    result.is_pinned
+                  );
+              }
+
+              renderComments(
+                currentComments,
+                "commentList"
+              );
+
+              if (
+                commentModal.classList.contains(
+                  "open"
+                ) &&
+                activeCommentTicketId
+              ) {
+
+                const thread =
+                  getCommentThread(
+                    activeCommentTicketId
+                  );
+
+                renderComments(
+                  thread,
+                  "commentModalList",
+                  true,
+                  true
+                );
+
+                refreshJumpLatestButtonSoon();
+              }
+
+            } catch (error) {
+
+              alert(
+                error.message ||
+                "Unable to update conversation."
+              );
+
+            } finally {
+
+              pinButton.disabled =
+                false;
+
+              solveButton.disabled =
+                false;
+            }
+          }
+
+          pinButton.addEventListener(
+            "click",
+            () => {
+
+              updateThreadState(
+                comment.thread_status ||
+                  "open",
+                !Boolean(
+                  comment.is_pinned
+                )
+              );
+            }
+          );
+
+          solveButton.addEventListener(
+            "click",
+            () => {
+
+              updateThreadState(
+                comment.thread_status ===
+                  "solved"
+                  ? "open"
+                  : "solved",
+                Boolean(
+                  comment.is_pinned
+                )
+              );
+            }
+          );
+
+          manage.appendChild(
+            pinButton
+          );
+
+          manage.appendChild(
+            solveButton
+          );
+
+          metaRight.appendChild(
+            manage
+          );
+        }
 
 
         if (
@@ -5569,10 +5906,45 @@
 
 
       const roots =
-        byParent.get(
-          0
-        ) ||
-        [];
+        (
+          byParent.get(
+            0
+          ) ||
+          []
+        )
+          .slice()
+          .sort(
+            (a, b) => {
+
+              const pinDiff =
+                Number(
+                  Boolean(
+                    b.is_pinned
+                  )
+                ) -
+                Number(
+                  Boolean(
+                    a.is_pinned
+                  )
+                );
+
+              if (
+                pinDiff !== 0
+              ) {
+
+                return pinDiff;
+              }
+
+              return new Date(
+                b.created_at ||
+                0
+              ).getTime() -
+              new Date(
+                a.created_at ||
+                0
+              ).getTime();
+            }
+          );
 
 
       if (
