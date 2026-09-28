@@ -382,6 +382,71 @@ export default {
 
 
     /* =====================================================
+       MOD COMMENTS
+       ===================================================== */
+
+    if (
+      url.pathname.match(
+        /^\/api\/mod\/[a-z0-9-]+\/comments$/
+      ) &&
+      request.method ===
+        "GET"
+    ) {
+
+      const parts =
+        url.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      const slug =
+        String(
+          parts[2] ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      return handleGetModComments(
+        env,
+        slug
+      );
+    }
+
+
+    if (
+      url.pathname.match(
+        /^\/api\/mod\/[a-z0-9-]+\/comments$/
+      ) &&
+      request.method ===
+        "POST"
+    ) {
+
+      const parts =
+        url.pathname
+          .split("/")
+          .filter(Boolean);
+
+
+      const slug =
+        String(
+          parts[2] ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      return handlePostModComment(
+        request,
+        env,
+        slug
+      );
+    }
+
+
+    /* =====================================================
        STAR / UNSTAR MOD
        ===================================================== */
 
@@ -3403,6 +3468,400 @@ async function handleMyMods(
 
         error:
           error.message
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   MOD COMMENTS
+   ========================================================= */
+
+async function handleGetModComments(
+  env,
+  slug
+) {
+
+  try {
+
+    if (
+      !slug ||
+      !/^[a-z0-9-]+$/.test(
+        slug
+      )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid mod."
+        },
+        400
+      );
+    }
+
+
+    const mod =
+      await env.DB
+        .prepare(
+          `
+          SELECT id
+
+          FROM mods
+
+          WHERE
+            slug = ?
+            AND is_published = 1
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          slug
+        )
+        .first();
+
+
+    if (
+      !mod
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Mod not found."
+        },
+        404
+      );
+    }
+
+
+    const result =
+      await env.DB
+        .prepare(
+          `
+          SELECT
+            mod_comments.id,
+            mod_comments.comment,
+            mod_comments.created_at,
+
+            users.username,
+            users.display_name,
+            users.avatar_url,
+            users.github_avatar_url
+
+          FROM mod_comments
+
+          INNER JOIN users
+            ON users.id =
+               mod_comments.user_id
+
+          WHERE
+            mod_comments.mod_id = ?
+
+          ORDER BY
+            datetime(
+              mod_comments.created_at
+            ) DESC,
+            mod_comments.id DESC
+
+          LIMIT 50
+          `
+        )
+        .bind(
+          mod.id
+        )
+        .all();
+
+
+    const comments =
+      (
+        result.results ||
+        []
+      ).map(
+        row => ({
+          id:
+            row.id,
+
+          comment:
+            row.comment,
+
+          created_at:
+            row.created_at,
+
+          username:
+            row.username,
+
+          display_name:
+            row.display_name ||
+            row.username,
+
+          avatar_url:
+            row.avatar_url ||
+            row.github_avatar_url ||
+            null
+        })
+      );
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      comments:
+        comments
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Load mod comments error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to load comments."
+      },
+      500
+    );
+  }
+}
+
+
+async function handlePostModComment(
+  request,
+  env,
+  slug
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in to comment."
+        },
+        401
+      );
+    }
+
+
+    if (
+      !slug ||
+      !/^[a-z0-9-]+$/.test(
+        slug
+      )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid mod."
+        },
+        400
+      );
+    }
+
+
+    let body;
+
+
+    try {
+
+      body =
+        await request.json();
+
+    } catch {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Invalid request body."
+        },
+        400
+      );
+    }
+
+
+    const comment =
+      String(
+        body.comment ||
+        ""
+      )
+        .trim();
+
+
+    if (
+      comment.length <
+        1 ||
+      comment.length >
+        1000
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Comment must be between 1 and 1000 characters."
+        },
+        400
+      );
+    }
+
+
+    const mod =
+      await env.DB
+        .prepare(
+          `
+          SELECT id
+
+          FROM mods
+
+          WHERE
+            slug = ?
+            AND is_published = 1
+
+          LIMIT 1
+          `
+        )
+        .bind(
+          slug
+        )
+        .first();
+
+
+    if (
+      !mod
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Mod not found."
+        },
+        404
+      );
+    }
+
+
+    const insert =
+      await env.DB
+        .prepare(
+          `
+          INSERT INTO mod_comments (
+            mod_id,
+            user_id,
+            comment,
+            created_at
+          )
+
+          VALUES (
+            ?,
+            ?,
+            ?,
+            CURRENT_TIMESTAMP
+          )
+          `
+        )
+        .bind(
+          mod.id,
+          user.id,
+          comment
+        )
+        .run();
+
+
+    return jsonResponse(
+      {
+        success:
+          true,
+
+        message:
+          "Comment posted.",
+
+        comment: {
+          id:
+            insert?.meta
+              ?.last_row_id ||
+            null,
+
+          comment:
+            comment,
+
+          created_at:
+            new Date()
+              .toISOString(),
+
+          username:
+            user.username,
+
+          display_name:
+            user.display_name ||
+            user.username,
+
+          avatar_url:
+            user.avatar_url ||
+            user.github_avatar_url ||
+            null
+        }
+      },
+      201
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Post mod comment error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to post comment."
       },
       500
     );
