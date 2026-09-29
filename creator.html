@@ -2174,7 +2174,9 @@
           (notification.actor_display_name ||
            notification.actor_username ||
            "Someone") +
-          " replied to you" +
+          (notification.type === "mod_comment"
+            ? " commented on your mod"
+            : " replied to you") +
           (notification.mod_name ? " on " + notification.mod_name : "");
 
         const meta = document.createElement("div");
