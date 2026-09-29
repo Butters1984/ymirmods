@@ -4355,7 +4355,9 @@ async function handlePostModComment(
       await env.DB
         .prepare(
           `
-          SELECT id
+          SELECT
+            id,
+            owner_user_id
 
           FROM mods
 
@@ -4512,6 +4514,50 @@ async function handlePostModComment(
         )
         .bind(
           parentComment.user_id,
+          user.id,
+          mod.id,
+          newCommentId
+        )
+        .run();
+    }
+
+
+    if (
+      !parentComment &&
+      Number(
+        mod.owner_user_id
+      ) !==
+      Number(
+        user.id
+      )
+    ) {
+
+      await env.DB
+        .prepare(
+          `
+          INSERT INTO notifications (
+            recipient_user_id,
+            actor_user_id,
+            type,
+            mod_id,
+            comment_id,
+            is_read,
+            created_at
+          )
+
+          VALUES (
+            ?,
+            ?,
+            'mod_comment',
+            ?,
+            ?,
+            0,
+            CURRENT_TIMESTAMP
+          )
+          `
+        )
+        .bind(
+          mod.owner_user_id,
           user.id,
           mod.id,
           newCommentId
