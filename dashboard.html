@@ -3782,7 +3782,12 @@
             notification.actor_username ||
             "Someone"
           ) +
-          " replied to your comment";
+          (
+            notification.type ===
+              "mod_comment"
+              ? " commented on your mod"
+              : " replied to your comment"
+          );
 
 
         const text =
@@ -3817,7 +3822,12 @@
                   0,
                   180
                 )
-              : "View the reply."
+              : (
+                  notification.type ===
+                    "mod_comment"
+                    ? "View the comment."
+                    : "View the reply."
+                )
           );
 
 
