@@ -1538,6 +1538,48 @@
     }
 
 
+    .catalog-controls {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      min-width: 0;
+    }
+
+
+    .catalog-sort {
+      height: 48px;
+      min-width: 170px;
+      padding: 0 38px 0 14px;
+      outline: none;
+      border-radius: 13px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      background:
+        rgba(11, 15, 20, 0.92);
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.15);
+      box-shadow:
+        inset 0 0 20px
+        rgba(0, 0, 0, 0.25);
+    }
+
+
+    .catalog-sort:focus {
+      border-color:
+        rgba(255, 190, 65, 0.52);
+      box-shadow:
+        0 0 18px
+        rgba(255, 135, 10, 0.12),
+        inset 0 0 20px
+        rgba(0, 0, 0, 0.22);
+    }
+
+
     .catalog-search {
       position: relative;
 
@@ -2639,8 +2681,21 @@
       }
 
 
-      .catalog-search {
+      .catalog-controls {
         width: 100%;
+        justify-content: stretch;
+        flex-wrap: wrap;
+      }
+
+
+      .catalog-sort {
+        flex: 0 0 180px;
+      }
+
+
+      .catalog-search {
+        width: auto;
+        flex: 1 1 260px;
 
         justify-self: stretch;
       }
@@ -3099,19 +3154,46 @@
           ></div>
 
 
-          <div class="catalog-search">
+          <div class="catalog-controls">
 
-            <input
-              id="modSearch"
-              type="search"
-              placeholder="Search mods..."
-              autocomplete="off"
-              aria-label="Search mods"
-            />
+            <select
+              id="catalogSort"
+              class="catalog-sort"
+              aria-label="Sort mods"
+            >
+              <option value="downloads">
+                Most Downloads
+              </option>
 
-            <span class="search-icon">
-              ⌕
-            </span>
+              <option value="loved">
+                Most Loved
+              </option>
+
+              <option value="updated">
+                Last Updated
+              </option>
+
+              <option value="new">
+                New
+              </option>
+            </select>
+
+
+            <div class="catalog-search">
+
+              <input
+                id="modSearch"
+                type="search"
+                placeholder="Search mods..."
+                autocomplete="off"
+                aria-label="Search mods"
+              />
+
+              <span class="search-icon">
+                ⌕
+              </span>
+
+            </div>
 
           </div>
 
@@ -3859,6 +3941,16 @@
       );
 
 
+    const catalogSort =
+      document.getElementById(
+        "catalogSort"
+      );
+
+
+    const CATALOG_SORT_STORAGE_KEY =
+      "ymir_catalog_sort";
+
+
     const catalogPagination =
       document.getElementById(
         "catalogPagination"
@@ -3934,6 +4026,245 @@
     }
 
 
+    let catalogSortMode =
+      "downloads";
+
+
+    try {
+
+      const savedSort =
+        localStorage.getItem(
+          CATALOG_SORT_STORAGE_KEY
+        );
+
+
+      if (
+        [
+          "downloads",
+          "loved",
+          "updated",
+          "new"
+        ].includes(
+          savedSort
+        )
+      ) {
+
+        catalogSortMode =
+          savedSort;
+      }
+
+    } catch {
+      /* localStorage may be unavailable in private contexts */
+    }
+
+
+    catalogSort.value =
+      catalogSortMode;
+
+
+    function sortCatalogMods(
+      mods
+    ) {
+
+      const sorted =
+        mods.slice();
+
+
+      const byDate =
+        (value) => {
+
+          const time =
+            new Date(
+              value ||
+              0
+            )
+              .getTime();
+
+
+          return Number.isFinite(
+            time
+          )
+            ? time
+            : 0;
+        };
+
+
+      sorted.sort(
+        (a, b) => {
+
+          if (
+            catalogSortMode ===
+              "loved"
+          ) {
+
+            const difference =
+              Number(
+                b.star_count ||
+                0
+              ) -
+              Number(
+                a.star_count ||
+                0
+              );
+
+
+            if (
+              difference !== 0
+            ) {
+
+              return difference;
+            }
+          }
+
+
+          if (
+            catalogSortMode ===
+              "updated"
+          ) {
+
+            const difference =
+              byDate(
+                b.updated_at
+              ) -
+              byDate(
+                a.updated_at
+              );
+
+
+            if (
+              difference !== 0
+            ) {
+
+              return difference;
+            }
+          }
+
+
+          if (
+            catalogSortMode ===
+              "new"
+          ) {
+
+            const difference =
+              byDate(
+                b.created_at
+              ) -
+              byDate(
+                a.created_at
+              );
+
+
+            if (
+              difference !== 0
+            ) {
+
+              return difference;
+            }
+          }
+
+
+          if (
+            catalogSortMode ===
+              "downloads"
+          ) {
+
+            const difference =
+              Number(
+                b.download_count ||
+                0
+              ) -
+              Number(
+                a.download_count ||
+                0
+              );
+
+
+            if (
+              difference !== 0
+            ) {
+
+              return difference;
+            }
+          }
+
+
+          return (
+            byDate(
+              b.updated_at
+            ) -
+            byDate(
+              a.updated_at
+            )
+          );
+        }
+      );
+
+
+      return sorted;
+    }
+
+
+    function refreshCatalogMods() {
+
+      const query =
+        modSearch.value
+          .trim()
+          .toLowerCase();
+
+
+      let source =
+        allPublishedMods;
+
+
+      if (
+        query
+      ) {
+
+        source =
+          allPublishedMods.filter(
+            mod => {
+
+              const searchable =
+                [
+                  mod.name,
+                  mod.author,
+                  mod.author_display_name,
+                  mod.category,
+                  mod.short_description,
+                  mod.full_description,
+                  mod.version
+                ]
+                  .filter(
+                    Boolean
+                  )
+                  .join(
+                    " "
+                  )
+                  .toLowerCase();
+
+
+              return searchable.includes(
+                query
+              );
+            }
+          );
+      }
+
+
+      filteredCatalogMods =
+        sortCatalogMods(
+          source
+        );
+
+
+      catalogPage =
+        1;
+
+
+      renderCatalogPage();
+    }
+
+
     /* =====================================================
        LOAD MODS
        ===================================================== */
@@ -3988,7 +4319,9 @@
 
 
         filteredCatalogMods =
-          allPublishedMods;
+          sortCatalogMods(
+            allPublishedMods
+          );
 
 
         renderLatestMods();
@@ -5452,72 +5785,31 @@
 
     modSearch.addEventListener(
       "input",
+      refreshCatalogMods
+    );
+
+
+    catalogSort.addEventListener(
+      "change",
       () => {
 
-        const query =
-          modSearch.value
-            .trim()
-            .toLowerCase();
+        catalogSortMode =
+          catalogSort.value;
 
 
-        if (
-          !query
-        ) {
+        try {
 
-          filteredCatalogMods =
-            allPublishedMods;
+          localStorage.setItem(
+            CATALOG_SORT_STORAGE_KEY,
+            catalogSortMode
+          );
 
-
-          catalogPage =
-            1;
-
-
-          renderCatalogPage();
-
-
-          return;
+        } catch {
+          /* localStorage may be unavailable in private contexts */
         }
 
 
-        const filtered =
-          allPublishedMods.filter(
-            mod => {
-
-              const searchable =
-                [
-                  mod.name,
-                  mod.author,
-                  mod.author_display_name,
-                  mod.category,
-                  mod.short_description,
-                  mod.full_description,
-                  mod.version
-                ]
-                  .filter(
-                    Boolean
-                  )
-                  .join(
-                    " "
-                  )
-                  .toLowerCase();
-
-
-              return searchable.includes(
-                query
-              );
-            }
-          );
-
-
-        filteredCatalogMods =
-          filtered;
-
-
-        catalogPage =
-          1;
-
-
-        renderCatalogPage();
+        refreshCatalogMods();
       }
     );
 
