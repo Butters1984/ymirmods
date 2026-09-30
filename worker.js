@@ -734,6 +734,39 @@ export default {
 
 
     /* =====================================================
+       LEGAL PAGE
+       ===================================================== */
+
+    if (
+      url.pathname ===
+        "/legal" &&
+      request.method ===
+        "GET"
+    ) {
+
+      const pageUrl =
+        new URL(
+          "/legal.html",
+          request.url
+        );
+
+
+      return env.ASSETS.fetch(
+        new Request(
+          pageUrl.toString(),
+          {
+            method:
+              "GET",
+
+            headers:
+              request.headers
+          }
+        )
+      );
+    }
+
+
+    /* =====================================================
        CLEAN MOD PAGE
        ===================================================== */
 
