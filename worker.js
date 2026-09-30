@@ -214,6 +214,24 @@ export default {
 
 
     /* =====================================================
+       UPDATE PUBLIC DISPLAY NAME
+       ===================================================== */
+
+    if (
+      url.pathname ===
+        "/api/profile/display-name" &&
+      request.method ===
+        "POST"
+    ) {
+
+      return handleUpdateDisplayName(
+        request,
+        env
+      );
+    }
+
+
+    /* =====================================================
        PUBLIC MOD LIST
        ===================================================== */
 
@@ -1721,7 +1739,6 @@ async function handleDiscordCallback(
 
           SET
             discord_username = ?,
-            display_name = ?,
             avatar_url = ?
 
           WHERE id = ?
@@ -1729,7 +1746,6 @@ async function handleDiscordCallback(
         )
         .bind(
           discordUsername,
-          displayName,
           avatarUrl,
           user.id
         )
@@ -1738,10 +1754,6 @@ async function handleDiscordCallback(
 
       user.discord_username =
         discordUsername;
-
-
-      user.display_name =
-        displayName;
 
 
       user.avatar_url =
@@ -6059,6 +6071,152 @@ async function handleCurrentUser(
 
         message:
           "Unable to check login."
+      },
+      500
+    );
+  }
+}
+
+
+/* =========================================================
+   UPDATE PUBLIC DISPLAY NAME
+   ========================================================= */
+
+async function handleUpdateDisplayName(
+  request,
+  env
+) {
+
+  try {
+
+    const user =
+      await getAuthenticatedUser(
+        request,
+        env
+      );
+
+
+    if (
+      !user
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "You must be logged in."
+        },
+        401
+      );
+    }
+
+
+    let body = {};
+
+
+    try {
+
+      body =
+        await request.json();
+
+    } catch {
+
+      body = {};
+    }
+
+
+    const displayName =
+      String(
+        body.display_name ||
+        ""
+      )
+        .trim();
+
+
+    if (
+      displayName.length <
+        2 ||
+      displayName.length >
+        32
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Creator name must be between 2 and 32 characters."
+        },
+        400
+      );
+    }
+
+
+    if (
+      !/^[A-Za-z0-9 _.'-]+$/.test(
+        displayName
+      )
+    ) {
+
+      return jsonResponse(
+        {
+          success:
+            false,
+
+          message:
+            "Creator name may use letters, numbers, spaces, apostrophes, periods, hyphens and underscores."
+        },
+        400
+      );
+    }
+
+
+    await env.DB
+      .prepare(
+        `
+        UPDATE users
+
+        SET display_name = ?
+
+        WHERE id = ?
+        `
+      )
+      .bind(
+        displayName,
+        user.id
+      )
+      .run();
+
+
+    return jsonResponse({
+      success:
+        true,
+
+      message:
+        "Creator name updated.",
+
+      display_name:
+        displayName
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Display name update error:",
+      error
+    );
+
+
+    return jsonResponse(
+      {
+        success:
+          false,
+
+        message:
+          "Unable to update creator name."
       },
       500
     );
