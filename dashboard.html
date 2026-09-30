@@ -2918,24 +2918,44 @@
 
 
           <h3>
-            Account
+            Creator Name
           </h3>
 
 
           <p>
-            Your connected account
-            and profile management
-            will live here.
+            Change the public name shown
+            on your YMIR creator profile
+            and beside your mods.
           </p>
 
 
+          <input
+            id="creatorDisplayNameInput"
+            class="api-input"
+            type="text"
+            maxlength="32"
+            placeholder="Creator name"
+          />
+
+
           <button
+            id="saveCreatorDisplayName"
             class="button secondary"
             type="button"
-            disabled
           >
-            Coming Soon
+            Save Name
           </button>
+
+
+          <div
+            id="creatorNameStatus"
+            style="
+              min-height:18px;
+              margin-top:8px;
+              color:var(--muted);
+              font-size:0.78rem;
+            "
+          ></div>
 
         </article>
 
@@ -3348,6 +3368,24 @@
       );
 
 
+    const creatorDisplayNameInput =
+      document.getElementById(
+        "creatorDisplayNameInput"
+      );
+
+
+    const saveCreatorDisplayName =
+      document.getElementById(
+        "saveCreatorDisplayName"
+      );
+
+
+    const creatorNameStatus =
+      document.getElementById(
+        "creatorNameStatus"
+      );
+
+
     /* =====================================================
        LOAD USER
        ===================================================== */
@@ -3460,6 +3498,10 @@
 
 
       welcomeUsername.textContent =
+        displayName;
+
+
+      creatorDisplayNameInput.value =
         displayName;
 
 
@@ -3639,6 +3681,114 @@
       }
 
     }
+
+
+    saveCreatorDisplayName.addEventListener(
+      "click",
+      async () => {
+
+        const nextName =
+          String(
+            creatorDisplayNameInput.value ||
+            ""
+          )
+            .trim();
+
+
+        creatorNameStatus.textContent =
+          "";
+
+
+        saveCreatorDisplayName.disabled =
+          true;
+
+
+        saveCreatorDisplayName.textContent =
+          "Saving...";
+
+
+        try {
+
+          const response =
+            await fetch(
+              "/api/profile/display-name",
+              {
+                method:
+                  "POST",
+
+                credentials:
+                  "same-origin",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    display_name:
+                      nextName
+                  })
+              }
+            );
+
+
+          const result =
+            await response.json();
+
+
+          if (
+            !response.ok ||
+            !result.success
+          ) {
+
+            throw new Error(
+              result.message ||
+              "Unable to update creator name."
+            );
+          }
+
+
+          currentUser.display_name =
+            result.display_name;
+
+
+          welcomeUsername.textContent =
+            result.display_name;
+
+
+          userDisplayName.textContent =
+            result.display_name;
+
+
+          creatorNameStatus.style.color =
+            "var(--green)";
+
+
+          creatorNameStatus.textContent =
+            "Creator name updated.";
+
+        } catch (error) {
+
+          creatorNameStatus.style.color =
+            "var(--red)";
+
+
+          creatorNameStatus.textContent =
+            error.message ||
+            "Unable to update creator name.";
+
+        } finally {
+
+          saveCreatorDisplayName.disabled =
+            false;
+
+
+          saveCreatorDisplayName.textContent =
+            "Save Name";
+        }
+      }
+    );
 
 
     /* =====================================================
