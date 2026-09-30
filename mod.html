@@ -1088,9 +1088,32 @@
     }
 
 
-    .mod-author strong {
+    .mod-author strong,
+    .mod-author-link {
       color:
         var(--orange2);
+    }
+
+
+    .mod-author-link {
+      font-weight:
+        bold;
+
+      text-decoration:
+        none;
+
+      cursor:
+        pointer;
+    }
+
+
+    .mod-author-link:hover {
+      color:
+        #ffd16a;
+
+      text-shadow:
+        0 0 7px
+        rgba(255,220,120,0.50);
     }
 
 
@@ -1155,107 +1178,52 @@
 
 
     .star-button {
-      min-width:
-        58px;
-
-      min-height:
-        30px;
-
-      padding:
-        4px 10px;
-
       display:
         inline-flex;
 
       align-items:
         center;
 
-      justify-content:
-        center;
-
       gap:
-        6px;
+        5px;
 
-      border-radius:
-        999px;
+      padding:
+        0;
+
+      border:
+        0;
 
       cursor:
         pointer;
 
       color:
-        #f2c14e;
+        #c7b88e;
 
       background:
         transparent;
 
-      border:
-        1px solid
-        rgba(255,190,70,0.18);
-
       box-shadow:
         none;
 
-      font-family:
+      font:
         inherit;
 
       font-size:
         0.82rem;
-
-      font-weight:
-        800;
-
-      line-height:
-        1;
-
-      transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        border-color 0.18s ease,
-        background 0.18s ease;
     }
 
 
-    .star-button:hover {
-      transform:
-        translateY(-1px);
-
-      border-color:
-        rgba(255,190,70,0.45);
-
-      background:
-        rgba(255,170,40,0.06);
-
-      box-shadow:
-        0 0 10px
-        rgba(255,170,40,0.22);
-    }
-
-
-    .star-button.starred {
-      color:
-        #f2c14e;
-
+    .star-button:hover,
+    .star-button.starred,
+    .star-button.starred:hover {
       background:
         transparent;
 
-      border-color:
-        rgba(255,190,70,0.18);
+      border:
+        0;
 
       box-shadow:
         none;
-    }
-
-
-    .star-button.starred:hover {
-      border-color:
-        rgba(255,190,70,0.45);
-
-      background:
-        rgba(255,170,40,0.06);
-
-      box-shadow:
-        0 0 10px
-        rgba(255,170,40,0.22);
     }
 
 
@@ -1268,40 +1236,52 @@
 
       line-height:
         1;
+
+      text-shadow:
+        none;
+
+      transition:
+        transform 0.18s ease,
+        text-shadow 0.18s ease,
+        filter 0.18s ease;
+    }
+
+
+    .star-button:hover
+    .like-heart {
+      transform:
+        scale(1.08);
+
+      filter:
+        brightness(1.12);
+
+      text-shadow:
+        0 0 7px
+        rgba(229,57,53,0.58);
     }
 
 
     .mod-download-stat {
-      min-height:
-        30px;
-
-      padding:
-        4px 10px;
-
       display:
         inline-flex;
 
       align-items:
         center;
 
-      justify-content:
-        center;
-
       gap:
-        6px;
+        5px;
 
-      border-radius:
-        999px;
+      padding:
+        0;
+
+      border:
+        0;
 
       color:
-        #f2c14e;
+        #a89974;
 
       background:
         transparent;
-
-      border:
-        1px solid
-        rgba(255,190,70,0.18);
 
       font-size:
         0.82rem;
@@ -1319,7 +1299,7 @@
 
     .mod-download-icon {
       color:
-        #d8b35a;
+        #a89974;
 
       font-size:
         0.95rem;
@@ -3519,9 +3499,13 @@
 
                 Created by
 
-                <strong id="modAuthor">
+                <a
+                  id="modAuthor"
+                  class="mod-author-link"
+                  href="#"
+                >
                   Unknown Creator
-                </strong>
+                </a>
 
               </div>
 
@@ -4580,6 +4564,26 @@
         mod.author ||
         "Unknown Creator"
       );
+
+
+      const modAuthorLink =
+        document.getElementById(
+          "modAuthor"
+        );
+
+
+      if (
+        modAuthorLink
+      ) {
+
+        modAuthorLink.href =
+          mod.author
+            ? "/creator/" +
+              encodeURIComponent(
+                mod.author
+              )
+            : "#";
+      }
 
 
       setText(
