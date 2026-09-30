@@ -1425,6 +1425,16 @@
        MAIN MOD PAGINATION
        ===================================================== */
 
+    .catalog-center-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+
     .catalog-pagination {
       display: flex;
 
@@ -1542,14 +1552,13 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 10px;
       min-width: 0;
     }
 
 
     .catalog-sort {
-      height: 48px;
-      min-width: 170px;
+      height: 44px;
+      min-width: 220px;
       padding: 0 38px 0 14px;
       outline: none;
       border-radius: 13px;
@@ -2681,15 +2690,20 @@
       }
 
 
+      .catalog-center-controls {
+        width: 100%;
+        align-items: flex-start;
+      }
+
+
       .catalog-controls {
         width: 100%;
         justify-content: stretch;
-        flex-wrap: wrap;
       }
 
 
       .catalog-sort {
-        flex: 0 0 180px;
+        min-width: 220px;
       }
 
 
@@ -3147,14 +3161,7 @@
           </div>
 
 
-          <div
-            id="catalogPagination"
-            class="catalog-pagination"
-            aria-label="Mod pages"
-          ></div>
-
-
-          <div class="catalog-controls">
+          <div class="catalog-center-controls">
 
             <select
               id="catalogSort"
@@ -3162,7 +3169,7 @@
               aria-label="Sort mods"
             >
               <option value="downloads">
-                Most Downloads
+                Most Downloaded
               </option>
 
               <option value="loved">
@@ -3174,10 +3181,21 @@
               </option>
 
               <option value="new">
-                New
+                New Mods
               </option>
             </select>
 
+
+            <div
+              id="catalogPagination"
+              class="catalog-pagination"
+              aria-label="Mod pages"
+            ></div>
+
+          </div>
+
+
+          <div class="catalog-controls">
 
             <div class="catalog-search">
 
