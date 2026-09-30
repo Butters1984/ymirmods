@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Terms & Privacy | YMIR Mods</title>
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="/ymirmodwebsiteicon.png?v=20260930"
+  />
+
+  <link
+    rel="shortcut icon"
+    type="image/png"
+    href="/ymirmodwebsiteicon.png?v=20260930"
+  />
+
+  <link
+    rel="apple-touch-icon"
+    href="/ymirmodwebsiteicon.png?v=20260930"
+  />
+
+  <meta
+    name="description"
+    content="YMIR Mods terms of service and privacy policy."
+  />
+
+  <style>
+    :root {
+      --bg: #07090d;
+      --panel: rgba(18, 21, 27, 0.95);
+      --panel-soft: rgba(13, 17, 22, 0.92);
+      --text: #f4e5b5;
+      --muted: #bca97a;
+      --gold: #f2c15b;
+      --gold2: #ffdc8c;
+      --orange: #d97706;
+      --orange2: #ff9f1c;
+      --line: rgba(255, 194, 82, 0.14);
+      --max: 1100px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+      line-height: 1.65;
+      background:
+        radial-gradient(
+          circle at 16% 18%,
+          rgba(255, 169, 45, 0.08),
+          transparent 24%
+        ),
+        radial-gradient(
+          circle at 82% 74%,
+          rgba(255, 120, 20, 0.06),
+          transparent 25%
+        ),
+        linear-gradient(
+          180deg,
+          #05070a,
+          #0a0f14 48%,
+          #080c11
+        );
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 8% 24%, rgba(255,255,255,.55) 0 1px, transparent 1.4px),
+        radial-gradient(circle at 22% 61%, rgba(255,211,107,.48) 0 1px, transparent 1.4px),
+        radial-gradient(circle at 46% 18%, rgba(255,255,255,.42) 0 1px, transparent 1.4px),
+        radial-gradient(circle at 63% 53%, rgba(255,186,69,.48) 0 1px, transparent 1.4px),
+        radial-gradient(circle at 78% 29%, rgba(255,255,255,.36) 0 1px, transparent 1.4px),
+        radial-gradient(circle at 91% 68%, rgba(255,211,107,.48) 0 1px, transparent 1.4px);
+      opacity: .55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width:
+        min(
+          var(--max),
+          calc(100% - 36px)
+        );
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(5, 7, 10, 0.92);
+      border-bottom:
+        1px solid
+        rgba(255, 195, 84, 0.13);
+      box-shadow:
+        0 8px 30px
+        rgba(0,0,0,.28);
+    }
+
+    .nav {
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-link img {
+      width: 54px;
+      height: 54px;
+      border-radius: 11px;
+      object-fit: cover;
+      filter:
+        drop-shadow(
+          0 0 9px
+          rgba(255, 174, 35, 0.42)
+        );
+    }
+
+    .brand-copy h1 {
+      color: var(--gold2);
+      font-size: 1.55rem;
+      line-height: 1.05;
+      letter-spacing: .8px;
+    }
+
+    .brand-copy p {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: .79rem;
+    }
+
+    .nav-links {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: #dfca92;
+      font-weight: 700;
+      font-size: .9rem;
+    }
+
+    .nav-links a:hover {
+      color: #ffe09a;
+    }
+
+    main {
+      padding:
+        62px 0 74px;
+    }
+
+    .page-heading {
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: var(--gold2);
+      background:
+        rgba(255, 188, 73, 0.06);
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.16);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .page-heading h2 {
+      margin-top: 14px;
+      color: #ffe3a0;
+      font-size:
+        clamp(
+          2.3rem,
+          5vw,
+          4rem
+        );
+      line-height: 1.03;
+    }
+
+    .page-heading p {
+      max-width: 780px;
+      margin-top: 14px;
+      color: #c9b684;
+    }
+
+    .updated {
+      margin-top: 10px;
+      color: #887b5f;
+      font-size: .8rem;
+    }
+
+    .legal-intro {
+      margin:
+        0 0 26px;
+      padding: 18px 20px;
+      border-radius: 15px;
+      color: #d6c28d;
+      background:
+        rgba(255, 183, 77, 0.035);
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.12);
+    }
+
+    .legal-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    details.legal-section {
+      overflow: hidden;
+      border-radius: 17px;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(20,24,31,.97),
+          rgba(12,16,21,.97)
+        );
+      border:
+        1px solid
+        var(--line);
+      box-shadow:
+        0 18px 46px
+        rgba(0,0,0,.28);
+    }
+
+    details.legal-section[open] {
+      border-color:
+        rgba(255, 194, 82, 0.24);
+    }
+
+    details.legal-section > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 19px 22px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--gold2);
+      font-size: 1.22rem;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    details.legal-section > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.legal-section > summary::before {
+      content: "▸";
+      color: var(--orange2);
+      transition: transform .18s ease;
+    }
+
+    details.legal-section[open] > summary::before {
+      transform: rotate(90deg);
+    }
+
+    .section-body {
+      padding:
+        0 22px 24px;
+    }
+
+    .legal-card {
+      margin-top: 12px;
+      padding: 18px 18px 17px;
+      border-radius: 13px;
+      background:
+        var(--panel-soft);
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.10);
+    }
+
+    .legal-card h3 {
+      color: #f2d797;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    .legal-card p {
+      color: #c8b584;
+      font-size: .91rem;
+    }
+
+    .legal-card p + p {
+      margin-top: 9px;
+    }
+
+    .legal-card ul {
+      margin:
+        9px 0 0 20px;
+      color: #c8b584;
+      font-size: .91rem;
+    }
+
+    .legal-card li + li {
+      margin-top: 5px;
+    }
+
+    .legal-card strong {
+      color: #ead49c;
+    }
+
+    .legal-card a {
+      color: var(--orange2);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .notice {
+      margin-top: 28px;
+      padding: 18px 20px;
+      border-radius: 14px;
+      color: #af9f7a;
+      font-size: .84rem;
+      background:
+        rgba(10, 13, 18, 0.78);
+      border:
+        1px solid
+        rgba(255, 194, 82, 0.09);
+    }
+
+    footer {
+      position: relative;
+      z-index: 2;
+      padding:
+        26px 0 36px;
+      border-top:
+        1px solid
+        rgba(255, 194, 82, 0.10);
+    }
+
+    .footer-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    footer p {
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 18px;
+      color: #cfbb88;
+    }
+
+    @media (max-width: 720px) {
+      .nav {
+        flex-wrap: wrap;
+        padding: 10px 0;
+      }
+
+      .nav-links {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .footer-grid {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+
+    <div class="container nav">
+
+      <a
+        class="brand-link"
+        href="/"
+      >
+        <img
+          src="/ymirmodwebsiteicon.png"
+          alt="YMIR Mods"
+        />
+
+        <div class="brand-copy">
+          <h1>
+            YMIR MODS
+          </h1>
+
+          <p>
+            Valheim mods, downloads, updates &amp; community
+          </p>
+        </div>
+      </a>
+
+
+      <nav class="nav-links">
+
+        <a href="/">
+          Home
+        </a>
+
+        <a href="/#mods">
+          Mods
+        </a>
+
+        <a href="/#community">
+          Community
+        </a>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <div class="container">
+
+      <section class="page-heading">
+
+        <span class="eyebrow">
+          YMIR Mods
+        </span>
+
+        <h2>
+          Terms &amp; Privacy
+        </h2>
+
+        <p>
+          A plain-English overview of the rules for using YMIR Mods,
+          what creators can expect when they upload content, and how
+          account information is handled.
+        </p>
+
+        <div class="updated">
+          Last updated: 30 September 2026
+        </div>
+
+      </section>
+
+
+      <div class="legal-intro">
+        We have tried to keep this readable. The short version is simple:
+        use YMIR in good faith, only upload things you have the right to share,
+        respect other creators and users, and do not use the site to harm people
+        or the service.
+      </div>
+
+
+      <div class="legal-stack">
+
+
+        <details
+          class="legal-section"
+          open
+        >
+
+          <summary>
+            Terms of Service
+          </summary>
+
+
+          <div class="section-body">
+
+
+            <div class="legal-card">
+
+              <h3>
+                1. Using YMIR Mods
+              </h3>
+
+              <p>
+                YMIR Mods is a community mod-hosting and distribution service.
+                By using the website, creator tools, download features, comments,
+                or Creator API, you agree to these terms.
+              </p>
+
+              <p>
+                If you do not agree with them, please do not use the service.
+                You are also responsible for meeting the age and account
+                requirements of any connected sign-in provider you use.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                2. What the service provides
+              </h3>
+
+              <p>
+                YMIR hosts third-party Valheim mods and related information such
+                as descriptions, screenshots, version history, download counts,
+                likes, creator pages, comments, and changelogs.
+              </p>
+
+              <p>
+                Mods are made by their respective creators. Hosting a mod on YMIR
+                does not mean YMIR created, approved, tested, or guarantees that mod.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                3. Accounts
+              </h3>
+
+              <p>
+                Accounts may be connected through services such as Discord or GitHub.
+                You are responsible for activity performed through your account and
+                for keeping access to those third-party accounts secure.
+              </p>
+
+              <ul>
+                <li>
+                  Do not impersonate another creator or person.
+                </li>
+
+                <li>
+                  Do not deliberately misrepresent ownership of a mod.
+                </li>
+
+                <li>
+                  Do not share Creator API keys publicly.
+                </li>
+
+                <li>
+                  If you believe your account or API key has been compromised,
+                  revoke the key and contact YMIR as soon as practical.
+                </li>
+              </ul>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                4. Your mods and other content
+              </h3>
+
+              <p>
+                You keep ownership of content you upload. YMIR does not claim
+                ownership of your mod simply because it is hosted here.
+              </p>
+
+              <p>
+                By uploading a mod, image, description, changelog, comment,
+                or other content, you give YMIR a non-exclusive permission
+                to store, reproduce, display, distribute, and make that content
+                available through the website and related YMIR services for the
+                purpose of operating and promoting the platform.
+              </p>
+
+              <p>
+                You confirm that you have the rights or permission needed to upload
+                the material. If your mod contains third-party assets, libraries,
+                music, images, or code, you are responsible for following the
+                licences and permissions that apply to them.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                5. Upload and community rules
+              </h3>
+
+              <p>
+                Please do not use YMIR to upload or distribute:
+              </p>
+
+              <ul>
+                <li>
+                  malware, credential stealers, destructive code, or files intended
+                  to compromise another person or system;
+                </li>
+
+                <li>
+                  stolen mods or content you do not have permission to redistribute;
+                </li>
+
+                <li>
+                  intentionally misleading files, descriptions, download claims,
+                  or creator information;
+                </li>
+
+                <li>
+                  content that is unlawful in the place where it is hosted or served;
+                </li>
+
+                <li>
+                  spam, harassment, threats, or repeated abuse through comments
+                  or creator pages;
+                </li>
+
+                <li>
+                  attempts to manipulate likes, downloads, comments, or other
+                  site metrics through bots or automation.
+                </li>
+              </ul>
+
+              <p>
+                YMIR may remove, hide, deprecate, or restrict content when there is
+                a security, legal, abuse, copyright, or service-integrity concern.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                6. Comments and replies
+              </h3>
+
+              <p>
+                Comments are there to help creators and users discuss mods,
+                report issues, make requests, and share useful feedback.
+                Keep conversations relevant and respectful.
+              </p>
+
+              <p>
+                Creators and YMIR administrators may moderate comment threads.
+                Comments may be removed when they are abusive, spammy, unlawful,
+                or unrelated to the purpose of the mod page.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                7. Creator API and automated access
+              </h3>
+
+              <p>
+                Creator API keys are intended for authorised creator workflows
+                such as release automation and GitHub Actions. Do not use the API
+                to bypass access controls, scrape the service aggressively,
+                probe for vulnerabilities, or interfere with normal site operation.
+              </p>
+
+              <p>
+                YMIR may limit, revoke, or disable API access where necessary
+                to protect the service or other users.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                8. Copyright and takedown requests
+              </h3>
+
+              <p>
+                If you believe material hosted on YMIR infringes your copyright
+                or other rights, contact us with enough information to identify
+                the work, the YMIR page or file involved, your relationship to
+                the rights holder, and a way for us to contact you.
+              </p>
+
+              <p>
+                We may temporarily disable access to disputed material while a
+                complaint is reviewed. Repeated or serious infringement may result
+                in account or upload restrictions.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                9. YMIR branding and third-party names
+              </h3>
+
+              <p>
+                The YMIR Mods name, site design, original graphics, and platform
+                code belong to YMIR or their respective licensors.
+              </p>
+
+              <p>
+                Valheim and other game, company, product, or platform names belong
+                to their respective owners. YMIR Mods is a community project and
+                is not presented as an official Valheim service.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                10. Suspension, removal, and account closure
+              </h3>
+
+              <p>
+                You may stop using YMIR at any time. YMIR may suspend accounts,
+                revoke API keys, remove content, or restrict access when someone
+                repeatedly breaks these terms, creates a security risk, infringes
+                rights, or seriously disrupts the service.
+              </p>
+
+              <p>
+                Where practical, we will try to use proportionate moderation rather
+                than jumping straight to permanent removal.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                11. Mods and service availability
+              </h3>
+
+              <p>
+                YMIR and the mods hosted on it are provided on an “as available”
+                basis. Mods can break after game updates, conflict with other mods,
+                corrupt saves, behave differently on servers, or stop being maintained.
+              </p>
+
+              <p>
+                Back up important game data before installing mods. YMIR cannot
+                promise uninterrupted service, permanent file availability,
+                compatibility, or that every uploaded mod is free from defects.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                12. Liability
+              </h3>
+
+              <p>
+                To the extent allowed by applicable law, YMIR is not responsible
+                for indirect or consequential losses arising from third-party mods,
+                unavailable files, account misuse, data loss, game-save damage,
+                server issues, or reliance on content posted by users.
+              </p>
+
+              <p>
+                Nothing in these terms is intended to remove rights or protections
+                that cannot legally be excluded.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                13. Changes to these terms
+              </h3>
+
+              <p>
+                YMIR will change these terms from time to time as the site grows.
+                When a meaningful change is made, the “Last updated” date on this
+                page will be changed as well.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                14. Contact
+              </h3>
+
+              <p>
+                For general questions, moderation issues, or legal/takedown requests,
+                contact the YMIR Mods team through the
+                <a
+                  href="https://discord.gg/pzFvb97HZ3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  YMIR Community Discord
+                </a>.
+              </p>
+
+            </div>
+
+
+          </div>
+
+        </details>
+
+
+        <details class="legal-section">
+
+          <summary>
+            Privacy Policy
+          </summary>
+
+
+          <div class="section-body">
+
+
+            <div class="legal-card">
+
+              <h3>
+                1. Information YMIR may hold
+              </h3>
+
+              <p>
+                Depending on how you use the site, YMIR may store information such as:
+              </p>
+
+              <ul>
+                <li>
+                  your YMIR username and public display name;
+                </li>
+
+                <li>
+                  account identifiers supplied by Discord or GitHub;
+                </li>
+
+                <li>
+                  an email address when a connected sign-in provider makes one
+                  available to YMIR;
+                </li>
+
+                <li>
+                  profile/avatar information supplied by a connected account;
+                </li>
+
+                <li>
+                  mods, descriptions, icons, changelogs, comments, replies,
+                  likes, and other content you submit;
+                </li>
+
+                <li>
+                  session information used to keep you signed in;
+                </li>
+
+                <li>
+                  Creator API key metadata. YMIR stores a cryptographic hash
+                  of active API keys rather than keeping the full key in readable form
+                  after it is created;
+                </li>
+
+                <li>
+                  service activity needed to operate features such as download
+                  counts, notifications, moderation, and version history.
+                </li>
+              </ul>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                2. Why this information is used
+              </h3>
+
+              <p>
+                YMIR uses account and service information to:
+              </p>
+
+              <ul>
+                <li>
+                  sign you in and maintain your account;
+                </li>
+
+                <li>
+                  show creator profiles and ownership of uploaded mods;
+                </li>
+
+                <li>
+                  host, update, and distribute mod files;
+                </li>
+
+                <li>
+                  operate likes, comments, replies, notifications, and downloads;
+                </li>
+
+                <li>
+                  provide Creator API access and release automation;
+                </li>
+
+                <li>
+                  investigate abuse, security incidents, and moderation reports;
+                </li>
+
+                <li>
+                  maintain and improve the reliability of the service.
+                </li>
+              </ul>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                3. Cookies and sessions
+              </h3>
+
+              <p>
+                YMIR uses a session cookie to keep signed-in users authenticated.
+                It is used for account access and site functionality rather than
+                advertising.
+              </p>
+
+              <p>
+                Your browser may also store small local preferences, such as the
+                mod sorting option you last selected.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                4. Connected services and hosting
+              </h3>
+
+              <p>
+                YMIR relies on third-party services to provide parts of the platform.
+                These currently include Cloudflare for hosting, storage and database
+                infrastructure, plus Discord and GitHub for connected sign-in.
+              </p>
+
+              <p>
+                When you use those services, their own privacy terms may also apply
+                to information they process independently of YMIR.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                5. Sharing information
+              </h3>
+
+              <p>
+                YMIR does not sell user account information to advertisers.
+              </p>
+
+              <p>
+                Information may be shared with service providers where necessary
+                to operate the site, or where disclosure is reasonably required
+                to respond to valid legal process, protect users, investigate abuse,
+                or protect the security of the service.
+              </p>
+
+              <p>
+                Information you intentionally publish — such as creator names,
+                mod pages, comments, and replies — is public by nature.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                6. Retention and deletion
+              </h3>
+
+              <p>
+                YMIR keeps account and content information for as long as it is
+                reasonably needed to operate the service, maintain version history,
+                handle moderation, or meet legal and security needs.
+              </p>
+
+              <p>
+                When an account or mod is deleted, associated records and hosted
+                files may also be removed. Some limited records may need to remain
+                for a period where they are required for security, dispute handling,
+                backups, or legal obligations.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                7. Security
+              </h3>
+
+              <p>
+                YMIR uses reasonable technical measures to protect accounts and
+                creator tools, including hashed API keys and server-side session
+                handling. No internet service can promise perfect security.
+              </p>
+
+              <p>
+                Do not post passwords, API keys, access tokens, or other secrets
+                in mod descriptions, comments, screenshots, or public repositories.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                8. Access, corrections, and deletion requests
+              </h3>
+
+              <p>
+                If information on your account is wrong, creators can update certain
+                public profile information from their dashboard. For other access,
+                correction, or deletion requests, contact the YMIR Mods team through
+                the community Discord.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                9. International users
+              </h3>
+
+              <p>
+                YMIR is available to users in different countries. The providers
+                used to run the service may process or store information in regions
+                different from where you live.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                10. Privacy policy changes
+              </h3>
+
+              <p>
+                This policy may be updated as YMIR adds new features or changes
+                service providers. Material changes will be reflected by updating
+                the date shown at the top of this page.
+              </p>
+
+            </div>
+
+
+            <div class="legal-card">
+
+              <h3>
+                11. Privacy contact
+              </h3>
+
+              <p>
+                For privacy questions or requests, contact the YMIR Mods team through
+                the
+                <a
+                  href="https://discord.gg/pzFvb97HZ3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  YMIR Community Discord
+                </a>.
+              </p>
+
+            </div>
+
+
+          </div>
+
+        </details>
+
+
+      </div>
+
+
+      <div class="notice">
+        This page is intended as a practical first draft for the current YMIR Mods
+        service. It is not a substitute for professional legal advice. If YMIR grows,
+        begins charging users, adds advertising, or materially changes how personal
+        information is handled, these terms and the privacy policy should be reviewed
+        again.
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <footer>
+
+    <div class="container footer-grid">
+
+      <p>
+        &copy;
+        <span id="year"></span>
+        YMIR Mods.
+        All rights reserved.
+      </p>
+
+
+      <div class="footer-links">
+
+        <a href="/">
+          Home
+        </a>
+
+        <a href="/#mods">
+          Mods
+        </a>
+
+        <a href="/legal">
+          Terms &amp; Privacy
+        </a>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <script>
+    document
+      .getElementById(
+        "year"
+      )
+      .textContent =
+        new Date()
+          .getFullYear();
+  </script>
+
+</body>
+</html>
