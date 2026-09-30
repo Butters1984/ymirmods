@@ -5317,6 +5317,7 @@
 
 
       link.textContent =
+        mod.author_display_name ||
         mod.author ||
         "Unknown Creator";
 
@@ -5486,6 +5487,7 @@
                 [
                   mod.name,
                   mod.author,
+                  mod.author_display_name,
                   mod.category,
                   mod.short_description,
                   mod.full_description,
