@@ -2445,8 +2445,13 @@
           "block";
 
 
+      const creatorDisplayName =
+        creator.display_name ||
+        creator.username;
+
+
       document.title =
-        creator.username +
+        creatorDisplayName +
         " | YMIR Mods";
 
 
@@ -2487,16 +2492,8 @@
 
       setText(
         "creatorName",
-        creator.username
+        creatorDisplayName
       );
-
-
-      const creatorDisplayName =
-        creator.display_name &&
-        creator.display_name !==
-          creator.username
-          ? creator.display_name
-          : creator.username;
 
 
       setText(
@@ -2533,7 +2530,7 @@
 
       setText(
         "modsHeading",
-        creator.username +
+        creatorDisplayName +
         "'s Mods"
       );
 
