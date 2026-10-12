@@ -42,5 +42,23 @@
         "period": 60
       }
     }
-  ]
+  ],
+  "previews": {
+    "vars": {
+      "SQUEE_PREVIEW": "true"
+    },
+    "ai": {
+      "binding": "AI"
+    },
+    "ratelimits": [
+      {
+        "name": "SQUEE_RATE_LIMITER",
+        "namespace_id": "1043",
+        "simple": {
+          "limit": 10,
+          "period": 60
+        }
+      }
+    ]
+  }
 }
