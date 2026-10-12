@@ -26,6 +26,30 @@
   </style><section id="panel" aria-label="Chat with Squee" hidden><header><img class="squee-head" src="/squee-avatar.png" alt=""><div><strong>Squee</strong><small>Your friendly Valheim Troll</small></div><button id="clear" aria-label="Clear conversation">↺</button><button id="close" aria-label="Close Squee">×</button></header><div id="log" role="log" aria-live="polite" aria-label="Conversation"></div><div id="suggestions"><button>Help me install mods</button><button>My mod isn't working</button></div><div id="status" role="status"></div><form><textarea rows="2" maxlength="3000" aria-label="Message Squee" placeholder="Ask Squee…" required></textarea><button id="send" type="submit">Send</button></form><footer>AI answers can be mistaken. Messages go to Cloudflare AI. Redact passwords and tokens from logs.</footer></section><button id="launch" aria-label="Ask Squee" aria-expanded="false" aria-controls="panel"><span id="avatar-wrap"><img id="avatar" src="/squee-avatar.png" alt="" width="80" height="80"></span><span id="launch-label" aria-hidden="true">Ask Squee</span></button>`;
   const $ = id => root.getElementById(id);
   const input = root.querySelector('textarea'); let history = [], busy = false;
+  let quotaHiddenUntil = 0;
+  try {quotaHiddenUntil = Number(localStorage.getItem("squee-rest-until")) || 0;} catch {}
+  function restUntil(resetAt) {
+    quotaHiddenUntil = Number(resetAt) || Date.now() + 60000;
+    try {localStorage.setItem("squee-rest-until", String(quotaHiddenUntil));} catch {}
+    host.hidden = true;
+    setTimeout(checkAvailability, Math.max(1000, quotaHiddenUntil - Date.now() + 1000));
+  }
+  async function checkAvailability() {
+    if (quotaHiddenUntil > Date.now()) {host.hidden = true;return;}
+    try {
+      const response = await fetch("/api/squee/status", {cache: "no-store"});
+      if (!response.ok) {host.hidden = true;return;}
+      const data = await response.json();
+      if (data.available === false) {restUntil(data.resetAt);return;}
+      if (data.available !== true) {host.hidden = true;return;}
+      quotaHiddenUntil = 0; host.hidden = false;
+      try {localStorage.removeItem("squee-rest-until");} catch {}
+    } catch {host.hidden = true;}
+  }
+  host.hidden = true;
+  if (quotaHiddenUntil > Date.now()) restUntil(quotaHiddenUntil);
+  else checkAvailability();
+  setInterval(checkAvailability, 60000);
   function add(content, type = '') {
     const el = document.createElement('div'); el.className = 'message ' + type;
     // Only link known local mod paths; render every other character as text.
@@ -50,7 +74,9 @@
     const controller = new AbortController(); const timer = setTimeout(() => controller.abort(),45000);
     try {
       const response = await fetch('/api/squee/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:outgoing}),signal:controller.signal});
-      const data = await response.json();if(!response.ok || typeof data.reply !== 'string') throw Error(data.error || 'Squee is unavailable. Please try again.');
+      const data = await response.json();
+      if (data.code === "SQUEE_QUOTA_EXHAUSTED" || data.code === "SQUEE_UNAVAILABLE") {restUntil(data.resetAt);return;}
+      if(!response.ok || typeof data.reply !== 'string') throw Error(data.error || 'Squee is unavailable. Please try again.');
       add(data.reply);history=[...outgoing,{role:'assistant',content:data.reply.slice(0,3000)}];
     } catch(error){add(error.name==='AbortError'?'Squee took too long. Please try again.':error.message,'error');if(!input.value)input.value=question;}
     finally{clearTimeout(timer);busy=false;$('send').disabled=false;$('clear').disabled=false;$('status').textContent='';if(!$('panel').hidden)input.focus();}
