@@ -52,6 +52,11 @@ export default {
       );
 
 
+    if (url.pathname === "/api/squee/status" && request.method === "GET") {
+      const resetAt = squeeNextReset();
+      const available = !!env.AI && !!env.SQUEE_RATE_LIMITER && await squeeQuotaAvailable(env);
+      return Response.json({available, resetAt}, {headers: {"Cache-Control": "no-store"}});
+    }
     if (url.pathname === "/api/squee/chat") return handleSqueeChat(request, env);
     // Preview APIs can only read published catalogue data; no account or upload routes.
     if (env.SQUEE_PREVIEW === "true" && url.pathname.startsWith("/api/")) {
@@ -11296,6 +11301,7 @@ async function handleSqueeChat(request, env) {
   if (!env.AI || !env.SQUEE_RATE_LIMITER) return reply({error: "Squee is getting ready. Please try again later."}, 503);
   let stage = "rate_limit";
   try {
+    if (!await squeeQuotaAvailable(env)) return reply({error: "Squee is resting until the daily allowance resets.", code: "SQUEE_UNAVAILABLE", resetAt: squeeNextReset()}, 503);
     const {success} = await env.SQUEE_RATE_LIMITER.limit({key: request.headers.get("CF-Connecting-IP") || "unknown"});
     if (!success) return reply({error: "Squee needs a breather! Please wait a minute."}, 429);
     // Bound the streamed body rather than trusting Content-Length.
@@ -11343,7 +11349,14 @@ async function handleSqueeChat(request, env) {
       : "I couldn't find a matching mod in the YMIR catalogue, Viking. Try the search on ymirmods.com or tell me more about what you need. I won't send you to another mod website.";
     return reply({reply: fallback});
   } catch (error) {
-    const code = Number.isInteger(error?.code) ? error.code : null;
+    const numericCode = Number(error?.code);
+    const code = Number.isInteger(numericCode) ? numericCode : null;
+    // The AI binding may include the internal code in its exception message.
+    const exhausted = stage === "ai" && (code === 3036 || /\b3036\b|used up your daily free allocation/i.test(String(error?.message || "")));
+    if (exhausted) {
+      await squeeMarkQuotaExhausted(env);
+      return reply({error: "Squee is resting until the free daily allowance resets.", code: "SQUEE_QUOTA_EXHAUSTED", resetAt: squeeNextReset()}, 503);
+    }
     console.error("Squee failure", {stage, code});
     return reply({error: "Squee couldn't answer just now. Please try again shortly." + (env.SQUEE_PREVIEW === "true" ? " (Step: " + stage + (code === null ? "" : ", code: " + code) + ")" : "")}, 503);
   }
@@ -11367,4 +11380,26 @@ function squeeCheckAnswer(answer, mods) {
     if (!allowedPaths.has(path.replace(/[.,!?;:]+$/, ""))) return null;
   }
   return answer;
+}
+
+function squeeNextReset() {
+  const date = new Date();
+  date.setUTCHours(24, 0, 0, 0);
+  return date.getTime();
+}
+async function squeeQuotaAvailable(env) {
+  try {
+    const row = await env.DB.prepare("SELECT reset_at FROM squee_daily_quota WHERE id = 1").first();
+    return !row || Number(row.reset_at) <= Date.now();
+  } catch (error) {
+    // Table is created only when the first quota exhaustion happens.
+    if (/no such table.*squee_daily_quota/i.test(String(error?.message || ""))) return true;
+    return false;
+  }
+}
+async function squeeMarkQuotaExhausted(env) {
+  try {
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS squee_daily_quota (id INTEGER PRIMARY KEY, reset_at INTEGER NOT NULL)").run();
+    await env.DB.prepare("INSERT INTO squee_daily_quota (id, reset_at) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET reset_at = excluded.reset_at").bind(squeeNextReset()).run();
+  } catch {console.error("Squee quota state could not be saved");}
 }
