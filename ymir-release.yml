@@ -1,0 +1,130 @@
+name: Publish release to YMIR Mods
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing stable release tag (e.g. v1.2.3)
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: ymir-publish-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.release.prerelease == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download package and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          YMIR_API_KEY: ${{ secrets.YMIR_API_KEY }}
+          YMIR_MOD_SLUG: ${{ vars.YMIR_MOD_SLUG }}
+          YMIR_ASSET_PATTERN: ${{ vars.YMIR_ASSET_PATTERN }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import fnmatch, json, os, pathlib, re, subprocess, sys, zipfile
+          def fail(message):
+              raise SystemExit(message)
+          slug = os.environ.get("YMIR_MOD_SLUG", "").strip()
+          key = os.environ.get("YMIR_API_KEY", "").strip()
+          if not re.fullmatch(r"[a-z0-9-]+", slug):
+              fail("Set repository variable YMIR_MOD_SLUG to the slug from your YMIR mod URL.")
+          if not key:
+              fail("Add repository secret YMIR_API_KEY.")
+          event = json.loads(pathlib.Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
+          tag = event.get("release", {}).get("tag_name") or os.environ.get("RELEASE_TAG", "")
+          if not tag or tag.startswith("-"):
+              fail("A published release tag is required.")
+          release = json.loads(subprocess.check_output(
+              ["gh", "release", "view", tag, "--repo", os.environ["GITHUB_REPOSITORY"],
+               "--json", "tagName,body,assets,isDraft,isPrerelease"], text=True))
+          if release["isDraft"] or release["isPrerelease"]:
+              fail("Only published stable releases are supported by this workflow.")
+          pattern = os.environ.get("YMIR_ASSET_PATTERN", "").strip() or "*.zip"
+          assets = [a for a in release["assets"] if fnmatch.fnmatchcase(a["name"], pattern)]
+          if len(assets) != 1:
+              fail("Expected exactly one matching release asset. Set YMIR_ASSET_PATTERN, e.g. MyMod-*.zip.")
+          asset = assets[0]
+          if not asset["name"].lower().endswith(".zip") or "/" in asset["name"] or "\\" in asset["name"]:
+              fail("Select a ZIP release asset with a plain filename.")
+          if asset["size"] <= 0 or asset["size"] > 95 * 1024 * 1024:
+              fail("This workflow supports packages up to 95 MiB; larger uploads may exceed the website request limit.")
+          folder = pathlib.Path("ymir-package")
+          folder.mkdir()
+          subprocess.run(["gh", "release", "download", tag, "--repo", os.environ["GITHUB_REPOSITORY"],
+                          "--pattern", asset["name"], "--dir", str(folder)], check=True)
+          package = folder / asset["name"]
+          with zipfile.ZipFile(package) as archive:
+              def member(name, limit, required=False):
+                  matches = [i for i in archive.infolist() if i.filename.lower() == name.lower()]
+                  if len(matches) > 1:
+                      fail("Duplicate ZIP member: " + name)
+                  if not matches:
+                      if required:
+                          fail("ZIP must contain " + name + " at its root.")
+                      return None
+                  if matches[0].file_size > limit:
+                      fail("ZIP member too large: " + name)
+                  return archive.read(matches[0])
+              manifest = json.loads(member("manifest.json", 65536, True).decode("utf-8-sig"))
+              version = str(manifest.get("version_number", "")).strip()
+              if not version or len(version) > 32:
+                  fail("manifest.json needs a valid version_number (maximum 32 characters).")
+              expected = tag[1:] if tag.startswith("v") else tag
+              if expected != version:
+                  fail("Release tag must match manifest version_number, optionally prefixed with v.")
+              readme = member("README.md", 400000)
+              icon = member("icon.png", 5 * 1024 * 1024)
+              fields = {"version": version, "changelog": release.get("body") or ""}
+              if len(fields["changelog"]) > 50000:
+                  fail("Release notes exceed the 50,000-character API limit.")
+              if readme is not None:
+                  description = readme.decode("utf-8-sig")
+                  if len(description) > 100000:
+                      fail("README exceeds the 100,000-character API limit.")
+                  fields["full_description"] = description
+          # Build multipart without interpolating release text into shell commands.
+          import uuid
+          boundary = "ymir-" + uuid.uuid4().hex
+          parts = []
+          for name, value in fields.items():
+              parts.append(("--" + boundary + "\r\nContent-Disposition: form-data; name=\"" +
+                            name + "\"\r\n\r\n" + value + "\r\n").encode())
+          def file_part(name, filename, mime, data):
+              return (("--" + boundary + "\r\nContent-Disposition: form-data; name=\"" + name +
+                       "\"; filename=\"" + filename + "\"\r\nContent-Type: " + mime +
+                       "\r\n\r\n").encode() + data + b"\r\n")
+          parts.append(file_part("mod_file", "package.zip", "application/zip", package.read_bytes()))
+          if icon is not None:
+              parts.append(file_part("icon_file", "icon.png", "image/png", icon))
+          parts.append(("--" + boundary + "--\r\n").encode())
+          import urllib.request, urllib.error
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, *args, **kwargs):
+                  return None
+          request = urllib.request.Request(
+              "https://ymirmods.com/api/v1/mods/" + slug + "/releases",
+              data=b"".join(parts),
+              headers={"Authorization": "Bearer " + key,
+                       "Content-Type": "multipart/form-data; boundary=" + boundary}, method="POST")
+          try:
+              with urllib.request.build_opener(NoRedirect).open(request, timeout=180) as response:
+                  result = json.load(response)
+              if not result.get("success"):
+                  fail("YMIR did not report a successful publish.")
+          except urllib.error.HTTPError as error:
+              hints = {401: "Invalid/revoked API key.", 403: "The API key must belong to the mod owner and allow updates.",
+                       404: "Create the mod on YMIR first and check YMIR_MOD_SLUG.",
+                       409: "This version already exists. Nothing was overwritten; publish a new version.",
+                       413: "Package exceeds the server upload limit."}
+              fail("YMIR HTTP " + str(error.code) + ": " + hints.get(error.code, "Check package fields and website availability."))
+          print("Published " + version + " to https://ymirmods.com/mod/" + slug)
+          
+          PY
